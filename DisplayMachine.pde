@@ -368,12 +368,20 @@ class DisplayMachine extends Machine
               p = scaleToScreen(p);
               stroke(0);
               vertex(p.x, p.y);
-              ellipse(p.x, p.y, 3, 3);
+              //ellipse(p.x, p.y, 3, 3);
             }
           }
           endShape();
         }
       }
+      // draw spot at centre
+      PVector centroid = new PVector(getVectorShape().width/2, getVectorShape().height/2);
+      centroid = PVector.mult(centroid, (vectorScaling/100));
+      centroid = PVector.add(centroid, getVectorPosition());
+      centroid = scaleToScreen(centroid);
+      fill(255,0,0,128);
+      ellipse(centroid.x, centroid.y, 20,20);
+      noFill();
     }
   }
 

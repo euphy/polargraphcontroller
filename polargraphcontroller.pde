@@ -46,8 +46,8 @@ import controlP5.*;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 2;
-int buildNo = 5;
+int minorVersionNo = 3;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -794,8 +794,13 @@ void drawMoveImageOutline()
   {
     RPoint[][] pointPaths = getVectorShape().getPointsInPaths();
     RG.ignoreStyles();
-    stroke(1);
+    stroke(100);
     strokeWeight(1);
+
+    // offset mouse vector so it grabs the centre of the shape
+    PVector centroid = new PVector(getVectorShape().width/2, getVectorShape().height/2);
+    centroid = PVector.mult(centroid, (vectorScaling/100));
+    PVector offsetMouseVector = PVector.sub(getDisplayMachine().scaleToDisplayMachine(getMouseVector()), centroid);
     if (pointPaths != null)
     {
       for (int i = 0; i<pointPaths.length; i++)
@@ -807,9 +812,8 @@ void drawMoveImageOutline()
           {
             PVector p = new PVector(pointPaths[i][j].x, pointPaths[i][j].y);
             p = PVector.mult(p, (vectorScaling/100));
-            p = PVector.add(p, getDisplayMachine().scaleToDisplayMachine(getMouseVector()));
+            p = PVector.add(p, offsetMouseVector);
             p = getDisplayMachine().scaleToScreen(p);
-            stroke(0);
             vertex(p.x, p.y);
           }
           endShape();
@@ -1421,8 +1425,11 @@ void mouseClicked()
     }
     else if (currentMode.equals(MODE_MOVE_VECTOR))
     {
-      PVector mVect = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
-      vectorPosition = mVect;
+      // offset mouse vector so it grabs the centre of the shape
+      PVector centroid = new PVector(getVectorShape().width/2, getVectorShape().height/2);
+      centroid = PVector.mult(centroid, (vectorScaling/100));
+      PVector offsetMouseVector = PVector.sub(getDisplayMachine().scaleToDisplayMachine(getMouseVector()), centroid);
+      vectorPosition = offsetMouseVector;
     }
     else if (mouseOverQueue())
     {
@@ -1564,8 +1571,9 @@ void setChromaKey(PVector p)
 
 boolean isPreviewable(String command)
 {
-  if ((command.startsWith(CMD_CHANGELENGTHDIRECT) 
-    || command.startsWith(CMD_CHANGELENGTH)))
+  if (command.startsWith(CMD_CHANGELENGTHDIRECT) 
+    || command.startsWith(CMD_CHANGELENGTH)
+    || command.startsWith(CMD_DRAWPIXEL))
   {
     return true;
   }
@@ -1583,31 +1591,13 @@ void previewQueue()
 {
   PVector startPoint = null;
   
-//  if (!commandHistory.isEmpty())
-//  {
-//    Integer commandPosition = commandHistory.size()-1;
-//    String lastCommand = "";
-//    while (commandPosition>=0)
-//    {
-//      lastCommand = commandHistory.get(commandPosition);
-//      if (isPreviewable(lastCommand))
-//      {
-//        String[] splitted = split(lastCommand, ",");
-//        fullList.add(splitted);
-////        fullList.add(lastCommand);
-//        break;
-//      }
-//      commandPosition--;
-//    }
-//  }
-
   if (commandQueue.hashCode() != lastCommandQueueHash)
   {
     println("regenerating preview queue.");
     previewCommandList.clear();
     for (String command : commandQueue)
     {
-      if ((command.startsWith(CMD_CHANGELENGTHDIRECT) || command.startsWith(CMD_CHANGELENGTH)))
+      if (command.startsWith(CMD_CHANGELENGTHDIRECT) || command.startsWith(CMD_CHANGELENGTH) || command.startsWith(CMD_DRAWPIXEL))
       {
         String[] splitted = split(command, ",");
 
@@ -1623,14 +1613,17 @@ void previewQueue()
         
         pv.x = endPoint.x;
         pv.y = endPoint.y;
+        pv.z = -1.0;
+        
+        if (command.startsWith(CMD_DRAWPIXEL))
+        {
+          String densStr = splitted[4];
+          pv.z = Integer.parseInt(densStr);
+        }
         
         previewCommandList.add(pv);
       }
     }
-
-
-
-    
     lastCommandQueueHash = commandQueue.hashCode();
   }
   
@@ -1654,6 +1647,15 @@ void previewQueue()
       stroke(200,0,0);
     line(startPoint.x, startPoint.y, p.x, p.y);
     startPoint = p;
+
+    if (pv.z >= 0.0)
+    {
+      noStroke();
+      fill(255,pv.z,pv.z);
+      ellipse(p.x, p.y, 5,5);
+      noFill();
+    }
+
   }
 
   if (startPoint != null)
@@ -1663,6 +1665,7 @@ void previewQueue()
     ellipse(startPoint.x, startPoint.y, 15,15);
     noFill();
   }
+  
 }
 
 boolean isHiddenPixel(PVector p)

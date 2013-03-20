@@ -423,9 +423,9 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       }
       else if (MODE_RESIZE_VECTOR.equals(key))
       {
-        n.setDecimalPrecision(0);
+        n.setDecimalPrecision(1);
         n.setValue(vectorScaling);
-        n.setMin(1);
+        n.setMin(0.1);
         n.setMax(1000);
         n.setMultiplier(0.5);
       }      

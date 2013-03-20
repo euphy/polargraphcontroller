@@ -638,9 +638,12 @@ void sendOutlineOfBox()
 
 void sendVectorShapes()
 {
+  println("Send vector shapes.");
   RPoint[][] pointPaths = getVectorShape().getPointsInPaths();      
   
   String command = "";
+  PVector lastPoint = new PVector();
+  boolean liftToGetToNewPoint = true;
   
   // go through and get each path
   for (int i = 0; i<pointPaths.length; i++)
@@ -648,7 +651,6 @@ void sendVectorShapes()
     if (pointPaths[i] != null) 
     {
       boolean firstPointFound = false;
-      PVector lastPoint = null;
       
       List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength);
       //println(filteredPoints);
@@ -656,12 +658,26 @@ void sendVectorShapes()
       {
         // draw the first one with a pen up and down to get to it
         PVector p = filteredPoints.get(0);
-        // pen UP!
-        addToCommandQueue(CMD_PENUP+"END");
+        if (
+          p.x == lastPoint.x
+          && p.y == lastPoint.y
+//          p.x <= lastPoint.x+2 
+//          && p.x >= lastPoint.x-2 
+//          && p.y <= lastPoint.y+2 
+//          && p.y >= lastPoint.y-2
+          )
+          liftToGetToNewPoint = false;
+        else
+          liftToGetToNewPoint = true;
+
+        // pen UP! (IF THE NEW POINT IS DIFFERENT FROM THE LAST ONE!)
+        if (liftToGetToNewPoint)
+          addToCommandQueue(CMD_PENUP+"END");
         // move to this point and put the pen down
         command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
         addToCommandQueue(command);
-        addToCommandQueue(CMD_PENDOWN+"END");
+        if (liftToGetToNewPoint)
+          addToCommandQueue(CMD_PENDOWN+"END");
 
         // then just iterate through the rest
         for (int j=1; j<filteredPoints.size(); j++)
@@ -670,7 +686,10 @@ void sendVectorShapes()
           command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
           addToCommandQueue(command);          
         }
+        lastPoint = new PVector(p.x,p.y);
+
       }
+      
     }
   }
   println("finished.");

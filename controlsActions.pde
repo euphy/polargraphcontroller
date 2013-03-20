@@ -173,8 +173,9 @@ void button_mode_renderCirclePixel()
 void button_mode_renderVectors()
 {
   // turn off vector view and turn queue preview on
-  minitoggle_mode_showVector(false);
+  //minitoggle_mode_showVector(false);
   minitoggle_mode_showQueuePreview(true);
+  println("here");
   sendVectorShapes();
 }
 
@@ -388,7 +389,27 @@ void numberbox_mode_resizeImage(float value)
 
 void numberbox_mode_resizeVector(float value)
 {
+  // get current size of vector in local coordinates
+  PVector oldVectorSize = new PVector(getVectorShape().width, getVectorShape().height);
+  oldVectorSize = PVector.mult(oldVectorSize, (vectorScaling/100));
+  // and current centre point of vector
+  PVector oldCentroid = new PVector(oldVectorSize.x / 2.0, oldVectorSize.y / 2.0);
+  
+  // get newly scaled size of vector
+  PVector newVectorSize = new PVector(getVectorShape().width, getVectorShape().height);
+  newVectorSize = PVector.mult(newVectorSize, (value/100));
+  // and new centre point of vector
+  PVector newCentroid = new PVector(newVectorSize.x / 2.0, newVectorSize.y / 2.0);
+  
+  // difference is current centre minus new centre
+  PVector difference = PVector.sub(oldCentroid, newCentroid);
+  
+  // add difference onto vector position
+  PVector newVectorPosition = PVector.add(vectorPosition, difference);
+  vectorPosition = newVectorPosition;
+  
   vectorScaling = value;
+  
 }
 void toggle_mode_moveVector(boolean flag)
 {

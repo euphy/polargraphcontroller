@@ -69,6 +69,7 @@ static final String CMD_SWIRLING = "C41,";
 static final String CMD_DRAW_RANDOM_SPRITE = "C42,";
 static final String CMD_DRAW_NORWEGIAN = "C43,";
 static final String CMD_DRAW_NORWEGIAN_OUTLINE = "C44,";
+static final String CMD_SETPENLIFTRANGE = "C45,";
 
 private PVector mouseVector = new PVector(0,0);
 

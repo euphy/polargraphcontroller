@@ -120,6 +120,8 @@ void sendMachineSpec()
   addToCommandQueue(command);
   command = CMD_SETMACHINESTEPMULTIPLIER+machineStepMultiplier+",END";
   addToCommandQueue(command);
+  command = CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END";
+  addToCommandQueue(command);
 }
 
 public PVector getMouseVector()

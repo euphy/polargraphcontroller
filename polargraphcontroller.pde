@@ -114,6 +114,8 @@ float gridSize = 75.0;
 float currentPenWidth = 0.8;
 float penIncrement = 0.05;
 
+int penLiftDownPosition = 90;
+int penLiftUpPosition = 180;
 // this variable controls how big the pixels are scaled when drawn.
 // 1.0 represents full size, 2.0 would be twice as big as the grid size,
 // 0.5 would be half the grid size.
@@ -281,6 +283,9 @@ static final String MODE_CHOOSE_CHROMA_KEY_COLOUR = "toggle_mode_chooseChromaKey
 static final String MODE_CHANGE_PIXEL_SCALING = "numberbox_mode_changePixelScaling";
 static final String MODE_PEN_LIFT_UP = "button_mode_penUp";
 static final String MODE_PEN_LIFT_DOWN = "button_mode_penDown";
+static final String MODE_PEN_LIFT_POS_UP = "numberbox_mode_penUpPos";
+static final String MODE_PEN_LIFT_POS_DOWN = "numberbox_mode_penDownPos";
+static final String MODE_SEND_PEN_LIFT_RANGE = "button_mode_sendPenliftRange";
 
 static final String MODE_SEND_ROVE_AREA = "button_mode_sendRoveArea";
 static final String MODE_SEND_START_TEXT = "toggle_mode_sendStartText";

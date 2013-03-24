@@ -89,12 +89,25 @@ void unsetOtherToggles(String except)
 }
 void button_mode_penUp()
 {
-  addToCommandQueue(CMD_PENUP + "END");
+  addToCommandQueue(CMD_PENUP + penLiftUpPosition +",END");
 }
 void button_mode_penDown()
 {
-  addToCommandQueue(CMD_PENDOWN + "END");
+  addToCommandQueue(CMD_PENDOWN + penLiftDownPosition +",END");
 }
+void numberbox_mode_penUpPos(int value)
+{
+  penLiftUpPosition =  value;
+}
+void numberbox_mode_penDownPos(int value)
+{
+  penLiftDownPosition =  value;
+}
+void button_mode_sendPenliftRange()
+{
+  addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END");
+}  
+
 void toggle_mode_inputBoxTopLeft(boolean flag)
 {
   if (flag)

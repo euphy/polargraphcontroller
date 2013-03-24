@@ -430,6 +430,10 @@ class Machine
     PVector framePos = new PVector(getIntProperty("controller.pictureframe.position.x", 200), getIntProperty("controller.pictureframe.position.y", 200));
     Rectangle frame = new Rectangle(inSteps(framePos), inSteps(frameSize));
     setPictureFrame(frame);
+    
+    // penlift positions
+    penLiftDownPosition = getIntProperty("machine.penlift.down", 90);
+    penLiftUpPosition = getIntProperty("machine.penlift.up", 180);
   }
   
   
@@ -502,6 +506,9 @@ class Machine
     // picture frame position
     props.setProperty("controller.pictureframe.position.x", Integer.toString((int) inMM(framePosX)));
     props.setProperty("controller.pictureframe.position.y", Integer.toString((int) inMM(framePosY)));
+    
+    props.setProperty("machine.penlift.down", Integer.toString((int) penLiftDownPosition));
+    props.setProperty("machine.penlift.up", Integer.toString((int) penLiftUpPosition));
 
 //    println("framesize: " + inMM(frameSizeX));
     

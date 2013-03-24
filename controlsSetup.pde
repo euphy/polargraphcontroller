@@ -441,6 +441,22 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       {
         n.setValue(minimumVectorLineLength);
         n.setMin(0);
+        n.setMultiplier(1);
+      }
+      else if (MODE_PEN_LIFT_POS_UP.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(penLiftUpPosition);
+        n.setMin(0);
+        n.setMax(360);
+        n.setMultiplier(1);
+      }
+      else if (MODE_PEN_LIFT_POS_DOWN.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(penLiftDownPosition);
+        n.setMin(0);
+        n.setMax(360);
         n.setMultiplier(0.1);
       }
     }
@@ -673,6 +689,10 @@ List<String> getControlNamesForDetailPanel()
   controlNames.add(MODE_CHANGE_PEN_TEST_INCREMENT_SIZE);
   controlNames.add(MODE_DRAW_TEST_PENWIDTH);
 
+  controlNames.add(MODE_PEN_LIFT_POS_UP);
+  controlNames.add(MODE_PEN_LIFT_POS_DOWN);
+  controlNames.add(MODE_SEND_PEN_LIFT_RANGE);
+
   controlNames.add(MODE_CHANGE_MACHINE_MAX_SPEED);
   controlNames.add(MODE_CHANGE_MACHINE_ACCELERATION);
   controlNames.add(MODE_SEND_MACHINE_SPEED);
@@ -818,6 +838,9 @@ Map<String, String> buildControlLabels()
   
   result.put(MODE_PEN_LIFT_UP, "Pen lift");
   result.put(MODE_PEN_LIFT_DOWN, "Pen drop");
+  result.put(MODE_PEN_LIFT_POS_UP, "Pen up position");
+  result.put(MODE_PEN_LIFT_POS_DOWN, "Pen down position");
+  result.put(MODE_SEND_PEN_LIFT_RANGE, "Send lift range");
   
   result.put(MODE_SEND_ROVE_AREA, "Send Roving Area");
   result.put(MODE_SEND_START_TEXT, "Start text at point");
@@ -940,6 +963,9 @@ Set<String> buildControlNames()
   result.add(MODE_CHANGE_PIXEL_SCALING);
   result.add(MODE_PEN_LIFT_UP);
   result.add(MODE_PEN_LIFT_DOWN);
+  result.add(MODE_PEN_LIFT_POS_UP);
+  result.add(MODE_PEN_LIFT_POS_DOWN);
+  result.add(MODE_SEND_PEN_LIFT_RANGE);
   
   result.add(MODE_SEND_ROVE_AREA);
   result.add(MODE_SEND_START_TEXT);

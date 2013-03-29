@@ -346,11 +346,99 @@ class DisplayMachine extends Machine
     }
   }
   
+  public void drawForWebcam()
+  {
+    // work out the scaling factor.
+    noStroke();
+    // draw machine outline
+
+//    fill(80);
+//    rect(getOutline().getLeft()+DROP_SHADOW_DISTANCE, getOutline().getTop()+DROP_SHADOW_DISTANCE, getOutline().getWidth(), getOutline().getHeight());
+
+    fill(getMachineColour());
+    rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
+
+
+
+//    if (displayingGuides)
+//    {
+//      // draw some guides
+//      stroke(getGuideColour());
+//      strokeWeight(1);
+//      // centre line
+//      line(getOutline().getLeft()+(getOutline().getWidth()/2), getOutline().getTop(), 
+//      getOutline().getLeft()+(getOutline().getWidth()/2), getOutline().getBottom());
+//
+//      // page top line
+//      line(getOutline().getLeft(), getOutline().getTop()+sc(getHomePoint().y), 
+//      getOutline().getRight(), getOutline().getTop()+sc(getHomePoint().y));
+//    }
+
+    // draw page
+    fill(getPageColour());
+    rect(getOutline().getLeft()+sc(getPage().getLeft()), 
+    getOutline().getTop()+sc(getPage().getTop()), 
+    sc(getPage().getWidth()), 
+    sc(getPage().getHeight()));
+    text("page " + getDimensionsAsText(getPage()), getOutline().getLeft()+sc(getPage().getLeft()), 
+    getOutline().getTop()+sc(getPage().getTop())-3);
+    noFill();
+
+
+
+    stroke(getBackgroundColour(),150);
+    strokeWeight(3);
+    noFill();
+    rect(getOutline().getLeft()-2, getOutline().getTop()-2, getOutline().getWidth()+3, getOutline().getHeight()+3);
+
+    stroke(getMachineColour(),150);
+    strokeWeight(3);
+    noFill();
+    rect(getOutline().getLeft()+sc(getPage().getLeft())-2, 
+    getOutline().getTop()+sc(getPage().getTop())-2, 
+    sc(getPage().getWidth())+4, 
+    sc(getPage().getHeight())+4);
+
+    if (displayingGuides)
+    {
+      drawPictureFrame();
+    }
+    
+    if (drawingLiveVideo)
+    {
+      drawLiveVideo();
+    }
+
+    if (displayingVector && getVectorShape() != null)
+    {
+      stroke(100);
+      displayVectorImage(color(200));
+    }
+
+    if (displayingGuides 
+      && getOutline().surrounds(getMouseVector())
+      && currentMode != MODE_MOVE_IMAGE
+      && mouseOverControls().isEmpty()
+      )
+    {
+      cursor(CROSS);
+    }
+    else
+    {
+      cursor(ARROW);
+    }
+  }  
+  
   public void displayVectorImage()
+  {
+    displayVectorImage(color(0,0,0));
+  }
+  
+  public void displayVectorImage(int strokeColour)
   {
     RPoint[][] pointPaths = getVectorShape().getPointsInPaths();
     RG.ignoreStyles();
-    stroke(1);
+    strokeWeight(1);
     if (pointPaths != null)
     {
       for(int i = 0; i<pointPaths.length; i++)
@@ -366,7 +454,7 @@ class DisplayMachine extends Machine
             if (getPage().surrounds(inSteps(p)))
             {
               p = scaleToScreen(p);
-              stroke(0);
+              stroke(strokeColour);
               vertex(p.x, p.y);
               //ellipse(p.x, p.y, 3, 3);
             }

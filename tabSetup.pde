@@ -49,6 +49,10 @@ Map<String, Set<Panel>> buildPanelsForTabs()
   rovingPanels.add(getPanel(PANEL_NAME_ROVING));
   rovingPanels.add(getPanel(PANEL_NAME_GENERAL));
 
+  Set<Panel> webcamPanels = new HashSet<Panel>(2);
+  webcamPanels.add(getPanel(PANEL_NAME_WEBCAM));
+  webcamPanels.add(getPanel(PANEL_NAME_WEBCAM));
+
   Set<Panel> detailsPanels = new HashSet<Panel>(2);
   detailsPanels.add(getPanel(PANEL_NAME_DETAILS));
   detailsPanels.add(getPanel(PANEL_NAME_GENERAL));
@@ -59,6 +63,7 @@ Map<String, Set<Panel>> buildPanelsForTabs()
   
   map.put(TAB_NAME_INPUT, inputPanels);
   map.put(TAB_NAME_ROVING, rovingPanels);
+  map.put(TAB_NAME_WEBCAM, webcamPanels);
   map.put(TAB_NAME_DETAILS, detailsPanels);
   map.put(TAB_NAME_QUEUE, queuePanels);
   
@@ -70,6 +75,7 @@ List<String> buildTabNames()
   List<String> list = new ArrayList<String>(4);
   list.add(TAB_NAME_INPUT);
   list.add(TAB_NAME_ROVING);
+  list.add(TAB_NAME_WEBCAM);
   list.add(TAB_NAME_DETAILS);
   list.add(TAB_NAME_QUEUE);
   return list;
@@ -89,9 +95,13 @@ void initTabs()
   cp5.tab(TAB_NAME_ROVING).activateEvent(true);
   cp5.tab(TAB_NAME_ROVING).setId(3);
 
+  cp5.tab(TAB_NAME_WEBCAM).setLabel(TAB_LABEL_WEBCAM);
+  cp5.tab(TAB_NAME_WEBCAM).activateEvent(true);
+  cp5.tab(TAB_NAME_WEBCAM).setId(4);
+
   cp5.tab(TAB_NAME_QUEUE).setLabel(TAB_LABEL_QUEUE);
   cp5.tab(TAB_NAME_QUEUE).activateEvent(true);
-  cp5.tab(TAB_NAME_QUEUE).setId(4);
+  cp5.tab(TAB_NAME_QUEUE).setId(5);
 }
 
 public Set<String> buildPanelNames()
@@ -99,6 +109,7 @@ public Set<String> buildPanelNames()
   Set<String> set = new HashSet<String>(5);
   set.add(PANEL_NAME_INPUT);
   set.add(PANEL_NAME_ROVING);
+  set.add(PANEL_NAME_WEBCAM);
   set.add(PANEL_NAME_DETAILS);
   set.add(PANEL_NAME_QUEUE);
   set.add(PANEL_NAME_GENERAL);

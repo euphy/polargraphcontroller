@@ -1,3 +1,8 @@
+import JMyron.*;
+import diewald_CV_kit.libraryinfo.*;
+import diewald_CV_kit.utility.*;
+import diewald_CV_kit.blobdetection.*;
+
 import geomerative.*;
 import org.apache.batik.svggen.font.table.*;
 import org.apache.batik.svggen.font.*;
@@ -383,6 +388,8 @@ public static final String TAB_NAME_DETAILS = "tab_details";
 public static final String TAB_LABEL_DETAILS = "Setup";
 public static final String TAB_NAME_QUEUE = "tab_queue";
 public static final String TAB_LABEL_QUEUE = "Queue";
+public static final String TAB_NAME_WEBCAM = "tab_webcam";
+public static final String TAB_LABEL_WEBCAM = "Camera";
 
 // Page states
 public String currentTab = TAB_NAME_INPUT;
@@ -392,6 +399,7 @@ public static final String PANEL_NAME_INPUT = "panel_input";
 public static final String PANEL_NAME_ROVING = "panel_roving";
 public static final String PANEL_NAME_DETAILS = "panel_details";
 public static final String PANEL_NAME_QUEUE = "panel_queue";
+public static final String PANEL_NAME_WEBCAM = "panel_webcam";
 
 public static final String PANEL_NAME_GENERAL = "panel_general";
 
@@ -565,6 +573,10 @@ void draw()
   {
     drawRovingPage();
   }
+  else if (getCurrentTab() == TAB_NAME_WEBCAM)
+  {
+    drawWebcamPage();
+  }
   else
   {
     drawDetailsPage();
@@ -725,6 +737,34 @@ void drawRovingPage()
   stroke(255, 0, 0);
  
   for (Panel panel : getPanelsForTab(TAB_NAME_ROVING))
+  {
+    panel.draw();
+  }
+  text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
+
+//  showCurrentMachinePosition();
+  showGroupBox();
+  showCurrentMachinePosition();
+  if (displayingInfoTextOnInputPage)
+    showText(250,45);
+  drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
+
+  showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
+}
+
+void drawWebcamPage()
+{
+  strokeWeight(1);
+  background(100);
+  noFill();
+  stroke(255, 150, 255, 100);
+  strokeWeight(3);
+  stroke(150);
+  noFill();
+  getDisplayMachine().drawForWebcam();
+  stroke(255, 0, 0);
+ 
+  for (Panel panel : getPanelsForTab(TAB_NAME_WEBCAM))
   {
     panel.draw();
   }

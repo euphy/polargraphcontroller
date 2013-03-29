@@ -130,6 +130,16 @@ Map<String, Panel> buildPanels()
   rovingPanel.setControlSizes(buildControlSizesForPanel(rovingPanel));
   panels.put(PANEL_NAME_ROVING, rovingPanel);
 
+  Panel webcamPanel = new Panel(PANEL_NAME_WEBCAM, panelOutline);
+  webcamPanel.setOutlineColour(color(200,200,200));
+  // get controls
+  webcamPanel.setResizable(true);
+  webcamPanel.setControls(getControlsForPanels().get(PANEL_NAME_WEBCAM));
+  // get control positions
+  rovingPanel.setControlPositions(buildControlPositionsForPanel(webcamPanel));
+  rovingPanel.setControlSizes(buildControlSizesForPanel(webcamPanel));
+  panels.put(PANEL_NAME_WEBCAM, webcamPanel);
+
   Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutline);
   detailsPanel.setOutlineColour(color(200, 200, 200));
   // get controls

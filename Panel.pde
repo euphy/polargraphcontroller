@@ -131,10 +131,13 @@ class Panel
   {
     for (Controller c : this.getControls())
     {
+      println("Control: " + c.name());
       PVector pos = getControlPositions().get(c.name());
       float x = pos.x+getOutline().getLeft();
       float y = pos.y+getOutline().getTop();
       c.setPosition(x, y);
+      
+      println("controlsizes: " + getControlSizes());
 
       PVector cSize = getControlSizes().get(c.name());
       c.setSize((int)cSize.x, (int)cSize.y);

@@ -469,6 +469,30 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setMax(360);
         n.setMultiplier(0.1);
       }
+      else if (MODE_LIVE_BLUR_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(blurValue);
+        n.setMin(1);
+        n.setMax(100);
+        n.setMultiplier(0.1);
+      }
+      else if (MODE_LIVE_SIMPLIFICATION_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(liveSimplification);
+        n.setMin(0);
+        n.setMax(360);
+        n.setMultiplier(0.1);
+      }
+      else if (MODE_LIVE_POSTERISE_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(posterizeValue);
+        n.setMin(2);
+        n.setMax(32);
+        n.setMultiplier(0.1);
+      }
     }
   }
   return map;
@@ -586,6 +610,7 @@ Map<String, List<Controller>> buildControlsForPanels()
   map.put(PANEL_NAME_DETAILS, getControllersForControllerNames(getControlNamesForDetailPanel()));
   map.put(PANEL_NAME_QUEUE, getControllersForControllerNames(getControlNamesForQueuePanel()));
   map.put(PANEL_NAME_GENERAL, getControllersForControllerNames(getControlNamesForGeneralPanel()));
+  map.put(PANEL_NAME_WEBCAM, getControllersForControllerNames(getControlNamesForWebcamPanel()));
   return map;
 }
 
@@ -666,6 +691,16 @@ List<String> getControlNamesForRovingPanel()
 //  controlNames.add(MODE_STOP_RANDOM_SPRITES);
   controlNames.add(MODE_DRAW_NORWEGIAN_DIALOG);
   
+  return controlNames;
+}
+
+List<String> getControlNamesForWebcamPanel()
+{
+  List<String> controlNames = new ArrayList<String>();
+  controlNames.add(MODE_LIVE_BLUR_VALUE);
+  controlNames.add(MODE_LIVE_SIMPLIFICATION_VALUE);
+  controlNames.add(MODE_LIVE_POSTERISE_VALUE);
+  controlNames.add(MODE_LIVE_CAPTURE_FROM_LIVE);
   return controlNames;
 }
 
@@ -862,6 +897,12 @@ Map<String, String> buildControlLabels()
   result.put(MODE_START_RANDOM_SPRITES, "Random sprites");
   result.put(MODE_STOP_RANDOM_SPRITES, "Stop sprites");
   result.put(MODE_DRAW_NORWEGIAN_DIALOG, "Draw norwegian...");
+  
+  result.put(MODE_LIVE_BLUR_VALUE, "Blur");
+  result.put(MODE_LIVE_SIMPLIFICATION_VALUE, "Simplify");
+  result.put(MODE_LIVE_POSTERISE_VALUE, "Posterise");
+  result.put(MODE_LIVE_CAPTURE_FROM_LIVE, "Capture");
+  
 
   return result;
 }
@@ -986,6 +1027,11 @@ Set<String> buildControlNames()
   result.add(MODE_START_RANDOM_SPRITES);
   result.add(MODE_STOP_RANDOM_SPRITES);
   result.add(MODE_DRAW_NORWEGIAN_DIALOG);
+  
+  result.add(MODE_LIVE_BLUR_VALUE);
+  result.add(MODE_LIVE_SIMPLIFICATION_VALUE);
+  result.add(MODE_LIVE_POSTERISE_VALUE);
+  result.add(MODE_LIVE_CAPTURE_FROM_LIVE);
   
   return result;
 }

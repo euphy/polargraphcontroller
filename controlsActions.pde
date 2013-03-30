@@ -108,6 +108,24 @@ void button_mode_sendPenliftRange()
   addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END");
 }  
 
+void numberbox_mode_liveBlurValue(int value)
+{
+  blurValue =  value;
+}
+void numberbox_mode_liveSimplificationValue(int value)
+{
+  liveSimplification =  value;
+}
+void numberbox_mode_livePosteriseValue(int value)
+{
+  posterizeValue =  value;
+}
+void button_mode_liveCaptureFromLive()
+{
+  addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END");
+}  
+
+
 void toggle_mode_inputBoxTopLeft(boolean flag)
 {
   if (flag)

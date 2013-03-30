@@ -352,27 +352,8 @@ class DisplayMachine extends Machine
     noStroke();
     // draw machine outline
 
-//    fill(80);
-//    rect(getOutline().getLeft()+DROP_SHADOW_DISTANCE, getOutline().getTop()+DROP_SHADOW_DISTANCE, getOutline().getWidth(), getOutline().getHeight());
-
     fill(getMachineColour());
     rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
-
-
-
-//    if (displayingGuides)
-//    {
-//      // draw some guides
-//      stroke(getGuideColour());
-//      strokeWeight(1);
-//      // centre line
-//      line(getOutline().getLeft()+(getOutline().getWidth()/2), getOutline().getTop(), 
-//      getOutline().getLeft()+(getOutline().getWidth()/2), getOutline().getBottom());
-//
-//      // page top line
-//      line(getOutline().getLeft(), getOutline().getTop()+sc(getHomePoint().y), 
-//      getOutline().getRight(), getOutline().getTop()+sc(getHomePoint().y));
-//    }
 
     // draw page
     fill(getPageColour());
@@ -380,11 +361,7 @@ class DisplayMachine extends Machine
     getOutline().getTop()+sc(getPage().getTop()), 
     sc(getPage().getWidth()), 
     sc(getPage().getHeight()));
-    text("page " + getDimensionsAsText(getPage()), getOutline().getLeft()+sc(getPage().getLeft()), 
-    getOutline().getTop()+sc(getPage().getTop())-3);
     noFill();
-
-
 
     stroke(getBackgroundColour(),150);
     strokeWeight(3);
@@ -406,12 +383,11 @@ class DisplayMachine extends Machine
     
     if (drawingLiveVideo)
     {
-      drawLiveVideo();
+      displayLiveVideo();
     }
 
     if (displayingVector && getVectorShape() != null)
     {
-      stroke(100);
       displayVectorImage(color(200));
     }
 
@@ -427,7 +403,41 @@ class DisplayMachine extends Machine
     {
       cursor(ARROW);
     }
-  }  
+  }
+  
+  public void displayLiveVideo()
+  {
+    buildLiveImage();
+    // draw actual image
+    if (liveImage != null)
+    {
+      float ox = getOutline().getLeft()+sc(getImageFrame().getLeft());
+      float oy = getOutline().getTop()+sc(getImageFrame().getTop());
+      float w = sc(getImageFrame().getWidth());
+      float h = sc(getImageFrame().getHeight());
+      tint(255, getImageTransparency());
+      translate(ox, oy);
+      rotate(radians(270));
+      image(liveImage, 0, 0, w, h);
+      rotate(radians(-270));
+      translate(-ox,-oy);
+      noTint();
+      noFill();
+    }
+  }
+  
+  public void buildLiveImage()
+  {
+    liveCamera.update();
+    liveImage = createImage(640,480, RGB);
+    liveImage.loadPixels();
+    // rotate it
+    liveImage.pixels = liveCamera.image();
+    liveImage.filter(BLUR, blurValue);
+    liveImage.filter(GRAY);
+    liveImage.filter(POSTERIZE, posterizeValue);
+    liveImage.updatePixels();
+  }
   
   public void displayVectorImage()
   {

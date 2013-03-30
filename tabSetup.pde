@@ -72,7 +72,7 @@ Map<String, Set<Panel>> buildPanelsForTabs()
 
 List<String> buildTabNames()
 {
-  List<String> list = new ArrayList<String>(4);
+  List<String> list = new ArrayList<String>(5);
   list.add(TAB_NAME_INPUT);
   list.add(TAB_NAME_ROVING);
   list.add(TAB_NAME_WEBCAM);
@@ -106,7 +106,7 @@ void initTabs()
 
 public Set<String> buildPanelNames()
 {
-  Set<String> set = new HashSet<String>(5);
+  Set<String> set = new HashSet<String>(6);
   set.add(PANEL_NAME_INPUT);
   set.add(PANEL_NAME_ROVING);
   set.add(PANEL_NAME_WEBCAM);

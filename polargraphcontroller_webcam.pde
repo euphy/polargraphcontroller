@@ -306,6 +306,12 @@ static final String MODE_START_RANDOM_SPRITES = "button_mode_startRandomSprite";
 static final String MODE_STOP_RANDOM_SPRITES = "button_mode_stopRandomSprites";
 static final String MODE_DRAW_NORWEGIAN_DIALOG = "button_mode_drawNorwegianDialog";
 
+static final String MODE_LIVE_BLUR_VALUE = "numberbox_mode_liveBlurValue";
+static final String MODE_LIVE_SIMPLIFICATION_VALUE = "numberbox_mode_liveSimplificationValue";
+static final String MODE_LIVE_POSTERISE_VALUE = "numberbox_mode_livePosteriseValue";
+static final String MODE_LIVE_CAPTURE_FROM_LIVE = "button_mode_liveCaptureFromLive";
+
+
 PVector statusTextPosition = new PVector(240.0, 12.0);
 
 static String currentMode = MODE_BEGIN;
@@ -442,6 +448,18 @@ boolean overwriteExistingStoreFile = true;
 public static Console console;
 public boolean useWindowedConsole = false;
 
+static boolean drawingLiveVideo = true;
+
+static PImage liveImage = null;
+JMyron liveCamera;
+BlobDetector blob_detector;
+int liveSimplification = 0;
+int blurValue = 1;
+int posterizeValue = 6;
+Set<Integer> colours = null;
+List<Integer> colourList = null;
+
+
 void setup()
 {
   println("Running polargraph controller");
@@ -510,6 +528,17 @@ void setup()
   changeTab(TAB_NAME_INPUT, TAB_NAME_INPUT);
 
   addEventListeners();
+
+  liveCamera = new JMyron();
+  liveCamera.start(640,480);
+
+  blob_detector = new BlobDetector( 640, 480);
+  blob_detector.setResolution(1);
+  blob_detector.computeContours(true);
+  blob_detector.computeBlobPixels(true);
+  blob_detector.setMinMaxPixels(10*10, 640*480);
+  
+  blob_detector.setBLOBable(new BLOBable_blueBlobs(liveImage));
   
 }
 void addEventListeners()
@@ -766,6 +795,7 @@ void drawWebcamPage()
  
   for (Panel panel : getPanelsForTab(TAB_NAME_WEBCAM))
   {
+    println("Panel:" + panel);
     panel.draw();
   }
   text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);

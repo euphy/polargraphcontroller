@@ -1,0 +1,140 @@
+public PImage webcam_buildLiveImage()
+{
+  liveCamera.update();
+  PImage pimg = createImage(640,480, RGB);
+  pimg.loadPixels();
+  pimg.pixels = liveCamera.image();
+  pimg.updatePixels();
+  return pimg;
+}
+
+public PImage webcam_processImageForTrace(PImage in)
+{
+  PImage out = createImage(in.width, in.height, RGB);
+  out.loadPixels();
+  for (int i = 0; i<in.pixels.length; i++) {
+    out.pixels[i] = in.pixels[i];
+  }
+  out.filter(BLUR, blurValue);
+  out.filter(GRAY);
+  out.filter(POSTERIZE, posterizeValue);
+  out.updatePixels();
+  return out;
+}
+
+public RShape webcam_traceImage(Map<Integer, PImage> seps)
+{
+  RShape allShapes = null;
+  if (seps != null)
+  {
+    //println("detecting...");
+    int i = 0;
+    int shapeNo = 1;
+    allShapes = new RShape();
+    for (Integer key : seps.keySet())
+    {
+      i++;
+      //println("Analysing sep " + i + " of " + seps.size());
+      PImage sep = seps.get(key);
+      blob_detector.setBLOBable(new BLOBable_blueBlobs(sep));
+      blob_detector.update();
+      ArrayList<Blob> blob_list = blob_detector.getBlobs();
+      for (int blob_idx = 0; blob_idx < blob_list.size(); blob_idx++ ) {
+        //println("Getting blob " + blob_idx + " of " + blob_list.size());
+        // get the current blob from the blob-list
+        Blob blob = blob_list.get(blob_idx);
+        // get the list of all the contours from the current blob
+        ArrayList<Contour> contour_list = blob.getContours();
+        // iterate through the contour_list
+        for (int contour_idx = 0; contour_idx < contour_list.size(); contour_idx++ ) {
+          // get the current contour from the contour-list
+          Contour contour = contour_list.get(contour_idx);
+
+          // example how to simplify a contour
+          if (liveSimplification > 0) {
+            // can improve speed, if the contour is needed for further work
+            ArrayList<Pixel> contour_simple = Polyline.SIMPLIFY(contour, 2, 1);
+            // repeat the simplifying process a view more times
+            for (int simple_cnt = 0; simple_cnt < liveSimplification; simple_cnt++) {
+              contour_simple= Polyline.SIMPLIFY(contour_simple, 2, simple_cnt);
+            }
+            RShape shp = webcam_convertDiewaldToRShape(contour_simple);
+            if (shp != null)
+            {
+              shapeNo++;
+              //println("adding shape " + shapeNo + " - blob: " + blob_idx + ", contour: " + contour_idx);
+              allShapes.addChild(shp);
+            }
+          }
+          else
+          {
+            RShape shp = webcam_convertDiewaldToRShape(contour.getPixels());
+            if (shp != null)
+              allShapes.addChild(shp);
+          }
+        }
+      }
+    }
+  }
+  // rotate image
+  allShapes.rotate(radians(-90));
+  return allShapes;
+}
+
+Map<Integer, PImage> webcam_buildSeps(PImage img, Integer keyColour)
+{
+  // create separations
+  // pull out number of colours
+  Set<Integer> colours = null;
+  List<Integer> colourList = null;
+
+  colours = new HashSet<Integer>();
+  for (int i=0; i< img.pixels.length; i++) {
+    colours.add(img.pixels[i]);
+  }
+  colourList = new ArrayList(colours);
+
+  Map<Integer, PImage> seps = new HashMap<Integer, PImage>(colours.size());
+  for (Integer colour : colours) {
+    PImage sep = createImage(img.width, img.height, RGB);
+    sep.loadPixels();
+    seps.put(colour, sep);
+  }
+
+  for (int i = 0; i<img.pixels.length; i++) {
+    Integer pixel = img.pixels[i];
+    seps.get(pixel).pixels[i] = keyColour;
+  }
+  
+  return seps;
+}
+
+RShape webcam_convertDiewaldToRShape(List<Pixel> points)
+{
+  RShape shp = null;
+  if (points.size() > 2) {
+    shp = new RShape();
+    Pixel p = points.get(0);
+    shp.addMoveTo(float(p.x_), float(p.y_));
+    for (int idx = 1; idx < points.size(); idx++) {
+      p = points.get(idx);
+      shp.addLineTo(float(p.x_), float(p.y_));
+    }
+    shp.addClose();
+  }
+  return shp;
+}
+
+
+public void webcam_captureCurrentImage()
+{
+  capturedImage = webcam_buildLiveImage();
+  processedCapturedImage = webcam_processImageForTrace(liveImage);
+  colourSeparations = webcam_buildSeps(processedCapturedImage, sepKeyColour);
+  captureShape = webcam_traceImage(colourSeparations);
+}
+
+public void stop() {
+  liveCamera.stop();
+  super.stop();
+}

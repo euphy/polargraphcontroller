@@ -703,6 +703,7 @@ List<String> getControlNamesForWebcamPanel()
   controlNames.add(MODE_LIVE_SIMPLIFICATION_VALUE);
   controlNames.add(MODE_LIVE_POSTERISE_VALUE);
   controlNames.add(MODE_LIVE_CAPTURE_FROM_LIVE);
+  controlNames.add(MODE_LIVE_CONFIRM_DRAW);
   return controlNames;
 }
 
@@ -904,6 +905,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_LIVE_SIMPLIFICATION_VALUE, "Simplify");
   result.put(MODE_LIVE_POSTERISE_VALUE, "Posterise");
   result.put(MODE_LIVE_CAPTURE_FROM_LIVE, "Capture");
+  result.put(MODE_LIVE_CONFIRM_DRAW, "Draw capture");
   
 
   return result;
@@ -1034,6 +1036,7 @@ Set<String> buildControlNames()
   result.add(MODE_LIVE_SIMPLIFICATION_VALUE);
   result.add(MODE_LIVE_POSTERISE_VALUE);
   result.add(MODE_LIVE_CAPTURE_FROM_LIVE);
+  result.add(MODE_LIVE_CONFIRM_DRAW);
   
   return result;
 }

@@ -638,11 +638,15 @@ void sendOutlineOfBox()
   
 }
 
-
 void sendVectorShapes()
 {
+  sendVectorShapes(getVectorShape());
+}
+
+void sendVectorShapes(RShape vec)
+{
   println("Send vector shapes.");
-  RPoint[][] pointPaths = getVectorShape().getPointsInPaths();      
+  RPoint[][] pointPaths = vec.getPointsInPaths();      
   
   String command = "";
   PVector lastPoint = new PVector();
@@ -661,14 +665,7 @@ void sendVectorShapes()
       {
         // draw the first one with a pen up and down to get to it
         PVector p = filteredPoints.get(0);
-        if (
-          p.x == lastPoint.x
-          && p.y == lastPoint.y
-//          p.x <= lastPoint.x+2 
-//          && p.x >= lastPoint.x-2 
-//          && p.y <= lastPoint.y+2 
-//          && p.y >= lastPoint.y-2
-          )
+        if ( p.x == lastPoint.x && p.y == lastPoint.y )
           liftToGetToNewPoint = false;
         else
           liftToGetToNewPoint = true;

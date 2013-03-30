@@ -310,6 +310,7 @@ static final String MODE_LIVE_BLUR_VALUE = "numberbox_mode_liveBlurValue";
 static final String MODE_LIVE_SIMPLIFICATION_VALUE = "numberbox_mode_liveSimplificationValue";
 static final String MODE_LIVE_POSTERISE_VALUE = "numberbox_mode_livePosteriseValue";
 static final String MODE_LIVE_CAPTURE_FROM_LIVE = "button_mode_liveCaptureFromLive";
+static final String MODE_LIVE_CONFIRM_DRAW = "button_mode_liveConfirmDraw";
 
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
@@ -448,17 +449,24 @@ boolean overwriteExistingStoreFile = true;
 public static Console console;
 public boolean useWindowedConsole = false;
 
-static boolean drawingLiveVideo = true;
+static boolean drawingLiveVideo = false;
+static boolean drawingWebcamShape = true;
 
 static PImage liveImage = null;
+static PImage processedLiveImage = null;
+static PImage capturedImage = null;
+static PImage processedCapturedImage = null;
+
 JMyron liveCamera;
 BlobDetector blob_detector;
-int liveSimplification = 0;
+int liveSimplification = 2;
 int blurValue = 1;
-int posterizeValue = 6;
-Set<Integer> colours = null;
-List<Integer> colourList = null;
+int posterizeValue = 8;
+int sepKeyColour = color(0, 0, 255);
 
+Map<Integer, PImage> colourSeparations = null;
+RShape webcamShape = null;
+RShape captureShape = null;
 
 void setup()
 {

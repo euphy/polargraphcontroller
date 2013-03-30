@@ -122,7 +122,12 @@ void numberbox_mode_livePosteriseValue(int value)
 }
 void button_mode_liveCaptureFromLive()
 {
-  addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END");
+  webcam_captureCurrentImage();
+}  
+
+void button_mode_liveConfirmDraw()
+{
+  sendVectorShapes(captureShape);
 }  
 
 

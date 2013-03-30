@@ -351,38 +351,28 @@ class DisplayMachine extends Machine
     // work out the scaling factor.
     noStroke();
     // draw machine outline
+    
+    liveImage = webcam_buildLiveImage();
+    processedLiveImage = webcam_processImageForTrace(liveImage);
+
+    colourSeparations = webcam_buildSeps(processedLiveImage, sepKeyColour);
+    webcamShape = webcam_traceImage(colourSeparations);
 
     if (drawingLiveVideo)
     {
       displayLiveVideo();
     }
-
-    if (displayingVector && getVectorShape() != null)
+    
+    if (drawingWebcamShape && webcamShape != null)
     {
-      displayVectorImage(color(200));
-    }
-
-    if (displayingGuides 
-      && getOutline().surrounds(getMouseVector())
-      && currentMode != MODE_MOVE_IMAGE
-      && mouseOverControls().isEmpty()
-      )
-    {
-      cursor(CROSS);
-    }
-    else
-    {
-      cursor(ARROW);
+      displayWebcamShape();
     }
   }
   
   public void displayLiveVideo()
   {
-    buildLiveImage();
-    // draw actual image, full size in centre of page
-    
-    
-    if (liveImage != null)
+    // draw actual image, maximum size
+    if (processedLiveImage != null)
     {
       float ox = getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7;
       float oy = getPanel(PANEL_NAME_GENERAL).getOutline().getTop();
@@ -398,7 +388,8 @@ class DisplayMachine extends Machine
       tint(255, getImageTransparency());
       translate(ox, oy+h);
       rotate(radians(270));
-      image(liveImage, 0, 0, h, w);
+      image(processedLiveImage, 0, 0, h, w);
+      image(liveImage, h-(h/4), w+10, h/4, w/4);
       rotate(radians(-270));
       translate(-ox, -(oy+h));
       noTint();
@@ -406,27 +397,63 @@ class DisplayMachine extends Machine
     }
   }
   
-  public void buildLiveImage()
+  public void displayWebcamShape()
   {
-    liveCamera.update();
-    liveImage = createImage(640,480, RGB);
-    liveImage.loadPixels();
-    // rotate it
-    liveImage.pixels = liveCamera.image();
-    liveImage.filter(BLUR, blurValue);
-    liveImage.filter(GRAY);
-    liveImage.filter(POSTERIZE, posterizeValue);
-    liveImage.updatePixels();
+    strokeWeight(1);
+    
+    if (captureShape != null)
+    {
+      stroke(150);
+      displayWebcamShapeAtFullSize(webcamShape);
+      stroke(255);
+      displayWebcamShapeAtFullSize(captureShape);
+    }
+    else
+    {
+      stroke(255);
+      displayWebcamShapeAtFullSize(webcamShape);
+    }
+  }
+  
+  public void displayWebcamShapeAtFullSize(RShape vec)
+  {
+    RG.ignoreStyles();
+    // work out scaling to make it full size on the screen
+    float aspectRatio = vec.getWidth()/vec.getHeight(); // rotated, remember
+    float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
+    float w = h * aspectRatio;
+    float scaler = h / vec.getHeight();
+    PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, height -10);
+
+    RPoint[][] pointPaths = vec.getPointsInPaths();
+    if (pointPaths != null)
+    {
+      for(int i = 0; i<pointPaths.length; i++)
+      {
+        if (pointPaths[i] != null) 
+        {
+          beginShape();
+          for (int j = 0; j<pointPaths[i].length; j++)
+          {
+            PVector p = new PVector(pointPaths[i][j].x, pointPaths[i][j].y);
+            p = PVector.mult(p, scaler);
+            p = PVector.add(p, position);
+            vertex(p.x, p.y);
+          }
+          endShape();
+        }
+      }
+    }
   }
   
   public void displayVectorImage()
   {
-    displayVectorImage(color(0,0,0));
+    displayVectorImage(getVectorShape(), color(0,0,0), true);
   }
   
-  public void displayVectorImage(int strokeColour)
+  public void displayVectorImage(RShape vec, int strokeColour, boolean drawCentroid)
   {
-    RPoint[][] pointPaths = getVectorShape().getPointsInPaths();
+    RPoint[][] pointPaths = vec.getPointsInPaths();
     RG.ignoreStyles();
     strokeWeight(1);
     if (pointPaths != null)
@@ -452,14 +479,17 @@ class DisplayMachine extends Machine
           endShape();
         }
       }
-      // draw spot at centre
-      PVector centroid = new PVector(getVectorShape().width/2, getVectorShape().height/2);
-      centroid = PVector.mult(centroid, (vectorScaling/100));
-      centroid = PVector.add(centroid, getVectorPosition());
-      centroid = scaleToScreen(centroid);
-      fill(255,0,0,128);
-      ellipse(centroid.x, centroid.y, 20,20);
-      noFill();
+      if (drawCentroid)
+      {
+        // draw spot at centre
+        PVector centroid = new PVector(vec.width/2, vec.height/2);
+        centroid = PVector.mult(centroid, (vectorScaling/100));
+        centroid = PVector.add(centroid, getVectorPosition());
+        centroid = scaleToScreen(centroid);
+        fill(255,0,0,128);
+        ellipse(centroid.x, centroid.y, 20,20);
+        noFill();
+      }
     }
   }
 

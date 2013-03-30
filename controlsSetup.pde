@@ -136,8 +136,8 @@ Map<String, Panel> buildPanels()
   webcamPanel.setResizable(true);
   webcamPanel.setControls(getControlsForPanels().get(PANEL_NAME_WEBCAM));
   // get control positions
-  rovingPanel.setControlPositions(buildControlPositionsForPanel(webcamPanel));
-  rovingPanel.setControlSizes(buildControlSizesForPanel(webcamPanel));
+  webcamPanel.setControlPositions(buildControlPositionsForPanel(webcamPanel));
+  webcamPanel.setControlSizes(buildControlSizesForPanel(webcamPanel));
   panels.put(PANEL_NAME_WEBCAM, webcamPanel);
 
   Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutline);
@@ -579,6 +579,7 @@ Map<String, PVector> buildControlPositionsForPanel(Panel panel)
 }
 Map<String, PVector> buildControlSizesForPanel(Panel panel)
 {
+  println("Building control sizes for panel " + panel.getName());
   Map<String, PVector> map = new HashMap<String, PVector>();
   String panelName = panel.getName();
   int col = 0;
@@ -594,6 +595,7 @@ Map<String, PVector> buildControlSizesForPanel(Panel panel)
     {
       PVector s = new PVector(DEFAULT_CONTROL_SIZE.x, DEFAULT_CONTROL_SIZE.y);
       map.put(controller.name(), s);
+      println("Added size of " + controller.name() + " to panel. " + s);
     }
   }
 

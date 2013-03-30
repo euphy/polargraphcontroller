@@ -352,35 +352,6 @@ class DisplayMachine extends Machine
     noStroke();
     // draw machine outline
 
-    fill(getMachineColour());
-    rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
-
-    // draw page
-    fill(getPageColour());
-    rect(getOutline().getLeft()+sc(getPage().getLeft()), 
-    getOutline().getTop()+sc(getPage().getTop()), 
-    sc(getPage().getWidth()), 
-    sc(getPage().getHeight()));
-    noFill();
-
-    stroke(getBackgroundColour(),150);
-    strokeWeight(3);
-    noFill();
-    rect(getOutline().getLeft()-2, getOutline().getTop()-2, getOutline().getWidth()+3, getOutline().getHeight()+3);
-
-    stroke(getMachineColour(),150);
-    strokeWeight(3);
-    noFill();
-    rect(getOutline().getLeft()+sc(getPage().getLeft())-2, 
-    getOutline().getTop()+sc(getPage().getTop())-2, 
-    sc(getPage().getWidth())+4, 
-    sc(getPage().getHeight())+4);
-
-    if (displayingGuides)
-    {
-      drawPictureFrame();
-    }
-    
     if (drawingLiveVideo)
     {
       displayLiveVideo();
@@ -408,19 +379,28 @@ class DisplayMachine extends Machine
   public void displayLiveVideo()
   {
     buildLiveImage();
-    // draw actual image
+    // draw actual image, full size in centre of page
+    
+    
     if (liveImage != null)
     {
-      float ox = getOutline().getLeft()+sc(getImageFrame().getLeft());
-      float oy = getOutline().getTop()+sc(getImageFrame().getTop());
-      float w = sc(getImageFrame().getWidth());
-      float h = sc(getImageFrame().getHeight());
+      float ox = getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7;
+      float oy = getPanel(PANEL_NAME_GENERAL).getOutline().getTop();
+      
+      // calculate height.  640 pixels stretched to 
+      float aspectRatio = 480.0/640.0; // rotated, remember
+      float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
+      float w = h * aspectRatio;
+      
+      stroke(255);
+      rect(ox,oy,w,h);
+
       tint(255, getImageTransparency());
-      translate(ox, oy);
+      translate(ox, oy+h);
       rotate(radians(270));
-      image(liveImage, 0, 0, w, h);
+      image(liveImage, 0, 0, h, w);
       rotate(radians(-270));
-      translate(-ox,-oy);
+      translate(-ox, -(oy+h));
       noTint();
       noFill();
     }

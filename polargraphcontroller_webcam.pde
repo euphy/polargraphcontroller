@@ -312,7 +312,7 @@ static final String MODE_LIVE_POSTERISE_VALUE = "numberbox_mode_livePosteriseVal
 static final String MODE_LIVE_CAPTURE_FROM_LIVE = "button_mode_liveCaptureFromLive";
 
 
-PVector statusTextPosition = new PVector(240.0, 12.0);
+PVector statusTextPosition = new PVector(300.0, 12.0);
 
 static String currentMode = MODE_BEGIN;
 static String lastMode = MODE_BEGIN;
@@ -795,19 +795,13 @@ void drawWebcamPage()
  
   for (Panel panel : getPanelsForTab(TAB_NAME_WEBCAM))
   {
-    println("Panel:" + panel);
     panel.draw();
   }
-  text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
 
-//  showCurrentMachinePosition();
-  showGroupBox();
-  showCurrentMachinePosition();
   if (displayingInfoTextOnInputPage)
     showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
-  showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
 }
 
 void drawCommandQueuePage()

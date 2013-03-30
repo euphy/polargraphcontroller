@@ -459,9 +459,9 @@ static PImage processedCapturedImage = null;
 
 JMyron liveCamera;
 BlobDetector blob_detector;
-int liveSimplification = 2;
+int liveSimplification = 4;
 int blurValue = 1;
-int posterizeValue = 8;
+int posterizeValue = 12;
 int sepKeyColour = color(0, 0, 255);
 
 Map<Integer, PImage> colourSeparations = null;
@@ -809,6 +809,7 @@ void drawWebcamPage()
   if (displayingInfoTextOnInputPage)
     showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
+  showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
 
 }
 

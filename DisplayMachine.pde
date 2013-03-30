@@ -448,11 +448,26 @@ class DisplayMachine extends Machine
   
   public void displayVectorImage()
   {
-    displayVectorImage(getVectorShape(), color(0,0,0), true);
+    displayVectorImage(getVectorShape(), vectorScaling/100, getVectorPosition(), color(0,0,0), true);
+    
+    if (captureShape != null)
+    {
+      float scaling = inMM(getPictureFrame().getWidth()) / captureShape.getWidth();
+      PVector position = new PVector(inMM(getPictureFrame().getPosition().x), inMM(getPictureFrame().getPosition().y) + (captureShape.getHeight() * scaling));
+      displayVectorImage(captureShape, 
+        scaling, 
+        position, 
+        color(0,200,0), true);
+    }
   }
   
-  public void displayVectorImage(RShape vec, int strokeColour, boolean drawCentroid)
+  public void displayVectorImage(RShape vec, float scaling, PVector position, int strokeColour, boolean drawCentroid)
   {
+    PVector centroid = new PVector(vec.width/2, vec.height/2);
+    centroid = PVector.mult(centroid, (vectorScaling/100));
+    centroid = PVector.add(centroid, getVectorPosition());
+    centroid = scaleToScreen(centroid);
+
     RPoint[][] pointPaths = vec.getPointsInPaths();
     RG.ignoreStyles();
     strokeWeight(1);
@@ -466,8 +481,8 @@ class DisplayMachine extends Machine
           for (int j = 0; j<pointPaths[i].length; j++)
           {
             PVector p = new PVector(pointPaths[i][j].x, pointPaths[i][j].y);
-            p = PVector.mult(p, (vectorScaling/100));
-            p = PVector.add(p, getVectorPosition());
+            p = PVector.mult(p, scaling);
+            p = PVector.add(p, position);
             if (getPage().surrounds(inSteps(p)))
             {
               p = scaleToScreen(p);
@@ -482,10 +497,6 @@ class DisplayMachine extends Machine
       if (drawCentroid)
       {
         // draw spot at centre
-        PVector centroid = new PVector(vec.width/2, vec.height/2);
-        centroid = PVector.mult(centroid, (vectorScaling/100));
-        centroid = PVector.add(centroid, getVectorPosition());
-        centroid = scaleToScreen(centroid);
         fill(255,0,0,128);
         ellipse(centroid.x, centroid.y, 20,20);
         noFill();

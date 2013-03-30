@@ -127,7 +127,18 @@ void button_mode_liveCaptureFromLive()
 
 void button_mode_liveConfirmDraw()
 {
-  sendVectorShapes(captureShape);
+  // work out scaling and position
+  float scaling = getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getWidth()) / captureShape.getWidth();
+  PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y) + (captureShape.getHeight() * scaling));
+
+//  float scaling = getDisplayMachine().getPictureFrame().getWidth() / captureShape.getWidth();
+//  println("Scaling: " + scaling);
+//  
+//  PVector position = getDisplayMachine().getPictureFrame().getPosition();
+//  
+//  println("CApture shape: " + captureShape);
+  
+  sendVectorShapes(captureShape, scaling, position);
 }  
 
 

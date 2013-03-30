@@ -640,13 +640,16 @@ void sendOutlineOfBox()
 
 void sendVectorShapes()
 {
-  sendVectorShapes(getVectorShape());
+  sendVectorShapes(getVectorShape(), vectorScaling/100, getVectorPosition());
 }
 
-void sendVectorShapes(RShape vec)
+void sendVectorShapes(RShape vec, float scaling, PVector position)
 {
   println("Send vector shapes.");
   RPoint[][] pointPaths = vec.getPointsInPaths();      
+  
+  // sort the paths to optimise the draw sequence
+  pointPaths = sortPathLongestFirst(pointPaths);
   
   String command = "";
   PVector lastPoint = new PVector();
@@ -659,7 +662,7 @@ void sendVectorShapes(RShape vec)
     {
       boolean firstPointFound = false;
       
-      List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength);
+      List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
       //println(filteredPoints);
       if (!filteredPoints.isEmpty())
       {
@@ -695,12 +698,52 @@ void sendVectorShapes(RShape vec)
   println("finished.");
 }
 
-List<PVector> filterPoints(RPoint[] points, int filterToUse, long filterParam)
+public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths)
 {
-  return filterPointsLowPass(points, filterParam);
+  // put the paths into a list
+  List<RPoint[]> pathsList = new ArrayList<RPoint[]>(pointPaths.length);
+  for (int i = 0; i<pointPaths.length; i++)
+  {
+    if (pointPaths[i] != null) 
+    {
+      pathsList.add(pointPaths[i]);
+    }
+  }
+  
+  println("PathsList: ");
+  for (RPoint[] path : pathsList)
+    println(path.length + ", ");
+  
+  // sort the list
+  Collections.sort(pathsList, new Comparator<RPoint[]>() {
+    public int compare(RPoint[] o1, RPoint[] o2) {
+        if (o1.length > o2.length) {
+            return -1;
+        } else if (o1.length < o2.length) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+  });
+  
+  println("Sorted PathsList: ");
+  for (RPoint[] path : pathsList)
+    println(path.length + ", ");
+  
+  for (int i=0; i<pathsList.size(); i++)
+  {
+    pointPaths[i] = pathsList.get(i);
+  }
+  return pointPaths;
 }
 
-List<PVector> filterPointsLowPass(RPoint[] points, long filterParam)
+List<PVector> filterPoints(RPoint[] points, int filterToUse, long filterParam, float scaling, PVector position)
+{
+  return filterPointsLowPass(points, filterParam, scaling, position);
+}
+
+List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scaling, PVector position)
 {
   List<PVector> result = new ArrayList<PVector>();
   
@@ -710,8 +753,8 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam)
   {
     RPoint firstPoint = points[j];
     PVector p = new PVector(firstPoint.x, firstPoint.y);
-    p = PVector.mult(p, (vectorScaling/100));
-    p = PVector.add(p, getVectorPosition());
+    p = PVector.mult(p, scaling);
+    p = PVector.add(p, position);
     p = getDisplayMachine().inSteps(p);
     if (getDisplayMachine().getPage().surrounds(p))
     {
@@ -734,7 +777,7 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam)
         
         if (abs(diffx) > filterParam || abs(diffy) > filterParam)
         {
-          println("Adding point " + p + ", last: " + result.get(result.size()-1));
+          //println("Adding point " + p + ", last: " + result.get(result.size()-1));
           result.add(p);
         }
     }
@@ -743,7 +786,7 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam)
   if (result.size() < 2)
     result.clear();
 
-  println("finished filter.");
+  //println("finished filter.");
   return result;
 }
 

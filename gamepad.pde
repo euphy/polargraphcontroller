@@ -7,6 +7,7 @@ ControllButton buttonX;
 ControllButton buttonY;
 ControllButton buttonL;
 ControllButton buttonR;
+ControllButton buttonStart;
 
 ControllCoolieHat dpad;
 
@@ -20,6 +21,7 @@ static final String BUTTON_A_RELEASED = "ButtonAReleased";
 static final String BUTTON_B_RELEASED = "ButtonBReleased";
 static final String BUTTON_L_RELEASED = "ButtonLReleased";
 static final String BUTTON_R_RELEASED = "ButtonRReleased";
+static final String BUTTON_START_RELEASED = "ButtonStartReleased";
 
 void gamepad_init()
 {
@@ -38,6 +40,8 @@ void gamepad_init()
     buttonL = joypad.getButton("Button 4");
     buttonR = joypad.getButton("Button 5");
     
+    buttonStart = joypad.getButton("Button 7");
+    
     buttonA.plug(this, "buttonARelease", ControllIO.ON_RELEASE);
     buttonB.plug(this, "buttonBRelease", ControllIO.ON_RELEASE);
     buttonX.plug(this, "buttonXPress", ControllIO.ON_PRESS);
@@ -46,6 +50,8 @@ void gamepad_init()
     
     buttonL.plug(this, "buttonLRelease", ControllIO.ON_RELEASE);
     buttonR.plug(this, "buttonRRelease", ControllIO.ON_RELEASE);
+    
+    buttonStart.plug(this, "buttonStartRelease", ControllIO.ON_RELEASE);
     
     dpad = joypad.getCoolieHat(10);
     dpad.setMultiplier(4);
@@ -74,6 +80,10 @@ public void buttonRRelease()
 {
   signalFromGamepad = BUTTON_R_RELEASED;
 }
+public void buttonStartRelease()
+{
+  signalFromGamepad = BUTTON_START_RELEASED;
+}
 
 void buttonXPress()
 {
@@ -90,15 +100,14 @@ void buttonYRelease()
 
 void dpadPress(float x, float y)
 {
-  println("VAl:" + dpad.getValue());
   float val = dpad.getValue();
-  if (val == 2.0)
+  if (val == 6.0)
   {
     liveSimplification--;
     if (liveSimplification < LIVE_SIMPLIFICATION_MIN)
       liveSimplification = LIVE_SIMPLIFICATION_MIN;
   }
-  else if (val == 6.0)
+  else if (val == 2.0)
   {
     liveSimplification++;
     if (liveSimplification > LIVE_SIMPLIFICATION_MAX)
@@ -156,8 +165,13 @@ void processGamepadInput()
     }
     else if (signalFromGamepad == BUTTON_R_RELEASED)
     {
-      cp5.tab(TAB_NAME_INPUT).setActive(true);
-    } 
+    }
+    else if (signalFromGamepad == BUTTON_START_RELEASED)
+    {
+      preLoadCommandQueue();
+      button_mode_setPositionHome();
+    }
+    
       
     // clear the signal  
     signalFromGamepad = null;

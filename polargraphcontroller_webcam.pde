@@ -612,7 +612,6 @@ void preLoadCommandQueue()
   addToCommandQueue(CMD_CHANGEPENWIDTH+currentPenWidth+",END");
   addToCommandQueue(CMD_SETMOTORSPEED+currentMachineMaxSpeed+",END");
   addToCommandQueue(CMD_SETMOTORACCEL+currentMachineAccel+",END");
-  
 }
 
 void windowResized()

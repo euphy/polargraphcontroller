@@ -900,8 +900,6 @@ void displayGamepadOverlay()
 
     image(dpadXImage, width-600, height-400, 128, 128);
     text("Filter short paths", width-600, height-420);
-
-
   }
   else
   {

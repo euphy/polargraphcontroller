@@ -5,6 +5,8 @@ ControllButton buttonA;
 ControllButton buttonB;
 ControllButton buttonX;
 ControllButton buttonY;
+ControllButton buttonL;
+ControllButton buttonR;
 
 ControllCoolieHat dpad;
 
@@ -16,6 +18,8 @@ String signalFromGamepad = null;
 
 static final String BUTTON_A_RELEASED = "ButtonAReleased";
 static final String BUTTON_B_RELEASED = "ButtonBReleased";
+static final String BUTTON_L_RELEASED = "ButtonLReleased";
+static final String BUTTON_R_RELEASED = "ButtonRReleased";
 
 void gamepad_init()
 {
@@ -31,11 +35,17 @@ void gamepad_init()
     buttonX = joypad.getButton("Button 2");
     buttonY = joypad.getButton("Button 3");
     
+    buttonL = joypad.getButton("Button 4");
+    buttonR = joypad.getButton("Button 5");
+    
     buttonA.plug(this, "buttonARelease", ControllIO.ON_RELEASE);
     buttonB.plug(this, "buttonBRelease", ControllIO.ON_RELEASE);
     buttonX.plug(this, "buttonXPress", ControllIO.ON_PRESS);
     buttonX.plug(this, "buttonXRelease", ControllIO.ON_RELEASE);
     buttonY.plug(this, "buttonYRelease", ControllIO.ON_RELEASE);
+    
+    buttonL.plug(this, "buttonLRelease", ControllIO.ON_RELEASE);
+    buttonR.plug(this, "buttonRRelease", ControllIO.ON_RELEASE);
     
     dpad = joypad.getCoolieHat(10);
     dpad.setMultiplier(4);
@@ -55,6 +65,14 @@ public void buttonARelease()
 public void buttonBRelease()
 {
   signalFromGamepad = BUTTON_B_RELEASED;
+}
+public void buttonLRelease()
+{
+  signalFromGamepad = BUTTON_L_RELEASED;
+}
+public void buttonRRelease()
+{
+  signalFromGamepad = BUTTON_R_RELEASED;
 }
 
 void buttonXPress()
@@ -132,7 +150,14 @@ void processGamepadInput()
       if (captureShape != null && !confirmedDraw)
         button_mode_liveConfirmDraw();
     }
-      
+    else if (signalFromGamepad == BUTTON_L_RELEASED)
+    {
+      commandQueueRunning = !commandQueueRunning;
+    }
+    else if (signalFromGamepad == BUTTON_R_RELEASED)
+    {
+      cp5.tab(TAB_NAME_INPUT).setActive(true);
+    } 
       
     // clear the signal  
     signalFromGamepad = null;

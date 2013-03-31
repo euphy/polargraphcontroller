@@ -485,11 +485,23 @@ Map<Integer, PImage> colourSeparations = null;
 RShape webcamShape = null;
 RShape captureShape = null;
 
+String shapeSavePath = "../../savedcaptures/";
+String shapeSavePrefix = "shape-";
+String shapeSaveExtension = ".svg";
+
+boolean displayGamepadOverlay = true;
+PImage yButtonImage = null;
+PImage xButtonImage = null;
+PImage aButtonImage = null;
+PImage bButtonImage = null;
+
 void setup()
 {
   println("Running polargraph controller");
   frame.setResizable(true);
   initLogging();
+  
+  initImages();
   
   RG.init(this);
   RG.setPolygonizer(RG.ADAPTATIVE);
@@ -831,6 +843,8 @@ void drawWebcamPage()
 
   processGamepadInput();
 
+  if (displayGamepadOverlay)
+    displayGamepadOverlay();
 }
 
 
@@ -864,6 +878,31 @@ void drawCommandQueuePage()
 void drawImageLoadPage()
 {
   drawImagePage();
+}
+
+void displayGamepadOverlay()
+{
+  textSize(40);
+
+  if (captureShape == null)
+  {
+    image(aButtonImage, width-190, height-180, 128, 128);
+    fill(255);
+    text("SNAP!", width-180, height-200);
+  }
+  else
+  {
+    image(aButtonImage, width-400, height-180, 128, 128);
+    fill(255);
+    text("BACK", width-400, height-200);
+
+    image(bButtonImage, width-190, height-180, 128, 128);
+    fill(255);
+    text("DRAW!", width-180, height-200);
+  }
+  
+  
+  textSize(12);
 }
 
 void drawMoveImageOutline()
@@ -2965,5 +3004,31 @@ void initLogging()
   {
     println("Exception setting up logger: " + e.getMessage());
   }
+}
+void initImages()
+{
+  try
+  {
+    yButtonImage = loadImage("y.png");
+    xButtonImage = loadImage("x.png");
+    aButtonImage = loadImage("a.png");
+    bButtonImage = loadImage("b.png");
+  }
+  catch (Exception e)
+  {
+    yButtonImage = makeColourImage(64,64,color(180,180,0));
+    xButtonImage = makeColourImage(64,64,color(0,0,180));
+    aButtonImage = makeColourImage(64,64,color(0,180,0));
+    bButtonImage = makeColourImage(64,64,color(180,0,0));
+  }
+  
+}
+PImage makeColourImage(int w, int h, int colour)
+{
+  PImage img = createImage(w,h,RGB);
+  for(int i=0; i < img.pixels.length; i++) {
+    img.pixels[i] = colour; 
+  }
+  return img;
 }
 

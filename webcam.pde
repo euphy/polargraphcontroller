@@ -166,6 +166,14 @@ public void webcam_captureCurrentImage()
   webcam_captureCurrentImage(capturedImage);
 }
 
+public void webcam_saveShape(RShape sh)
+{
+  SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+  String dateCode = sdf.format(new java.util.Date());
+  String filename = shapeSavePath + shapeSavePrefix + dateCode + shapeSaveExtension;
+  RG.saveShape(filename, sh);
+}
+
 public void stop() {
   liveCamera.stop();
   super.stop();

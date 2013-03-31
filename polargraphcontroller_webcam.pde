@@ -461,6 +461,7 @@ public boolean useWindowedConsole = false;
 static boolean drawingLiveVideo = false;
 static boolean drawingWebcamShape = true;
 static boolean flipWebcamImage = true;
+static boolean confirmedDraw = false;
 
 static PImage liveImage = null;
 static PImage processedLiveImage = null;
@@ -494,6 +495,9 @@ PImage yButtonImage = null;
 PImage xButtonImage = null;
 PImage aButtonImage = null;
 PImage bButtonImage = null;
+
+PImage dpadXImage = null;
+PImage dpadYImage = null;
 
 void setup()
 {
@@ -883,22 +887,36 @@ void drawImageLoadPage()
 void displayGamepadOverlay()
 {
   textSize(40);
-
+  fill(255);
+  
   if (captureShape == null)
   {
-    image(aButtonImage, width-190, height-180, 128, 128);
-    fill(255);
-    text("SNAP!", width-180, height-200);
+    image(aButtonImage, width-400, height-180, 128, 128);
+    text("SNAP!", width-400, height-200);
+
+    textSize(30);
+    image(dpadYImage, width-600, height-180, 128, 128);
+    text("Simplify", width-600, height-200);
+
+    image(dpadXImage, width-600, height-400, 128, 128);
+    text("Filter short paths", width-600, height-420);
+
+
   }
   else
   {
-    image(aButtonImage, width-400, height-180, 128, 128);
-    fill(255);
-    text("BACK", width-400, height-200);
-
-    image(bButtonImage, width-190, height-180, 128, 128);
-    fill(255);
-    text("DRAW!", width-180, height-200);
+    if (confirmedDraw)
+    {
+      image(aButtonImage, width-400, height-180, 128, 128);
+      text("CANCEL!", width-385, height-200);
+    }
+    else
+    {
+      image(aButtonImage, width-400, height-180, 128, 128);
+      text("BACK", width-400, height-200);
+      image(bButtonImage, width-190, height-180, 128, 128);
+      text("DRAW!", width-180, height-200);
+    }
   }
   
   
@@ -3013,6 +3031,8 @@ void initImages()
     xButtonImage = loadImage("x.png");
     aButtonImage = loadImage("a.png");
     bButtonImage = loadImage("b.png");
+    dpadXImage = loadImage("dpadlr.png");
+    dpadYImage = loadImage("dpadud.png");
   }
   catch (Exception e)
   {

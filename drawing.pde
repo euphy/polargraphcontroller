@@ -714,9 +714,6 @@ public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths, int highPassCutoff
     }
   }
   
-  for (RPoint[] path : pathsList)
-    println(path.length + ", ");
-  
   // sort the list
   Collections.sort(pathsList, new Comparator<RPoint[]>() {
     public int compare(RPoint[] o1, RPoint[] o2) {
@@ -746,12 +743,14 @@ List<RPoint[]> removeShortPaths(List<RPoint[]> list, int cutoff)
 {
   if (cutoff > 0)
   {
-    int numberOfPaths = list.size()-1;
-    for (int i=0; i<numberOfPaths; i++)
+    int numberOfPaths = list.size();
+    ListIterator<RPoint[]> it = list.listIterator();
+    while (it.hasNext())
     {
-      if (cutoff >= list.get(i).length)
+      RPoint[] paths = it.next();
+      if (paths == null || cutoff >= paths.length)
       {
-        list.remove(i);
+        it.remove();
       }
     }
   }

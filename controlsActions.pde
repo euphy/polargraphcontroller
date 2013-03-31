@@ -141,17 +141,17 @@ void button_mode_liveConfirmDraw()
 {
   if (captureShape != null)
   {
-    //  save shape as SVG
-    
-    
+    confirmedDraw = true;
     
     // work out scaling and position
     float scaling = getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getWidth()) / captureShape.getWidth();
     PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y) + (captureShape.getHeight() * scaling));
   
     sendVectorShapes(captureShape, scaling, position);
-    webcam_saveShape(captureShape);
     button_mode_penUp();
+
+    //  save shape as SVG
+    webcam_saveShape(captureShape);
   }
 }  
 

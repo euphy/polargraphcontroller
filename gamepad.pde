@@ -113,13 +113,25 @@ void processGamepadInput()
 {
   if (signalFromGamepad != null)
   {
+    println("Signal from gamepad:  " + signalFromGamepad);
     if (signalFromGamepad == BUTTON_A_RELEASED)
-      if (captureShape == null)
+    {
+      if (captureShape == null && !confirmedDraw)
         button_mode_liveCaptureFromLive(); 
-      else
+      else if (captureShape != null && !confirmedDraw)
         button_mode_liveClearCapture();
+      else if (captureShape != null && confirmedDraw)
+      {
+        button_mode_liveClearCapture();
+        button_mode_clearQueue();
+        confirmedDraw = false;
+      }
+    }
     else if (signalFromGamepad == BUTTON_B_RELEASED)
-      button_mode_liveConfirmDraw();
+    {
+      if (captureShape != null && !confirmedDraw)
+        button_mode_liveConfirmDraw();
+    }
       
       
     // clear the signal  

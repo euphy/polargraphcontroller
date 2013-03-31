@@ -8,6 +8,9 @@ import org.apache.batik.svggen.font.table.*;
 import org.apache.batik.svggen.font.*;
 import java.util.zip.CRC32;
 
+import procontroll.*;
+//import net.java.games.input.*;
+
 // for OSX
 import java.text.*;
 import java.util.*;
@@ -310,6 +313,8 @@ static final String MODE_LIVE_BLUR_VALUE = "numberbox_mode_liveBlurValue";
 static final String MODE_LIVE_SIMPLIFICATION_VALUE = "numberbox_mode_liveSimplificationValue";
 static final String MODE_LIVE_POSTERISE_VALUE = "numberbox_mode_livePosteriseValue";
 static final String MODE_LIVE_CAPTURE_FROM_LIVE = "button_mode_liveCaptureFromLive";
+static final String MODE_LIVE_CANCEL_CAPTURE = "button_mode_liveClearCapture";
+static final String MODE_LIVE_ADD_CAPTION = "button_mode_liveAddCaption";
 static final String MODE_LIVE_CONFIRM_DRAW = "button_mode_liveConfirmDraw";
 
 
@@ -451,6 +456,7 @@ public boolean useWindowedConsole = false;
 
 static boolean drawingLiveVideo = false;
 static boolean drawingWebcamShape = true;
+static boolean flipWebcamImage = true;
 
 static PImage liveImage = null;
 static PImage processedLiveImage = null;
@@ -537,6 +543,7 @@ void setup()
 
   addEventListeners();
 
+  gamepad_init();
   liveCamera = new JMyron();
   liveCamera.start(640,480);
 
@@ -809,7 +816,7 @@ void drawWebcamPage()
   if (displayingInfoTextOnInputPage)
     showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
-  showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
+  showCommandQueue((int) width-200, 20);
 
 }
 

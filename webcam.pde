@@ -4,6 +4,33 @@ public PImage webcam_buildLiveImage()
   PImage pimg = createImage(640,480, RGB);
   pimg.loadPixels();
   pimg.pixels = liveCamera.image();
+  // flip the image left to right
+  if (flipWebcamImage)
+  {
+    
+    List<int[]> list = new ArrayList<int[]>(480);
+    
+    for (int r=0; r<pimg.pixels.length; r+=640)
+    {
+      int[] temp = new int[640];
+      for (int c=0; c<640; c++)
+      {
+        temp[c] = pimg.pixels[r+c];
+      }
+      list.add(temp);
+    }
+    
+    // reverse the list
+    Collections.reverse(list);
+    
+    for (int r=0; r<list.size(); r++)
+    {
+      for (int c=0; c<640; c++)
+      {
+        pimg.pixels[(r*640)+c] = list.get(r)[c];
+      }
+    }
+  }
   pimg.updatePixels();
   return pimg;
 }

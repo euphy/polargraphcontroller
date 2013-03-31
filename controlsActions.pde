@@ -123,7 +123,15 @@ void numberbox_mode_livePosteriseValue(int value)
 void button_mode_liveCaptureFromLive()
 {
   webcam_captureCurrentImage();
-}  
+}
+void button_mode_liveClearCapture()
+{
+  captureShape = null;
+}
+void button_mode_liveAddCaption()
+{
+  
+}
 
 void button_mode_liveConfirmDraw()
 {
@@ -131,13 +139,6 @@ void button_mode_liveConfirmDraw()
   float scaling = getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getWidth()) / captureShape.getWidth();
   PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y) + (captureShape.getHeight() * scaling));
 
-//  float scaling = getDisplayMachine().getPictureFrame().getWidth() / captureShape.getWidth();
-//  println("Scaling: " + scaling);
-//  
-//  PVector position = getDisplayMachine().getPictureFrame().getPosition();
-//  
-//  println("CApture shape: " + captureShape);
-  
   sendVectorShapes(captureShape, scaling, position);
 }  
 

@@ -430,17 +430,20 @@ class DisplayMachine extends Machine
     {
       for(int i = 0; i<pointPaths.length; i++)
       {
-        if (pointPaths[i] != null) 
+        if (pointPaths[i].length >= pathLengthHighPassCutoff)
         {
-          beginShape();
-          for (int j = 0; j<pointPaths[i].length; j++)
+          if (pointPaths[i] != null) 
           {
-            PVector p = new PVector(pointPaths[i][j].x, pointPaths[i][j].y);
-            p = PVector.mult(p, scaler);
-            p = PVector.add(p, position);
-            vertex(p.x, p.y);
+            beginShape();
+            for (int j = 0; j<pointPaths[i].length; j++)
+            {
+              PVector p = new PVector(pointPaths[i][j].x, pointPaths[i][j].y);
+              p = PVector.mult(p, scaler);
+              p = PVector.add(p, position);
+              vertex(p.x, p.y);
+            }
+            endShape();
           }
-          endShape();
         }
       }
     }

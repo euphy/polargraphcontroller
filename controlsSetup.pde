@@ -474,15 +474,15 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setDecimalPrecision(1);
         n.setValue(blurValue);
         n.setMin(1);
-        n.setMax(100);
+        n.setMax(10);
         n.setMultiplier(0.1);
       }
       else if (MODE_LIVE_SIMPLIFICATION_VALUE.equals(key))
       {
         n.setDecimalPrecision(1);
         n.setValue(liveSimplification);
-        n.setMin(0);
-        n.setMax(360);
+        n.setMin(LIVE_SIMPLIFICATION_MIN);
+        n.setMax(LIVE_SIMPLIFICATION_MAX);
         n.setMultiplier(0.1);
       }
       else if (MODE_LIVE_POSTERISE_VALUE.equals(key))
@@ -492,6 +492,14 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setMin(2);
         n.setMax(32);
         n.setMultiplier(0.1);
+      }
+      else if (MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(pathLengthHighPassCutoff);
+        n.setMin(0);
+        n.setMax(10000);
+        n.setMultiplier(0.5);
       }
     }
   }
@@ -663,6 +671,7 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_RESIZE_VECTOR);
   controlNames.add(MODE_MOVE_VECTOR);
   controlNames.add(MODE_CHANGE_MIN_VECTOR_LINE_LENGTH);
+  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
   controlNames.add(MODE_RENDER_VECTORS);
 
   controlNames.add(MODE_SHOW_IMAGE);
@@ -706,6 +715,7 @@ List<String> getControlNamesForWebcamPanel()
   controlNames.add(MODE_LIVE_CANCEL_CAPTURE);
   controlNames.add(MODE_LIVE_ADD_CAPTION);
   controlNames.add(MODE_LIVE_CONFIRM_DRAW);
+  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
   return controlNames;
 }
 
@@ -911,6 +921,8 @@ Map<String, String> buildControlLabels()
   result.put(MODE_LIVE_CANCEL_CAPTURE, "Cancel capture");
   result.put(MODE_LIVE_ADD_CAPTION, "Add caption");
   
+  result.put(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF, "Path length cutoff");
+  
 
   return result;
 }
@@ -1043,6 +1055,7 @@ Set<String> buildControlNames()
   result.add(MODE_LIVE_CONFIRM_DRAW);
   result.add(MODE_LIVE_CANCEL_CAPTURE);
   result.add(MODE_LIVE_ADD_CAPTION);
+  result.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
   
   return result;
 }

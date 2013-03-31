@@ -132,14 +132,26 @@ void button_mode_liveAddCaption()
 {
   
 }
+void numberbox_mode_vectorPathLengthHighPassCutoff(int value)
+{
+  pathLengthHighPassCutoff =  value;
+}
 
 void button_mode_liveConfirmDraw()
 {
-  // work out scaling and position
-  float scaling = getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getWidth()) / captureShape.getWidth();
-  PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y) + (captureShape.getHeight() * scaling));
-
-  sendVectorShapes(captureShape, scaling, position);
+  if (captureShape != null)
+  {
+    //  save shape as SVG
+    
+    
+    
+    // work out scaling and position
+    float scaling = getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getWidth()) / captureShape.getWidth();
+    PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y) + (captureShape.getHeight() * scaling));
+  
+    sendVectorShapes(captureShape, scaling, position);
+    button_mode_penUp();
+  }
 }  
 
 

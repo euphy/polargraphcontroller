@@ -649,7 +649,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position)
   RPoint[][] pointPaths = vec.getPointsInPaths();      
   
   // sort the paths to optimise the draw sequence
-  pointPaths = sortPathLongestFirst(pointPaths);
+  pointPaths = sortPathLongestFirst(pointPaths, pathLengthHighPassCutoff);
   
   String command = "";
   PVector lastPoint = new PVector();
@@ -662,43 +662,47 @@ void sendVectorShapes(RShape vec, float scaling, PVector position)
     {
       boolean firstPointFound = false;
       
-      List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
-      //println(filteredPoints);
-      if (!filteredPoints.isEmpty())
+      if (pointPaths[i].length > pathLengthHighPassCutoff)
       {
-        // draw the first one with a pen up and down to get to it
-        PVector p = filteredPoints.get(0);
-        if ( p.x == lastPoint.x && p.y == lastPoint.y )
-          liftToGetToNewPoint = false;
-        else
-          liftToGetToNewPoint = true;
-
-        // pen UP! (IF THE NEW POINT IS DIFFERENT FROM THE LAST ONE!)
-        if (liftToGetToNewPoint)
-          addToCommandQueue(CMD_PENUP+"END");
-        // move to this point and put the pen down
-        command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
-        addToCommandQueue(command);
-        if (liftToGetToNewPoint)
-          addToCommandQueue(CMD_PENDOWN+"END");
-
-        // then just iterate through the rest
-        for (int j=1; j<filteredPoints.size(); j++)
+        List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
+        //println(filteredPoints);
+        if (!filteredPoints.isEmpty())
         {
-          p = filteredPoints.get(j);
+          // draw the first one with a pen up and down to get to it
+          PVector p = filteredPoints.get(0);
+          if ( p.x == lastPoint.x && p.y == lastPoint.y )
+            liftToGetToNewPoint = false;
+          else
+            liftToGetToNewPoint = true;
+  
+          // pen UP! (IF THE NEW POINT IS DIFFERENT FROM THE LAST ONE!)
+          if (liftToGetToNewPoint)
+            addToCommandQueue(CMD_PENUP+"END");
+          // move to this point and put the pen down
           command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
-          addToCommandQueue(command);          
+          addToCommandQueue(command);
+          if (liftToGetToNewPoint)
+            addToCommandQueue(CMD_PENDOWN+"END");
+  
+  
+  
+          // then just iterate through the rest
+          for (int j=1; j<filteredPoints.size(); j++)
+          {
+            p = filteredPoints.get(j);
+            command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
+            addToCommandQueue(command);          
+          }
+          lastPoint = new PVector(p.x,p.y);
+  
         }
-        lastPoint = new PVector(p.x,p.y);
-
       }
-      
     }
   }
   println("finished.");
 }
 
-public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths)
+public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths, int highPassCutoff)
 {
   // put the paths into a list
   List<RPoint[]> pathsList = new ArrayList<RPoint[]>(pointPaths.length);
@@ -710,7 +714,6 @@ public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths)
     }
   }
   
-  println("PathsList: ");
   for (RPoint[] path : pathsList)
     println(path.length + ", ");
   
@@ -726,17 +729,34 @@ public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths)
         }
     }
   });
+
+  // filter out some short paths
+  pathsList = removeShortPaths(pathsList, highPassCutoff);
   
-  println("Sorted PathsList: ");
-  for (RPoint[] path : pathsList)
-    println(path.length + ", ");
-  
+  // and put them into a new array
   for (int i=0; i<pathsList.size(); i++)
   {
     pointPaths[i] = pathsList.get(i);
   }
+
   return pointPaths;
 }
+
+List<RPoint[]> removeShortPaths(List<RPoint[]> list, int cutoff)
+{
+  if (cutoff > 0)
+  {
+    int numberOfPaths = list.size();
+    for (int i=0; i<numberOfPaths; i++)
+    {
+      if (cutoff >= list.get(i).length)
+      {
+        list.remove(i);
+      }
+    }
+  }
+  return list;
+}  
 
 List<PVector> filterPoints(RPoint[] points, int filterToUse, long filterParam, float scaling, PVector position)
 {

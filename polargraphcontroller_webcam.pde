@@ -111,6 +111,8 @@ Serial myPort;                       // The serial port
 int[] serialInArray = new int[1];    // Where we'll put what we receive
 int serialCount = 0;                 // A count of how many bytes we receive
 
+boolean[] keys = new boolean[526];
+
 final JFileChooser chooser = new JFileChooser();
 
 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy hh:mm:ss");
@@ -317,6 +319,8 @@ static final String MODE_LIVE_CANCEL_CAPTURE = "button_mode_liveClearCapture";
 static final String MODE_LIVE_ADD_CAPTION = "button_mode_liveAddCaption";
 static final String MODE_LIVE_CONFIRM_DRAW = "button_mode_liveConfirmDraw";
 
+static final String MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF = "numberbox_mode_vectorPathLengthHighPassCutoff";
+
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -462,6 +466,11 @@ static PImage liveImage = null;
 static PImage processedLiveImage = null;
 static PImage capturedImage = null;
 static PImage processedCapturedImage = null;
+
+static final Integer LIVE_SIMPLIFICATION_MIN = 1;
+static final Integer LIVE_SIMPLIFICATION_MAX = 32;
+
+static int pathLengthHighPassCutoff = 100;
 
 JMyron liveCamera;
 BlobDetector blob_detector;
@@ -818,7 +827,10 @@ void drawWebcamPage()
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
   showCommandQueue((int) width-200, 20);
 
+  processGamepadInput();
+
 }
+
 
 void drawCommandQueuePage()
 {
@@ -1318,41 +1330,44 @@ void changeMachineScaling(int delta)
   }
 }
 
+boolean checkKey(int k)
+{
+  if (keys.length >= k) {
+    return keys[k];  
+  }
+  return false;
+}
+
+void keyReleased()
+{ 
+  keys[keyCode] = false; 
+}
+
 void keyPressed()
 {
-  if (key == CODED)
-  {
-    // set key to zero (or something besides the ESC).
-    if (keyCode == java.awt.event.KeyEvent.VK_PAGE_UP)
-    {
-      changeMachineScaling(1);
-    }
-    else if (keyCode == java.awt.event.KeyEvent.VK_PAGE_DOWN)
-    {
-      changeMachineScaling(-1);
-    }
-    else if (keyCode == DOWN)
-    {
-      getDisplayMachine().getOffset().y = getDisplayMachine().getOffset().y + 10;
-    }
-    else if (keyCode == UP)
-    {
-      getDisplayMachine().getOffset().y = getDisplayMachine().getOffset().y - 10;
-    }
-    else if (keyCode == RIGHT)
-    {
-      getDisplayMachine().getOffset().x = getDisplayMachine().getOffset().x + 10;
-    }
-    else if (keyCode == LEFT)
-    {
-      getDisplayMachine().getOffset().x = getDisplayMachine().getOffset().x - 10;
-    }
-  }
-  else if (key == java.awt.event.KeyEvent.VK_ESCAPE) 
-  {
+
+  keys[keyCode] = true;
+  println(KeyEvent.getKeyText(keyCode));
+  
+  if (checkKey(CONTROL) && checkKey(KeyEvent.VK_PAGE_UP)) 
+    changeMachineScaling(1);
+  else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_PAGE_DOWN)) 
+    changeMachineScaling(-1);
+  else if (checkKey(CONTROL) && checkKey(DOWN))
+    getDisplayMachine().getOffset().y = getDisplayMachine().getOffset().y + 10;
+  else if (checkKey(CONTROL) && checkKey(UP)) 
+    getDisplayMachine().getOffset().y = getDisplayMachine().getOffset().y - 10;
+  else if (checkKey(CONTROL) && checkKey(RIGHT)) 
+    getDisplayMachine().getOffset().x = getDisplayMachine().getOffset().x + 10;
+  else if (checkKey(CONTROL) && checkKey(LEFT)) 
+    getDisplayMachine().getOffset().x = getDisplayMachine().getOffset().x - 10;
+  else if (checkKey(KeyEvent.VK_ESCAPE))
     key = 0;
-  }
-  else if (key == 'g' || key == 'G')
+
+//  if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G)) 
+//    println("CTRL+G");
+
+  else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G))
   {
     Toggle t = (Toggle) getAllControls().get(MODE_SHOW_GUIDES);
     if (displayingGuides)
@@ -1367,7 +1382,7 @@ void keyPressed()
     }
     t.update();
   }
-  else if (key == 'c' || key == 'C')
+  else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_C))
   {
     if (isUseWindowedConsole())
       setUseWindowedConsole(false);
@@ -1376,70 +1391,69 @@ void keyPressed()
       
     initLogging();
   }
-  else if (key == 's' || key == 'S')
+  else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_S))
   {
     if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
       displayingSelectedCentres = (displayingSelectedCentres) ? false : true;
   }
-  else if (key == 'i' || key == 'I')
+  else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_I))
   {
-    println("I pressed!.");
     displayingInfoTextOnInputPage = (displayingInfoTextOnInputPage) ? false : true;
   }
-  else if (key == '+')
-  {
-    currentMachineMaxSpeed = currentMachineMaxSpeed+MACHINE_MAXSPEED_INCREMENT;
-    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-    DecimalFormat df = (DecimalFormat)nf;  
-    df.applyPattern("###.##");
-    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
-  }
-  else if (key == '-')
-  {
-    currentMachineMaxSpeed = currentMachineMaxSpeed+(0.0 - MACHINE_MAXSPEED_INCREMENT);
-    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-    DecimalFormat df = (DecimalFormat)nf;  
-    df.applyPattern("###.##");
-    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
-  }
-  else if (key == '*')
-  {
-    currentMachineAccel = currentMachineAccel+MACHINE_ACCEL_INCREMENT;
-    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-    DecimalFormat df = (DecimalFormat)nf;  
-    df.applyPattern("###.##");
-    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
-  }
-  else if (key == '/')
-  {
-    currentMachineAccel = currentMachineAccel+(0.0 - MACHINE_ACCEL_INCREMENT);
-    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-    DecimalFormat df = (DecimalFormat)nf;  
-    df.applyPattern("###.##");
-    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
-  }
-  else if (key == ']')
-  {
-    currentPenWidth = currentPenWidth+penIncrement;
-    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-    DecimalFormat df = (DecimalFormat)nf;  
-    df.applyPattern("###.##");
-    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
-  }
-  else if (key == '[')
-  {
-    currentPenWidth = currentPenWidth-penIncrement;
-    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
-    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-    DecimalFormat df = (DecimalFormat)nf;  
-    df.applyPattern("###.##");
-    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
-  }
+//  else if (key == '+')
+//  {
+//    currentMachineMaxSpeed = currentMachineMaxSpeed+MACHINE_MAXSPEED_INCREMENT;
+//    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
+//  }
+//  else if (key == '-')
+//  {
+//    currentMachineMaxSpeed = currentMachineMaxSpeed+(0.0 - MACHINE_MAXSPEED_INCREMENT);
+//    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
+//  }
+//  else if (key == '*')
+//  {
+//    currentMachineAccel = currentMachineAccel+MACHINE_ACCEL_INCREMENT;
+//    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
+//  }
+//  else if (key == '/')
+//  {
+//    currentMachineAccel = currentMachineAccel+(0.0 - MACHINE_ACCEL_INCREMENT);
+//    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
+//  }
+//  else if (key == ']')
+//  {
+//    currentPenWidth = currentPenWidth+penIncrement;
+//    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
+//  }
+//  else if (key == '[')
+//  {
+//    currentPenWidth = currentPenWidth-penIncrement;
+//    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
+//  }
   else if (key == '#' )
   {
     addToRealtimeCommandQueue(CMD_PENUP+"END");
@@ -1457,15 +1471,15 @@ void keyPressed()
   {
     this.maxSegmentLength++;
   }
-  else if (key == ',')
-  {
-    if (this.minimumVectorLineLength > 0)
-      this.minimumVectorLineLength--;
-  }
-  else if (key == '.')
-  {
-    this.minimumVectorLineLength++;
-  }
+//  else if (key == ',')
+//  {
+//    if (this.minimumVectorLineLength > 0)
+//      this.minimumVectorLineLength--;
+//  }
+//  else if (key == '.')
+//  {
+//    this.minimumVectorLineLength++;
+//  }
 }
 void mouseDragged()
 {

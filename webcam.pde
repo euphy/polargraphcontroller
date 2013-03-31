@@ -1,15 +1,15 @@
 public PImage webcam_buildLiveImage()
 {
   liveCamera.update();
-  PImage pimg = createImage(640,480, RGB);
+  PImage pimg = createImage(640, 480, RGB);
   pimg.loadPixels();
   pimg.pixels = liveCamera.image();
   // flip the image left to right
   if (flipWebcamImage)
   {
-    
+
     List<int[]> list = new ArrayList<int[]>(480);
-    
+
     for (int r=0; r<pimg.pixels.length; r+=640)
     {
       int[] temp = new int[640];
@@ -19,10 +19,10 @@ public PImage webcam_buildLiveImage()
       }
       list.add(temp);
     }
-    
+
     // reverse the list
     Collections.reverse(list);
-    
+
     for (int r=0; r<list.size(); r++)
     {
       for (int c=0; c<640; c++)
@@ -132,7 +132,7 @@ Map<Integer, PImage> webcam_buildSeps(PImage img, Integer keyColour)
     Integer pixel = img.pixels[i];
     seps.get(pixel).pixels[i] = keyColour;
   }
-  
+
   return seps;
 }
 
@@ -153,15 +153,21 @@ RShape webcam_convertDiewaldToRShape(List<Pixel> points)
 }
 
 
+public void webcam_captureCurrentImage(PImage inImage)
+{
+  processedCapturedImage = webcam_processImageForTrace(inImage);
+  colourSeparations = webcam_buildSeps(processedCapturedImage, sepKeyColour);
+  captureShape = webcam_traceImage(colourSeparations);
+}
+
 public void webcam_captureCurrentImage()
 {
   capturedImage = webcam_buildLiveImage();
-  processedCapturedImage = webcam_processImageForTrace(liveImage);
-  colourSeparations = webcam_buildSeps(processedCapturedImage, sepKeyColour);
-  captureShape = webcam_traceImage(colourSeparations);
+  webcam_captureCurrentImage(capturedImage);
 }
 
 public void stop() {
   liveCamera.stop();
   super.stop();
 }
+

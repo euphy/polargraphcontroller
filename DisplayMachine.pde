@@ -425,6 +425,17 @@ class DisplayMachine extends Machine
     float scaler = h / vec.getHeight();
     PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, height -10);
 
+//    int noOfChildren = vec.countChildren();
+//    List<RShape> children = new ArrayList<RShape>(noOfChildren);
+//    for (int i=0; i < noOfChildren; i++)
+//    {
+//      if (vec.children[i].getArea() > pathLengthHighPassCutoff)
+//        children.add(vec.children[i]);
+//    }
+//    
+//    RShape[] newArray = children.toArray(new RShape[children.size()]);
+//    vec.children = newArray;
+    
     RPoint[][] pointPaths = vec.getPointsInPaths();
     if (pointPaths != null)
     {

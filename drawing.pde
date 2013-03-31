@@ -746,7 +746,7 @@ List<RPoint[]> removeShortPaths(List<RPoint[]> list, int cutoff)
 {
   if (cutoff > 0)
   {
-    int numberOfPaths = list.size();
+    int numberOfPaths = list.size()-1;
     for (int i=0; i<numberOfPaths; i++)
     {
       if (cutoff >= list.get(i).length)

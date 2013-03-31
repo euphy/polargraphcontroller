@@ -497,8 +497,8 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       {
         n.setDecimalPrecision(1);
         n.setValue(pathLengthHighPassCutoff);
-        n.setMin(0);
-        n.setMax(10000);
+        n.setMin(PATH_LENGTH_HIGHPASS_CUTOFF_MIN);
+        n.setMax(PATH_LENGTH_HIGHPASS_CUTOFF_MAX);
         n.setMultiplier(0.5);
       }
     }

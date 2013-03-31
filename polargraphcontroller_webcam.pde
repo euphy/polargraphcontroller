@@ -470,7 +470,9 @@ static PImage processedCapturedImage = null;
 static final Integer LIVE_SIMPLIFICATION_MIN = 1;
 static final Integer LIVE_SIMPLIFICATION_MAX = 32;
 
-static int pathLengthHighPassCutoff = 100;
+static int pathLengthHighPassCutoff = 0;
+static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MAX = 10000;
+static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MIN = 0;
 
 JMyron liveCamera;
 BlobDetector blob_detector;

@@ -86,9 +86,25 @@ void dpadPress(float x, float y)
     if (liveSimplification > LIVE_SIMPLIFICATION_MAX)
       liveSimplification = LIVE_SIMPLIFICATION_MAX;
   }
+  if (val == 8.0) // left
+  {
+    pathLengthHighPassCutoff--;
+    if (pathLengthHighPassCutoff < PATH_LENGTH_HIGHPASS_CUTOFF_MIN)
+      pathLengthHighPassCutoff = PATH_LENGTH_HIGHPASS_CUTOFF_MIN;
+  }
+  else if (val == 4.0) // right
+  {
+    pathLengthHighPassCutoff++;
+    if (pathLengthHighPassCutoff > PATH_LENGTH_HIGHPASS_CUTOFF_MAX)
+      pathLengthHighPassCutoff = PATH_LENGTH_HIGHPASS_CUTOFF_MAX;
+  }
 
   Numberbox n = (Numberbox) getAllControls().get(MODE_LIVE_SIMPLIFICATION_VALUE);
   n.setValue(liveSimplification);
+  n.update();
+
+  n = (Numberbox) getAllControls().get(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
+  n.setValue(pathLengthHighPassCutoff);
   n.update();
 
 }

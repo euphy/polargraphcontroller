@@ -105,7 +105,7 @@ void numberbox_mode_penDownPos(int value)
 }
 void button_mode_sendPenliftRange()
 {
-  addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END");
+  addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",1,END");
 }  
 
 void numberbox_mode_liveBlurValue(int value)

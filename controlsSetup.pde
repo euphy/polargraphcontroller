@@ -587,7 +587,7 @@ Map<String, PVector> buildControlPositionsForPanel(Panel panel)
 }
 Map<String, PVector> buildControlSizesForPanel(Panel panel)
 {
-  println("Building control sizes for panel " + panel.getName());
+  //println("Building control sizes for panel " + panel.getName());
   Map<String, PVector> map = new HashMap<String, PVector>();
   String panelName = panel.getName();
   int col = 0;
@@ -603,7 +603,7 @@ Map<String, PVector> buildControlSizesForPanel(Panel panel)
     {
       PVector s = new PVector(DEFAULT_CONTROL_SIZE.x, DEFAULT_CONTROL_SIZE.y);
       map.put(controller.name(), s);
-      println("Added size of " + controller.name() + " to panel. " + s);
+      //println("Added size of " + controller.name() + " to panel. " + s);
     }
   }
 

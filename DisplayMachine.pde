@@ -403,19 +403,16 @@ class DisplayMachine extends Machine
     
     if (captureShape != null)
     {
-      stroke(150);
-      displayWebcamShapeAtFullSize(webcamShape);
-      stroke(255);
-      displayWebcamShapeAtFullSize(captureShape);
+      //displayWebcamShapeAtFullSize(webcamShape, false, color(150,150,150));
+      displayWebcamShapeAtFullSize(captureShape, true, color(0,0,0));
     }
     else
     {
-      stroke(255);
-      displayWebcamShapeAtFullSize(webcamShape);
+      displayWebcamShapeAtFullSize(webcamShape, false, color(255,255,255));
     }
   }
   
-  public void displayWebcamShapeAtFullSize(RShape vec)
+  public void displayWebcamShapeAtFullSize(RShape vec, boolean illustrateSequence, Integer colour)
   {
     RG.ignoreStyles();
     // work out scaling to make it full size on the screen
@@ -423,28 +420,31 @@ class DisplayMachine extends Machine
     float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
     float w = h * aspectRatio;
     float scaler = h / vec.getHeight();
-    PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, height -10);
+    PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10);
 
-//    int noOfChildren = vec.countChildren();
-//    List<RShape> children = new ArrayList<RShape>(noOfChildren);
-//    for (int i=0; i < noOfChildren; i++)
-//    {
-//      if (vec.children[i].getArea() > pathLengthHighPassCutoff)
-//        children.add(vec.children[i]);
-//    }
-//    
-//    RShape[] newArray = children.toArray(new RShape[children.size()]);
-//    vec.children = newArray;
-    
+    noFill();
     RPoint[][] pointPaths = vec.getPointsInPaths();
+    if (illustrateSequence)
+      pointPaths = sortPathsCentreFirst(vec, pathLengthHighPassCutoff);
+    
     if (pointPaths != null)
     {
+      float incPerPath = 0.0;
+      if (illustrateSequence)
+        incPerPath = 255.0 / (float) pointPaths.length;
+
       for(int i = 0; i<pointPaths.length; i++)
       {
-        if (pointPaths[i].length >= pathLengthHighPassCutoff)
-        {
+        float col = (float)i * incPerPath;
+//        if (pointPaths[i].length >= pathLengthHighPassCutoff)
+//        {
           if (pointPaths[i] != null) 
           {
+            if (illustrateSequence)
+              stroke((int)col, (int)col, (int)col, 128);
+            else
+              stroke(colour);
+              
             beginShape();
             for (int j = 0; j<pointPaths[i].length; j++)
             {
@@ -454,10 +454,11 @@ class DisplayMachine extends Machine
               vertex(p.x, p.y);
             }
             endShape();
-          }
+//          }
         }
       }
     }
+    noFill();
   }
   
   public void displayVectorImage()

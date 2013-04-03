@@ -1,31 +1,31 @@
 /**
-  Polargraph controller
-  Copyright Sandy Noble 2012.
-
-  This file is part of Polargraph Controller.
-
-  Polargraph Controller is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  Polargraph Controller is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
-    
-  Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
-  Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
-  
-  This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
-
-  sandy.noble@gmail.com
-  http://www.polargraph.co.uk/
-  http://code.google.com/p/polargraph/
-*/
+ Polargraph controller
+ Copyright Sandy Noble 2012.
+ 
+ This file is part of Polargraph Controller.
+ 
+ Polargraph Controller is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ Polargraph Controller is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
+ Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
+ 
+ This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
+ 
+ sandy.noble@gmail.com
+ http://www.polargraph.co.uk/
+ http://code.google.com/p/polargraph/
+ */
 static final String CMD_CHANGELENGTH = "C01,";
 static final String CMD_CHANGEPENWIDTH = "C02,";
 static final String CMD_CHANGEMOTORSPEED = "C03,";
@@ -71,7 +71,7 @@ static final String CMD_DRAW_NORWEGIAN = "C43,";
 static final String CMD_DRAW_NORWEGIAN_OUTLINE = "C44,";
 static final String CMD_SETPENLIFTRANGE = "C45,";
 
-private PVector mouseVector = new PVector(0,0);
+private PVector mouseVector = new PVector(0, 0);
 
 Comparator xAscending = new Comparator() 
 {
@@ -79,7 +79,7 @@ Comparator xAscending = new Comparator()
   {
     PVector a = (PVector) p1;
     PVector b = (PVector) p2;
-    
+
     int xValue = new Float(a.x).compareTo(b.x);
     return xValue;
   }
@@ -91,7 +91,7 @@ Comparator yAscending = new Comparator()
   {
     PVector a = (PVector) p1;
     PVector b = (PVector) p2;
-    
+
     int yValue = new Float(a.y).compareTo(b.y);
     return yValue;
   }
@@ -128,9 +128,9 @@ public PVector getMouseVector()
 {
   if (mouseVector == null)
   {
-    mouseVector = new PVector(0,0);
+    mouseVector = new PVector(0, 0);
   }
-  
+
   mouseVector.x = mouseX;
   mouseVector.y = mouseY;
   return mouseVector;
@@ -158,7 +158,7 @@ void sendMoveToNativePosition(boolean direct, PVector p)
     command = CMD_CHANGELENGTHDIRECT+int(p.x+0.5)+","+int(p.y+0.5)+","+getMaxSegmentLength()+",END";
   else
     command = CMD_CHANGELENGTH+(int)p.x+","+(int)p.y+",END";
-  
+
   addToCommandQueue(command);
 }
 
@@ -182,13 +182,13 @@ void sendTestPenWidth()
   StringBuilder sb = new StringBuilder();
   sb.append(testPenWidthCommand)
     .append(int(gridSize))
-    .append(",")
-    .append(df.format(testPenWidthStartSize))
-    .append(",")
-    .append(df.format(testPenWidthEndSize))
-    .append(",")
-    .append(df.format(testPenWidthIncrementSize))
-    .append(",END");
+      .append(",")
+        .append(df.format(testPenWidthStartSize))
+          .append(",")
+            .append(df.format(testPenWidthEndSize))
+              .append(",")
+                .append(df.format(testPenWidthIncrementSize))
+                  .append(",END");
   addToCommandQueue(sb.toString());
 }
 
@@ -197,7 +197,7 @@ void sendSetPosition()
   PVector p = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
   p = getDisplayMachine().convertToNative(p);
   p = getDisplayMachine().inSteps(p);
-  
+
   String command = CMD_SETPOSITION+int(p.x+0.5)+","+int(p.y+0.5)+",END";
   addToCommandQueue(command);
 }
@@ -207,7 +207,7 @@ void sendStartTextAtPoint()
   PVector p = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
   p = getDisplayMachine().convertToNative(p);
   p = getDisplayMachine().inSteps(p);
-  
+
   String command = CMD_START_TEXT+(int)p.x+","+(int)p.y+","+gridSize+",2,END";
   addToCommandQueue(command);
 }
@@ -215,7 +215,7 @@ void sendStartTextAtPoint()
 void sendSetHomePosition()
 {
   PVector pgCoords = getDisplayMachine().asNativeCoords(getHomePoint());
-  
+
   String command = CMD_SETPOSITION+int(pgCoords.x+0.5)+","+int(pgCoords.y+0.5)+",END";
   addToCommandQueue(command);
 }
@@ -224,13 +224,13 @@ int scaleDensity(int inDens, int inMax, int outMax)
 {
   float reducedDens = (float(inDens) / float(inMax)) * float(outMax);
   reducedDens = outMax-reducedDens;
-//  println("inDens:"+inDens+", inMax:"+inMax+", outMax:"+outMax+", reduced:"+reducedDens);
-  
+  //  println("inDens:"+inDens+", inMax:"+inMax+", outMax:"+outMax+", reduced:"+reducedDens);
+
   // round up if bigger than .5
   int result = int(reducedDens);
   if (reducedDens - (result) > 0.5)
     result ++;
-  
+
   //result = outMax - result;
   return result;
 }
@@ -238,13 +238,13 @@ int scaleDensity(int inDens, int inMax, int outMax)
 SortedMap<Float, List<PVector>> divideIntoRows(Set<PVector> pixels, int direction)
 {
   SortedMap<Float, List<PVector>> inRows = new TreeMap<Float, List<PVector>>();
-  
+
   for (PVector p : pixels)
   {
     Float row = p.x;
     if (direction == DRAW_DIR_SE || direction == DRAW_DIR_NW)
       row = p.y;
-      
+
     if (!inRows.containsKey(row))
     {
       inRows.put(row, new ArrayList<PVector>());
@@ -259,7 +259,7 @@ PVector sortPixelsInRowsAlternating(SortedMap<Float, List<PVector>> inRows, int 
   PVector startPoint = null;
   Comparator comp = null;
   boolean rowIsAlongXAxis = true;
-  
+
   if (initialDirection == DRAW_DIR_SE || initialDirection == DRAW_DIR_NW)
   {
     rowIsAlongXAxis = true;
@@ -270,7 +270,7 @@ PVector sortPixelsInRowsAlternating(SortedMap<Float, List<PVector>> inRows, int 
     rowIsAlongXAxis = false;
     comp = yAscending;
   }
-  
+
   // now sort each row, reversing the direction after each row
   boolean reverse = false;
   for (Float rowCoord : inRows.keySet())
@@ -283,38 +283,38 @@ PVector sortPixelsInRowsAlternating(SortedMap<Float, List<PVector>> inRows, int 
       // reverse it (descending)
       Collections.sort(row, comp);
       Collections.reverse(row);
-//      if (startPoint == null)
-//      {
-//        if (rowIsAlongXAxis)
-//          startPoint = new PVector(row.get(0).x+(maxPixelSize/2.0), row.get(0).y);
-//        else
-//          startPoint = new PVector(row.get(0).x, row.get(0).y-(maxPixelSize/2.0));
-//      }
+      //      if (startPoint == null)
+      //      {
+      //        if (rowIsAlongXAxis)
+      //          startPoint = new PVector(row.get(0).x+(maxPixelSize/2.0), row.get(0).y);
+      //        else
+      //          startPoint = new PVector(row.get(0).x, row.get(0).y-(maxPixelSize/2.0));
+      //      }
       reverse = false;
     }
     else
     {
       // sort row ascending
       Collections.sort(row, comp);
-//      if (startPoint == null)
-//      {
-//        if (rowIsAlongXAxis)
-//          startPoint = new PVector(row.get(0).x-(maxPixelSize/2.0), row.get(0).y);
-//        else
-//          startPoint = new PVector(row.get(0).x, row.get(0).y+(maxPixelSize/2.0));
-//      }
+      //      if (startPoint == null)
+      //      {
+      //        if (rowIsAlongXAxis)
+      //          startPoint = new PVector(row.get(0).x-(maxPixelSize/2.0), row.get(0).y);
+      //        else
+      //          startPoint = new PVector(row.get(0).x, row.get(0).y+(maxPixelSize/2.0));
+      //      }
       reverse = true;
     }
   }
   return startPoint;
 }
-   
+
 void sortPixelsInRows(SortedMap<Float, List<PVector>> inRows, int initialDirection)
 {
   PVector startPoint = null;
   Comparator comp = null;
   boolean rowIsAlongXAxis = true;
-  
+
   if (initialDirection == DRAW_DIR_SE || initialDirection == DRAW_DIR_NW)
   {
     rowIsAlongXAxis = true;
@@ -325,7 +325,7 @@ void sortPixelsInRows(SortedMap<Float, List<PVector>> inRows, int initialDirecti
     rowIsAlongXAxis = false;
     comp = yAscending;
   }
-  
+
   // now sort each row, reversing the direction after each row
   for (Float rowCoord : inRows.keySet())
   {
@@ -333,7 +333,7 @@ void sortPixelsInRows(SortedMap<Float, List<PVector>> inRows, int initialDirecti
     List<PVector> row = inRows.get(rowCoord);
     // sort row ascending
     Collections.sort(row, comp);
-    
+
     if (initialDirection == DRAW_DIR_NW || initialDirection == DRAW_DIR_NE)
       Collections.reverse(row);
   }
@@ -343,21 +343,21 @@ void sortPixelsInRows(SortedMap<Float, List<PVector>> inRows, int initialDirecti
 
 void sendPixels(Set<PVector> pixels, String pixelCommand, int initialDirection, int startCorner, float maxPixelSize, boolean scaleSizeToDensity)
 {
-  
+
   // sort it into a map of rows, keyed by y coordinate value
   SortedMap<Float, List<PVector>> inRows = divideIntoRows(pixels, initialDirection);
-  
+
   sortPixelsInRowsAlternating(inRows, initialDirection, maxPixelSize);
-  
+
   // that was easy.
   // load the queue
   // add a preamble
-  
-  // set the first direction
+
+    // set the first direction
   int drawDirection = initialDirection;
   String changeDir = CMD_CHANGEDRAWINGDIRECTION+getPixelDirectionMode()+"," + drawDirection +",END";
   addToCommandQueue(changeDir);
-  
+
   // reverse the row sequence if the draw is starting from the bottom
   // and reverse the pixel sequence if it needs to be done (odd number of rows)
   boolean reversePixelSequence = false;
@@ -400,14 +400,14 @@ void sendPixels(Set<PVector> pixels, String pixelCommand, int initialDirection, 
     startPointY-=halfSize;
     println("NE");
   }
-  
+
   if (startPoint != null)
   {
     String touchdown = CMD_CHANGELENGTH+int(startPointX)+","+int(startPointY)+",END";
     addToCommandQueue(touchdown);
     addToCommandQueue(CMD_PENDOWN+"END");
   }
-  
+
   boolean penLifted = false;
 
   // so for each row
@@ -416,7 +416,7 @@ void sendPixels(Set<PVector> pixels, String pixelCommand, int initialDirection, 
     List<PVector> row = inRows.get(key);
     if (reversePixelSequence)
       Collections.reverse(row);
-      
+
     for (PVector v : row)
     {
       if (isHiddenPixel(v)) // check for masked pixels,
@@ -432,7 +432,7 @@ void sendPixels(Set<PVector> pixels, String pixelCommand, int initialDirection, 
           }
           else
           {
-           // println("Pen is already lifted.");
+            // println("Pen is already lifted.");
           }
           // now convert to ints 
           int inX = int(v.x);
@@ -462,11 +462,11 @@ void sendPixels(Set<PVector> pixels, String pixelCommand, int initialDirection, 
         }
         int scaledPixelSize = int((pixelSize*getPixelScalingOverGridSize())+0.5);
         String command = pixelCommand+inX+","+inY+","+scaledPixelSize+","+density+",END";
-  
+
         // put the pen down if lifting over masked pixels is on
         if (liftPenOnMaskedPixels && penLifted)
         {
-//          println("Pen down.");
+          //          println("Pen down.");
           String lowerPen = CMD_PENDOWN + "END";
           addToCommandQueue(lowerPen);
           penLifted = false;
@@ -479,7 +479,7 @@ void sendPixels(Set<PVector> pixels, String pixelCommand, int initialDirection, 
     String command = CMD_CHANGEDRAWINGDIRECTION+getPixelDirectionMode()+"," + drawDirection +",END";
     addToCommandQueue(command);
   }
-  
+
   addToCommandQueue(CMD_PENUP+"END");
   numberOfPixelsTotal = commandQueue.size();
   startPixelTimer();
@@ -498,7 +498,7 @@ int flipDrawDirection(int curr)
     return DRAW_DIR_NE;
   else return DRAW_DIR_SE;
 }
-  
+
 
 int getPixelDirectionMode()
 {
@@ -545,7 +545,7 @@ void sendOutlineOfPixels(Set<PVector> pixels)
 {
   // sort it into a map of rows, keyed by y coordinate value
   SortedMap<Float, List<PVector>> inRows = divideIntoRows(pixels, DRAW_DIR_SE);
-  
+
   sortPixelsInRowsAlternating(inRows, DRAW_DIR_SE, getGridSize());
 
   float halfGrid = getGridSize() / 2.0;
@@ -558,14 +558,14 @@ void sendOutlineOfPixels(Set<PVector> pixels)
       String command = CMD_DRAWRECT + int(startPoint.x)+","+int(startPoint.y)+","+int(endPoint.x)+","+int(endPoint.y)+",END";
       addToCommandQueue(command);
     }
-  }  
+  }
 }
 
 void sendOutlineOfRows(Set<PVector> pixels, int drawDirection)
 {
   // sort it into a map of rows, keyed by y coordinate value
   SortedMap<Float, List<PVector>> inRows = divideIntoRows(pixels, drawDirection);
-  
+
   sortPixelsInRows(inRows, drawDirection);
 
   PVector offset = new PVector(getGridSize() / 2.0, getGridSize() / 2.0);
@@ -573,7 +573,7 @@ void sendOutlineOfRows(Set<PVector> pixels, int drawDirection)
   {
     PVector startPoint = inRows.get(key).get(0);
     PVector endPoint = inRows.get(key).get(inRows.get(key).size()-1);
-    
+
     if (drawDirection == DRAW_DIR_SE)
     {
       startPoint.sub(offset);
@@ -594,10 +594,10 @@ void sendOutlineOfRows(Set<PVector> pixels, int drawDirection)
       startPoint.add(offset);
       endPoint.sub(offset);
     }
-    
+
     String command = CMD_DRAWRECT + int(startPoint.x)+","+int(startPoint.y)+","+int(endPoint.x)+","+int(endPoint.y)+",END";
     addToCommandQueue(command);
-  }  
+  }
 }
 
 void sendGridOfBox(Set<PVector> pixels)
@@ -615,12 +615,12 @@ void sendOutlineOfBox()
 
   PVector tr = new PVector(br.x, tl.y);
   PVector bl = new PVector(tl.x, br.y);
-  
+
   tl = getDisplayMachine().asNativeCoords(tl);
   tr = getDisplayMachine().asNativeCoords(tr);
   bl = getDisplayMachine().asNativeCoords(bl);
   br = getDisplayMachine().asNativeCoords(br);
-  
+
   String command = CMD_CHANGELENGTHDIRECT+(int)tl.x+","+(int)tl.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
 
@@ -635,7 +635,6 @@ void sendOutlineOfBox()
 
   command = CMD_CHANGELENGTHDIRECT+(int)tl.x+","+(int)tl.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
-  
 }
 
 void sendVectorShapes()
@@ -647,25 +646,26 @@ void sendVectorShapes(RShape vec, float scaling, PVector position)
 {
   println("Send vector shapes.");
   RPoint[][] pointPaths = vec.getPointsInPaths();      
-  
+
   // sort the paths to optimise the draw sequence
-  pointPaths = sortPathLongestFirst(pointPaths, pathLengthHighPassCutoff);
-  
+  //  pointPaths = sortPathsLongestFirst(pointPaths, pathLengthHighPassCutoff);
+  //  pointPaths = sortPathsGreatestAreaFirst(vec, pathLengthHighPassCutoff);
+  pointPaths = sortPathsCentreFirst(vec, pathLengthHighPassCutoff);
+
   String command = "";
   PVector lastPoint = new PVector();
   boolean liftToGetToNewPoint = true;
-  
+
   // go through and get each path
   for (int i = 0; i<pointPaths.length; i++)
   {
     if (pointPaths[i] != null) 
     {
       boolean firstPointFound = false;
-      
+
       if (pointPaths[i].length > pathLengthHighPassCutoff)
       {
         List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
-        //println(filteredPoints);
         if (!filteredPoints.isEmpty())
         {
           // draw the first one with a pen up and down to get to it
@@ -674,7 +674,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position)
             liftToGetToNewPoint = false;
           else
             liftToGetToNewPoint = true;
-  
+
           // pen UP! (IF THE NEW POINT IS DIFFERENT FROM THE LAST ONE!)
           if (liftToGetToNewPoint)
             addToCommandQueue(CMD_PENUP+"END");
@@ -683,18 +683,17 @@ void sendVectorShapes(RShape vec, float scaling, PVector position)
           addToCommandQueue(command);
           if (liftToGetToNewPoint)
             addToCommandQueue(CMD_PENDOWN+"END");
-  
-  
-  
+
+
+
           // then just iterate through the rest
           for (int j=1; j<filteredPoints.size(); j++)
           {
             p = filteredPoints.get(j);
             command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
-            addToCommandQueue(command);          
+            addToCommandQueue(command);
           }
-          lastPoint = new PVector(p.x,p.y);
-  
+          lastPoint = new PVector(p.x, p.y);
         }
       }
     }
@@ -713,23 +712,26 @@ public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths, int highPassCutoff
       pathsList.add(pointPaths[i]);
     }
   }
-  
+
   // sort the list
   Collections.sort(pathsList, new Comparator<RPoint[]>() {
     public int compare(RPoint[] o1, RPoint[] o2) {
-        if (o1.length > o2.length) {
-            return -1;
-        } else if (o1.length < o2.length) {
-            return 1;
-        } else {
-            return 0;
-        }
+      if (o1.length > o2.length) {
+        return -1;
+      } 
+      else if (o1.length < o2.length) {
+        return 1;
+      } 
+      else {
+        return 0;
+      }
     }
-  });
+  }
+  );
 
   // filter out some short paths
   pathsList = removeShortPaths(pathsList, highPassCutoff);
-  
+
   // and put them into a new array
   for (int i=0; i<pathsList.size(); i++)
   {
@@ -739,13 +741,110 @@ public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths, int highPassCutoff
   return pointPaths;
 }
 
+public RPoint[][] sortPathsGreatestAreaFirst(RShape vec, int highPassCutoff)
+{
+  // put the paths into a list
+  SortedMap<Float, RPoint[]> pathsList = new TreeMap<Float, RPoint[]>();
+
+  int noOfChildren = vec.countChildren();
+  for (int i=0; i < noOfChildren; i++)
+  {
+    float area = vec.children[i].getArea();
+    RPoint[] path = vec.children[i].getPointsInPaths()[0];
+    pathsList.put(area, path);
+  }
+
+  RPoint[][] pointPaths = vec.getPointsInPaths();  
+  List<RPoint[]> filtered = new ArrayList<RPoint[]>();
+  
+  // and put them into a new array
+  int i = 0;
+  for (Float k : pathsList.keySet())
+  {
+    if (k >= highPassCutoff)
+    {
+      filtered.add(pathsList.get(k));
+      println("Filtered kept path of area " + k);
+    }
+    else
+      println("Filtered discarded path of area " + k);
+  }
+  
+  pointPaths = new RPoint[filtered.size()][];
+  for (i = 0; i < filtered.size(); i++)
+  {
+    pointPaths[i] = filtered.get(i);
+  }
+
+  return pointPaths;
+}
+
+public RPoint[][] sortPathsCentreFirst(RShape vec, int highPassCutoff)
+{
+  // put the paths into a list
+  int noOfChildren = vec.countChildren();
+  List<RShape> pathsList = new ArrayList<RShape>(noOfChildren);
+  for (int i=0; i < noOfChildren; i++)
+    pathsList.add(vec.children[i]);
+  List<RShape> orderedPathsList = new ArrayList<RShape>(noOfChildren);
+
+  // make a tiny area in the centre of the shape,
+  // plan to increment the size of the area until it covers vec entirely
+  // (radius of area min = 0, max = distance from shape centre to any corner.)
+  
+  float aspectRatio = vec.getHeight() / vec.getWidth();
+  int n = 0;
+  float w = 1.0;
+  float h = w * aspectRatio;
+  
+  RPoint topLeft = vec.getTopLeft();
+  RPoint botRight = vec.getBottomRight();
+  
+  PVector centre = new PVector(vec.getWidth()/2, vec.getHeight()/2);
+
+  float vecWidth = vec.getWidth();
+  
+  while (w <= vecWidth)
+  {
+    w+=6.0;
+    h = w * aspectRatio;
+    
+    //println(n++ + ". Rect w " + w + ", h " + h);
+    RShape field = RShape.createRectangle(centre.x-(w/2.0), centre.y-(h/2.0), w, h);
+    // add all the shapes that are entirely inside the circle to orderedPathsList
+    ListIterator<RShape> it = pathsList.listIterator();
+    int shapesAdded = 0;
+    while (it.hasNext())
+    {
+      RShape sh = it.next();
+      if (field.contains(sh.getCenter()))
+      {
+        orderedPathsList.add(sh);
+        // remove the shapes from pathsList (so it isn't found again)
+        shapesAdded++;
+        it.remove();
+      }
+    }
+    // increase the size of the circle and try again
+  }
+
+  RPoint[][] pointPaths = new RPoint[orderedPathsList.size()][];// vec.getPointsInPaths();
+  for (int i = 0; i < orderedPathsList.size(); i++)
+  {
+    pointPaths[i] = orderedPathsList.get(i).getPointsInPaths()[0];
+  }
+
+  return pointPaths;
+}
+
+
 List<RPoint[]> removeShortPaths(List<RPoint[]> list, int cutoff)
 {
   if (cutoff > 0)
   {
     int numberOfPaths = list.size();
     ListIterator<RPoint[]> it = list.listIterator();
-    while (it.hasNext())
+    while (it.hasNext ())
     {
       RPoint[] paths = it.next();
       if (paths == null || cutoff >= paths.length)
@@ -765,7 +864,7 @@ List<PVector> filterPoints(RPoint[] points, int filterToUse, long filterParam, f
 List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scaling, PVector position)
 {
   List<PVector> result = new ArrayList<PVector>();
-  
+
   // scale and convert all the points first
   List<PVector> scaled = new ArrayList<PVector>(points.length);
   for (int j = 0; j<points.length; j++)
@@ -781,27 +880,27 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scali
       scaled.add(p);
     }
   }
-  
+
   if (scaled.size() > 1)
   {
     PVector p = scaled.get(0);
     result.add(p);
-    
+
     for (int j = 1; j<scaled.size(); j++)
     {
       p = scaled.get(j);
-        // and even then, only bother drawing if it's a move of over "x" steps
-        int diffx = int(p.x) - int(result.get(result.size()-1).x);
-        int diffy = int(p.y) - int(result.get(result.size()-1).y);
-        
-        if (abs(diffx) > filterParam || abs(diffy) > filterParam)
-        {
-          //println("Adding point " + p + ", last: " + result.get(result.size()-1));
-          result.add(p);
-        }
+      // and even then, only bother drawing if it's a move of over "x" steps
+      int diffx = int(p.x) - int(result.get(result.size()-1).x);
+      int diffy = int(p.y) - int(result.get(result.size()-1).y);
+
+      if (abs(diffx) > filterParam || abs(diffy) > filterParam)
+      {
+        //println("Adding point " + p + ", last: " + result.get(result.size()-1));
+        result.add(p);
+      }
     }
   }
-  
+
   if (result.size() < 2)
     result.clear();
 
@@ -817,12 +916,12 @@ void sendMachineStoreMode()
   String overwrite = ",R";
   if (!getOverwriteExistingStoreFile())
     overwrite = ",A";
-    
-  addToCommandQueue(CMD_MACHINE_MODE_STORE_COMMANDS + getStoreFilename()+overwrite+",END");
+
+  addToRealtimeCommandQueue(CMD_MACHINE_MODE_STORE_COMMANDS + getStoreFilename()+overwrite+",END");
 }
 void sendMachineLiveMode()
 {
-  addToCommandQueue(CMD_MACHINE_MODE_LIVE+"END");
+  addToRealtimeCommandQueue(CMD_MACHINE_MODE_LIVE+"END");
 }
 void sendMachineExecMode()
 {
@@ -847,5 +946,4 @@ void sendDrawRandomSprite(String spriteFilename)
   addToCommandQueue(CMD_DRAW_RANDOM_SPRITE+","+spriteFilename+",100,500,END");
 }
 
-  
 

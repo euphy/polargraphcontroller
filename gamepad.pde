@@ -11,9 +11,9 @@ ControllButton buttonStart;
 
 ControllCoolieHat dpad;
 
-
-String inputDeviceName = "Controller (Xbox 360 Wireless Receiver for Windows)";
-
+List<String> devices = new ArrayList<String>(
+  Arrays.asList("Controller (Xbox 360 Wireless Receiver for Windows)", 
+                "Controller (XBOX 360 For Windows)"));
 
 String signalFromGamepad = null;
 
@@ -29,38 +29,55 @@ void gamepad_init()
 
   try
   {
-    joypad = controllIO.getDevice(inputDeviceName);
-    joypad.printButtons();
-  
-    buttonA = joypad.getButton("Button 0");
-    buttonB = joypad.getButton("Button 1");
-    buttonX = joypad.getButton("Button 2");
-    buttonY = joypad.getButton("Button 3");
+    controllIO.printDevices();
+    for (int i = 0; i<devices.size(); i++)
+    {
+      try
+      {
+        println("trying " + i + ": " + devices.get(i));
+        joypad = controllIO.getDevice(devices.get(i));
+        break;
+      }
+      catch (RuntimeException e)
+      {
+        println("Requested device (" + devices.get(i) + ") not found.");
+        joypad = null;
+      }   
+    }
     
-    buttonL = joypad.getButton("Button 4");
-    buttonR = joypad.getButton("Button 5");
+    if (joypad != null)
+    {
+      joypad.printButtons();
     
-    buttonStart = joypad.getButton("Button 7");
-    
-    buttonA.plug(this, "buttonARelease", ControllIO.ON_RELEASE);
-    buttonB.plug(this, "buttonBRelease", ControllIO.ON_RELEASE);
-    buttonX.plug(this, "buttonXPress", ControllIO.ON_PRESS);
-    buttonX.plug(this, "buttonXRelease", ControllIO.ON_RELEASE);
-    buttonY.plug(this, "buttonYRelease", ControllIO.ON_RELEASE);
-    
-    buttonL.plug(this, "buttonLRelease", ControllIO.ON_RELEASE);
-    buttonR.plug(this, "buttonRRelease", ControllIO.ON_RELEASE);
-    
-    buttonStart.plug(this, "buttonStartRelease", ControllIO.ON_RELEASE);
-    
-    dpad = joypad.getCoolieHat(10);
-    dpad.setMultiplier(4);
-    dpad.plug(this, "dpadPress", ControllIO.ON_PRESS);
-    
+      buttonA = joypad.getButton("Button 0");
+      buttonB = joypad.getButton("Button 1");
+      buttonX = joypad.getButton("Button 2");
+      buttonY = joypad.getButton("Button 3");
+      
+      buttonL = joypad.getButton("Button 4");
+      buttonR = joypad.getButton("Button 5");
+      
+      buttonStart = joypad.getButton("Button 7");
+      
+      buttonA.plug(this, "buttonARelease", ControllIO.ON_RELEASE);
+      buttonB.plug(this, "buttonBRelease", ControllIO.ON_RELEASE);
+      buttonX.plug(this, "buttonXPress", ControllIO.ON_PRESS);
+      buttonX.plug(this, "buttonXRelease", ControllIO.ON_RELEASE);
+      buttonY.plug(this, "buttonYRelease", ControllIO.ON_RELEASE);
+      
+      buttonL.plug(this, "buttonLRelease", ControllIO.ON_RELEASE);
+      buttonR.plug(this, "buttonRRelease", ControllIO.ON_RELEASE);
+      
+      buttonStart.plug(this, "buttonStartRelease", ControllIO.ON_RELEASE);
+      
+      dpad = joypad.getCoolieHat(10);
+      dpad.setMultiplier(4);
+      dpad.plug(this, "dpadPress", ControllIO.ON_PRESS);
+    }
   }
   catch (RuntimeException e)
   {
-    println("Requested device (" + inputDeviceName + ") not found.");
+    println("Exception occurred while initialising gamepad: " + e.getMessage());
   }
 }
 

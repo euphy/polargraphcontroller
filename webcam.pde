@@ -1,9 +1,12 @@
 public PImage webcam_buildLiveImage()
 {
-  liveCamera.update();
+  //liveCamera.start();
   PImage pimg = createImage(640, 480, RGB);
   pimg.loadPixels();
-  pimg.pixels = liveCamera.image();
+  if (liveCamera.available()) {
+    liveCamera.read();
+  }
+  pimg.pixels = liveCamera.pixels;
   // flip the image left to right
   if (flipWebcamImage)
   {

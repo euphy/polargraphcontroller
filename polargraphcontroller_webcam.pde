@@ -1,4 +1,4 @@
-import JMyron.*;
+import processing.video.*;
 import diewald_CV_kit.libraryinfo.*;
 import diewald_CV_kit.utility.*;
 import diewald_CV_kit.blobdetection.*;
@@ -475,11 +475,12 @@ static int pathLengthHighPassCutoff = 0;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MAX = 10000;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MIN = 0;
 
-JMyron liveCamera;
+Capture liveCamera;
+//JMyron liveCamera;
 BlobDetector blob_detector;
-int liveSimplification = 4;
+int liveSimplification = 5;
 int blurValue = 1;
-int posterizeValue = 12;
+int posterizeValue = 5;
 int sepKeyColour = color(0, 0, 255);
 
 Map<Integer, PImage> colourSeparations = null;
@@ -571,8 +572,11 @@ void setup()
   addEventListeners();
 
   gamepad_init();
-  liveCamera = new JMyron();
-  liveCamera.start(640,480);
+  String[] cameras = Capture.list();
+  if (cameras.length > 0) {
+    liveCamera = new Capture(this, 640, 480, cameras[0]);
+    //liveCamera.start();
+  }
 
   blob_detector = new BlobDetector( 640, 480);
   blob_detector.setResolution(1);

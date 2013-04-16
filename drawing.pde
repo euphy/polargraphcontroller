@@ -120,8 +120,15 @@ void sendMachineSpec()
   addToCommandQueue(command);
   command = CMD_SETMACHINESTEPMULTIPLIER+machineStepMultiplier+",END";
   addToCommandQueue(command);
-  command = CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END";
+  command = CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",1,END";
   addToCommandQueue(command);
+
+  // speeds
+  NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+  DecimalFormat df = (DecimalFormat)nf;  
+  df.applyPattern("###.##");
+  addToCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",1,END");
+  addToCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",1,END");
 }
 
 public PVector getMouseVector()

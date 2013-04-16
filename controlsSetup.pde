@@ -301,7 +301,6 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       }
       else if (MODE_CHANGE_MACHINE_WIDTH.equals(key))
       {
-        println("key:"+key+", width: " + getDisplayMachine().getWidth() + ", multiplied:"+getDisplayMachine().inMM(getDisplayMachine().getWidth()));
         n.setValue(getDisplayMachine().inMM(getDisplayMachine().getWidth()));
         n.setMin(20);
         n.setMultiplier(0.5);
@@ -752,10 +751,12 @@ List<String> getControlNamesForDetailPanel()
   controlNames.add(MODE_PEN_LIFT_POS_UP);
   controlNames.add(MODE_PEN_LIFT_POS_DOWN);
   controlNames.add(MODE_SEND_PEN_LIFT_RANGE);
+  controlNames.add(MODE_SEND_PEN_LIFT_RANGE_PERSIST);
 
   controlNames.add(MODE_CHANGE_MACHINE_MAX_SPEED);
   controlNames.add(MODE_CHANGE_MACHINE_ACCELERATION);
   controlNames.add(MODE_SEND_MACHINE_SPEED);
+  controlNames.add(MODE_SEND_MACHINE_SPEED_PERSIST);
 
   controlNames.add(MODE_CHANGE_SERIAL_PORT);
 
@@ -813,8 +814,6 @@ Map<String, String> buildControlLabels()
   result.put(MODE_DRAW_TESTPATTERN, "test pattern");
   result.put(MODE_PLACE_IMAGE, "place image");
   result.put(MODE_LOAD_IMAGE, "Load image file");
-  result.put(MODE_INC_ROW_SIZE, "Rowsize up");
-  result.put(MODE_DEC_ROW_SIZE, "Rowsize down");
   result.put(MODE_SET_POSITION_HOME, "Set home");
   result.put(MODE_RETURN_TO_HOME, "Return to home");
   result.put(MODE_INPUT_SINGLE_PIXEL, "Choose pixel");
@@ -877,6 +876,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_CHANGE_MACHINE_MAX_SPEED, "Motor max speed");
   result.put(MODE_CHANGE_MACHINE_ACCELERATION, "Motor acceleration");
   result.put(MODE_SEND_MACHINE_SPEED, "Send speed");
+  result.put(MODE_SEND_MACHINE_SPEED_PERSIST, "Upload speed");
   result.put(MODE_RENDER_VECTORS, "Draw vectors");
   result.put(MODE_LOAD_VECTOR_FILE, "Load vector");
   result.put(MODE_CHANGE_MIN_VECTOR_LINE_LENGTH, "Shortest vector");
@@ -900,7 +900,8 @@ Map<String, String> buildControlLabels()
   result.put(MODE_PEN_LIFT_DOWN, "Pen drop");
   result.put(MODE_PEN_LIFT_POS_UP, "Pen up position");
   result.put(MODE_PEN_LIFT_POS_DOWN, "Pen down position");
-  result.put(MODE_SEND_PEN_LIFT_RANGE, "Send lift range");
+  result.put(MODE_SEND_PEN_LIFT_RANGE, "Test lift range");
+  result.put(MODE_SEND_PEN_LIFT_RANGE_PERSIST, "Upload lift range");
   
   result.put(MODE_SEND_ROVE_AREA, "Send Roving Area");
   result.put(MODE_SEND_START_TEXT, "Start text at point");
@@ -952,8 +953,6 @@ Set<String> buildControlNames()
   result.add(MODE_DRAW_TESTPATTERN);
   result.add(MODE_PLACE_IMAGE);
   result.add(MODE_LOAD_IMAGE);
-  result.add(MODE_INC_ROW_SIZE);
-  result.add(MODE_DEC_ROW_SIZE);
   result.add(MODE_SET_POSITION_HOME);
   result.add(MODE_RETURN_TO_HOME);
   result.add(MODE_INPUT_SINGLE_PIXEL);
@@ -1037,6 +1036,7 @@ Set<String> buildControlNames()
   result.add(MODE_PEN_LIFT_POS_UP);
   result.add(MODE_PEN_LIFT_POS_DOWN);
   result.add(MODE_SEND_PEN_LIFT_RANGE);
+  result.add(MODE_SEND_PEN_LIFT_RANGE_PERSIST);
   
   result.add(MODE_SEND_ROVE_AREA);
   result.add(MODE_SEND_START_TEXT);

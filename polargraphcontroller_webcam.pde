@@ -8,8 +8,6 @@ import org.apache.batik.svggen.font.table.*;
 import org.apache.batik.svggen.font.*;
 import java.util.zip.CRC32;
 
-import procontroll.*;
-//import net.java.games.input.*;
 
 // for OSX
 import java.text.*;
@@ -198,8 +196,6 @@ static final String MODE_RENDER_PIXEL_DIALOG = "button_mode_drawPixelsDialog";
 static final String MODE_INPUT_ROW_START = "button_mode_inputRowStart";
 static final String MODE_INPUT_ROW_END = "button_mode_inputRowEnd";
 static final String MODE_DRAW_TESTPATTERN = "button_mode_drawTestPattern";
-static final String MODE_INC_ROW_SIZE = "button_mode_incRowSize";
-static final String MODE_DEC_ROW_SIZE = "button_mode_decRowSize";
 static final String MODE_DRAW_GRID = "button_mode_drawGrid";
 static final String MODE_PLACE_IMAGE = "button_mode_placeImage";
 static final String MODE_LOAD_IMAGE = "button_mode_loadImage";
@@ -276,6 +272,7 @@ static final String MODE_CHANGE_PEN_TEST_INCREMENT_SIZE = "numberbox_mode_change
 static final String MODE_CHANGE_MACHINE_MAX_SPEED = "numberbox_mode_changeMachineMaxSpeed";
 static final String MODE_CHANGE_MACHINE_ACCELERATION = "numberbox_mode_changeMachineAcceleration";
 static final String MODE_SEND_MACHINE_SPEED = "button_mode_sendMachineSpeed";
+static final String MODE_SEND_MACHINE_SPEED_PERSIST = "button_mode_sendMachineSpeedPersist";
 
 static final String MODE_RENDER_VECTORS = "button_mode_renderVectors";
 static final String MODE_LOAD_VECTOR_FILE = "button_mode_loadVectorFile";
@@ -296,6 +293,7 @@ static final String MODE_PEN_LIFT_DOWN = "button_mode_penDown";
 static final String MODE_PEN_LIFT_POS_UP = "numberbox_mode_penUpPos";
 static final String MODE_PEN_LIFT_POS_DOWN = "numberbox_mode_penDownPos";
 static final String MODE_SEND_PEN_LIFT_RANGE = "button_mode_sendPenliftRange";
+static final String MODE_SEND_PEN_LIFT_RANGE_PERSIST = "button_mode_sendPenliftRangePersist";
 
 static final String MODE_SEND_ROVE_AREA = "button_mode_sendRoveArea";
 static final String MODE_SEND_START_TEXT = "toggle_mode_sendStartText";
@@ -458,6 +456,7 @@ boolean overwriteExistingStoreFile = true;
 public static Console console;
 public boolean useWindowedConsole = false;
 
+static boolean webcamEnabled = false;
 static boolean drawingLiveVideo = false;
 static boolean drawingWebcamShape = true;
 static boolean flipWebcamImage = true;
@@ -491,14 +490,14 @@ String shapeSavePath = "../../savedcaptures/";
 String shapeSavePrefix = "shape-";
 String shapeSaveExtension = ".svg";
 
-boolean displayGamepadOverlay = true;
-PImage yButtonImage = null;
-PImage xButtonImage = null;
-PImage aButtonImage = null;
-PImage bButtonImage = null;
-
-PImage dpadXImage = null;
-PImage dpadYImage = null;
+//boolean displayGamepadOverlay = false;
+//PImage yButtonImage = null;
+//PImage xButtonImage = null;
+//PImage aButtonImage = null;
+//PImage bButtonImage = null;
+//
+//PImage dpadXImage = null;
+//PImage dpadYImage = null;
 
 void setup()
 {
@@ -571,11 +570,20 @@ void setup()
 
   addEventListeners();
 
-  gamepad_init();
-  String[] cameras = Capture.list();
-  if (cameras.length > 0) {
-    liveCamera = new Capture(this, 640, 480, cameras[0]);
-    //liveCamera.start();
+  //gamepad_init();
+  try
+  {
+    String[] cameras = Capture.list();
+    if (cameras.length > 0) {
+      liveCamera = new Capture(this, 640, 480, cameras[0]);
+      //liveCamera.start();
+      webcamEnabled = true;
+    }
+  }
+  catch (Exception e)
+  {
+    println("Exception occurred trying to look for attached webcams.  Webcam will not be used. " + e.getMessage());
+    webcamEnabled = false;
   }
 
   blob_detector = new BlobDetector( 640, 480);
@@ -835,12 +843,19 @@ void drawWebcamPage()
   strokeWeight(3);
   stroke(150);
   noFill();
-  getDisplayMachine().drawForWebcam();
-  stroke(255, 0, 0);
- 
-  for (Panel panel : getPanelsForTab(TAB_NAME_WEBCAM))
+  if (webcamEnabled) 
   {
-    panel.draw();
+    getDisplayMachine().drawForWebcam();
+    stroke(255, 0, 0);
+   
+    for (Panel panel : getPanelsForTab(TAB_NAME_WEBCAM))
+    {
+      panel.draw();
+    }
+  }
+  else
+  {
+    text("No camera attached.", 250, 100);
   }
 
   if (displayingInfoTextOnInputPage)
@@ -848,10 +863,10 @@ void drawWebcamPage()
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
   showCommandQueue((int) width-200, 20);
 
-  processGamepadInput();
-
-  if (displayGamepadOverlay)
-    displayGamepadOverlay();
+//  processGamepadInput();
+//
+//  if (displayGamepadOverlay)
+//    displayGamepadOverlay();
 }
 
 
@@ -887,42 +902,7 @@ void drawImageLoadPage()
   drawImagePage();
 }
 
-void displayGamepadOverlay()
-{
-  textSize(40);
-  fill(255);
-  
-  if (captureShape == null)
-  {
-    image(aButtonImage, width-400, height-180, 128, 128);
-    text("SNAP!", width-400, height-200);
 
-    textSize(30);
-    image(dpadYImage, width-600, height-180, 128, 128);
-    text("Simplify", width-600, height-200);
-
-    image(dpadXImage, width-600, height-400, 128, 128);
-    text("Filter short paths", width-600, height-420);
-  }
-  else
-  {
-    if (confirmedDraw)
-    {
-      image(aButtonImage, width-400, height-180, 128, 128);
-      text("CANCEL!", width-385, height-200);
-    }
-    else
-    {
-      image(aButtonImage, width-400, height-180, 128, 128);
-      text("BACK", width-400, height-200);
-      image(bButtonImage, width-190, height-180, 128, 128);
-      text("DRAW!", width-180, height-200);
-    }
-  }
-  
-  
-  textSize(12);
-}
 
 void drawMoveImageOutline()
 {
@@ -2455,6 +2435,11 @@ void serialEvent(Serial myPort)
     readStepsPerRev(incoming);
   else if (incoming.startsWith("PGSTEPMULTIPLIER"))
     readStepMultiplier(incoming);
+  else if (incoming.startsWith("PGLIFT"))
+    readPenLiftRange(incoming);
+  else if (incoming.startsWith("PGSPEED"))
+    readMachineSpeed(incoming);
+    
   else if ("RESEND".equals(incoming))
     resendLastCommand();
   else if ("DRAWING".equals(incoming))
@@ -2571,6 +2556,36 @@ void readMachineName(String sync)
   {
     String name = splitted[1];
     
+  }
+}
+
+void readMachineSpeed(String in)
+{
+  String[] splitted = split(in, ",");
+  if (splitted.length == 4)
+  {
+    String speed = splitted[1];
+    String accel = splitted[2];
+    
+    currentMachineMaxSpeed = Float.parseFloat(speed);
+    currentMachineAccel = Float.parseFloat(accel);
+    
+    updateNumberboxValues();
+  }
+}
+
+void readPenLiftRange(String in)
+{
+  String[] splitted = split(in, ",");
+  if (splitted.length == 4)
+  {
+    String downPos = splitted[1];
+    String upPos = splitted[2];
+    
+    penLiftDownPosition = Integer.parseInt(downPos);
+    penLiftUpPosition = Integer.parseInt(upPos);
+
+    updateNumberboxValues();
   }
 }
 
@@ -3026,24 +3041,24 @@ void initLogging()
 }
 void initImages()
 {
-  try
-  {
-    yButtonImage = loadImage("y.png");
-    xButtonImage = loadImage("x.png");
-    aButtonImage = loadImage("a.png");
-    bButtonImage = loadImage("b.png");
-    dpadXImage = loadImage("dpadlr.png");
-    dpadYImage = loadImage("dpadud.png");
-  }
-  catch (Exception e)
-  {
-    yButtonImage = makeColourImage(64,64,color(180,180,0));
-    xButtonImage = makeColourImage(64,64,color(0,0,180));
-    aButtonImage = makeColourImage(64,64,color(0,180,0));
-    bButtonImage = makeColourImage(64,64,color(180,0,0));
-  }
-  
+//  try
+//  {
+//    yButtonImage = loadImage("y.png");
+//    xButtonImage = loadImage("x.png");
+//    aButtonImage = loadImage("a.png");
+//    bButtonImage = loadImage("b.png");
+//    dpadXImage = loadImage("dpadlr.png");
+//    dpadYImage = loadImage("dpadud.png");
+//  }
+//  catch (Exception e)
+//  {
+//    yButtonImage = makeColourImage(64,64,color(180,180,0));
+//    xButtonImage = makeColourImage(64,64,color(0,0,180));
+//    aButtonImage = makeColourImage(64,64,color(0,180,0));
+//    bButtonImage = makeColourImage(64,64,color(180,0,0));
+//  }
 }
+
 PImage makeColourImage(int w, int h, int colour)
 {
   PImage img = createImage(w,h,RGB);

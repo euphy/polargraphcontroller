@@ -105,6 +105,10 @@ void numberbox_mode_penDownPos(int value)
 }
 void button_mode_sendPenliftRange()
 {
+  addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",END");
+}  
+void button_mode_sendPenliftRangePersist()
+{
   addToCommandQueue(CMD_SETPENLIFTRANGE+penLiftDownPosition+","+penLiftUpPosition+",1,END");
 }  
 
@@ -451,24 +455,27 @@ void numberbox_mode_resizeImage(float value)
 
 void numberbox_mode_resizeVector(float value)
 {
-  // get current size of vector in local coordinates
-  PVector oldVectorSize = new PVector(getVectorShape().width, getVectorShape().height);
-  oldVectorSize = PVector.mult(oldVectorSize, (vectorScaling/100));
-  // and current centre point of vector
-  PVector oldCentroid = new PVector(oldVectorSize.x / 2.0, oldVectorSize.y / 2.0);
-  
-  // get newly scaled size of vector
-  PVector newVectorSize = new PVector(getVectorShape().width, getVectorShape().height);
-  newVectorSize = PVector.mult(newVectorSize, (value/100));
-  // and new centre point of vector
-  PVector newCentroid = new PVector(newVectorSize.x / 2.0, newVectorSize.y / 2.0);
-  
-  // difference is current centre minus new centre
-  PVector difference = PVector.sub(oldCentroid, newCentroid);
-  
-  // add difference onto vector position
-  PVector newVectorPosition = PVector.add(vectorPosition, difference);
-  vectorPosition = newVectorPosition;
+  if (getVectorShape() != null)
+  {
+    // get current size of vector in local coordinates
+    PVector oldVectorSize = new PVector(getVectorShape().width, getVectorShape().height);
+    oldVectorSize = PVector.mult(oldVectorSize, (vectorScaling/100));
+    // and current centre point of vector
+    PVector oldCentroid = new PVector(oldVectorSize.x / 2.0, oldVectorSize.y / 2.0);
+    
+    // get newly scaled size of vector
+    PVector newVectorSize = new PVector(getVectorShape().width, getVectorShape().height);
+    newVectorSize = PVector.mult(newVectorSize, (value/100));
+    // and new centre point of vector
+    PVector newCentroid = new PVector(newVectorSize.x / 2.0, newVectorSize.y / 2.0);
+    
+    // difference is current centre minus new centre
+    PVector difference = PVector.sub(oldCentroid, newCentroid);
+    
+    // add difference onto vector position
+    PVector newVectorPosition = PVector.add(vectorPosition, difference);
+    vectorPosition = newVectorPosition;
+  }
   
   vectorScaling = value;
   
@@ -608,6 +615,18 @@ void button_mode_sendMachineSpeed()
 
   df.applyPattern("###.##");
   addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
+}
+
+void button_mode_sendMachineSpeedPersist()
+{
+  NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+  DecimalFormat df = (DecimalFormat)nf;  
+
+  df.applyPattern("###.##");
+  addToCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",1,END");
+
+  df.applyPattern("###.##");
+  addToCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",1,END");
 }
 
 void button_mode_sendRoveArea()

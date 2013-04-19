@@ -152,7 +152,7 @@ void button_mode_liveConfirmDraw()
     PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), 
     getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y));
   
-    sendVectorShapes(captureShape, scaling, position);
+    sendVectorShapes(captureShape, scaling, position, PATH_SORT_CENTRE_FIRST);
     button_mode_penUp();
 
     //  save shape as SVG

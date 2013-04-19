@@ -1,22 +1,3 @@
-import processing.video.*;
-import diewald_CV_kit.libraryinfo.*;
-import diewald_CV_kit.utility.*;
-import diewald_CV_kit.blobdetection.*;
-
-import geomerative.*;
-import org.apache.batik.svggen.font.table.*;
-import org.apache.batik.svggen.font.*;
-import java.util.zip.CRC32;
-
-
-// for OSX
-import java.text.*;
-import java.util.*;
-import java.io.*;
-
-import java.util.logging.*;
-//import java.util.concurrent.CopyOnWriteArrayList;
-//import processing.opengl.PGraphicsOpenGL;
 /**
   Polargraph controller
   Copyright Sandy Noble 2012.
@@ -46,13 +27,30 @@ import java.util.logging.*;
   http://code.google.com/p/polargraph/
 
 */
+import processing.video.*;
+import diewald_CV_kit.libraryinfo.*;
+import diewald_CV_kit.utility.*;
+import diewald_CV_kit.blobdetection.*;
+
+import geomerative.*;
+import org.apache.batik.svggen.font.table.*;
+import org.apache.batik.svggen.font.*;
+import java.util.zip.CRC32;
+
+
+// for OSX
+import java.text.*;
+import java.util.*;
+import java.io.*;
+
+import java.util.logging.*;
 import javax.swing.*;
 import processing.serial.*;
 import controlP5.*;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 3;
+int minorVersionNo = 4;
 int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;

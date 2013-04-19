@@ -71,6 +71,11 @@ static final String CMD_DRAW_NORWEGIAN = "C43,";
 static final String CMD_DRAW_NORWEGIAN_OUTLINE = "C44,";
 static final String CMD_SETPENLIFTRANGE = "C45,";
 
+static final int PATH_SORT_NONE = 0;
+static final int PATH_SORT_MOST_POINTS_FIRST = 1;
+static final int PATH_SORT_GREATEST_AREA_FIRST = 2;
+static final int PATH_SORT_CENTRE_FIRST = 3;
+
 private PVector mouseVector = new PVector(0, 0);
 
 Comparator xAscending = new Comparator() 
@@ -646,18 +651,21 @@ void sendOutlineOfBox()
 
 void sendVectorShapes()
 {
-  sendVectorShapes(getVectorShape(), vectorScaling/100, getVectorPosition());
+  sendVectorShapes(getVectorShape(), vectorScaling/100, getVectorPosition(), PATH_SORT_NONE);
 }
 
-void sendVectorShapes(RShape vec, float scaling, PVector position)
+
+void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSortingAlgorithm)
 {
   println("Send vector shapes.");
   RPoint[][] pointPaths = vec.getPointsInPaths();      
 
   // sort the paths to optimise the draw sequence
-  //  pointPaths = sortPathsLongestFirst(pointPaths, pathLengthHighPassCutoff);
-  //  pointPaths = sortPathsGreatestAreaFirst(vec, pathLengthHighPassCutoff);
-  pointPaths = sortPathsCentreFirst(vec, pathLengthHighPassCutoff);
+  switch (pathSortingAlgorithm) {
+    case PATH_SORT_MOST_POINTS_FIRST: pointPaths = sortPathsLongestFirst(pointPaths, pathLengthHighPassCutoff); break;
+    case PATH_SORT_GREATEST_AREA_FIRST: pointPaths = sortPathsGreatestAreaFirst(vec, pathLengthHighPassCutoff); break;
+    case PATH_SORT_CENTRE_FIRST: pointPaths = sortPathsCentreFirst(vec, pathLengthHighPassCutoff); break;
+  }
 
   String command = "";
   PVector lastPoint = new PVector();
@@ -708,7 +716,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position)
   println("finished.");
 }
 
-public RPoint[][] sortPathLongestFirst(RPoint[][] pointPaths, int highPassCutoff)
+public RPoint[][] sortPathsLongestFirst(RPoint[][] pointPaths, int highPassCutoff)
 {
   // put the paths into a list
   List<RPoint[]> pathsList = new ArrayList<RPoint[]>(pointPaths.length);

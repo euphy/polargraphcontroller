@@ -896,7 +896,7 @@ void button_mode_drawPixelsDialog()
   rStyle.add("Scribble", PIXEL_STYLE_SCRIBBLE);
   if (currentHardware >= HARDWARE_VER_MEGA)
   {
-    rStyle.add("Circles", PIXEL_STYLE_CIRCLE);
+    rStyle.add("Spiral", PIXEL_STYLE_CIRCLE);
     rStyle.add("Sawtooth", PIXEL_STYLE_SAW);
   }
   rStyle.setWindow(dialogWindow);

@@ -806,7 +806,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_RENDER_SQUARE_PIXELS, "Shade Squarewave");
   result.put(MODE_RENDER_SCALED_SQUARE_PIXELS, "Shade Scaled Square");
   result.put(MODE_RENDER_SAW_PIXELS, "Shade sawtooth");
-  result.put(MODE_RENDER_CIRCLE_PIXELS, "Shade circular");
+  result.put(MODE_RENDER_CIRCLE_PIXELS, "Shade spiral");
   result.put(MODE_INPUT_ROW_START, "Select Row start");
   result.put(MODE_INPUT_ROW_END, "Select Row end");
   result.put(MODE_SET_POSITION, "Set pen position");

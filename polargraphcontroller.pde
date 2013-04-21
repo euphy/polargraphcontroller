@@ -51,7 +51,7 @@ import java.awt.event.*;
 
 int majorVersionNo = 1;
 int minorVersionNo = 4;
-int buildNo = 0;
+int buildNo = 2;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -1183,11 +1183,11 @@ void saveNewPropertiesFileWithFileChooser()
 
 void setPictureFrameDimensionsToBox()
 {
-  if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
-  {
+//  if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
+//  {
     Rectangle r = new Rectangle(getDisplayMachine().inSteps(getBoxVector1()), getDisplayMachine().inSteps(getBoxVectorSize()));
     getDisplayMachine().setPictureFrame(r);
-  }
+//  }
 }
 void setBoxToPictureframeDimensions()
 {

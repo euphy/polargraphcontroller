@@ -374,24 +374,48 @@ class DisplayMachine extends Machine
     // draw actual image, maximum size
     if (processedLiveImage != null)
     {
+      // origin - top left of the corner
       float ox = getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7;
       float oy = getPanel(PANEL_NAME_GENERAL).getOutline().getTop();
       
-      // calculate height.  640 pixels stretched to 
-      float aspectRatio = 480.0/640.0; // rotated, remember
+      // calculate size to display at.
+      float aspectRatio = (rotateWebcamImage) ? 480.0/640.0 : 640.0/480.0; // rotated, remember
       float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
-      float w = h * aspectRatio;
+      float w = h * (480.0/640.0);
+      println("height: " + h + ", width: " + w);
+      println("origin x: " + ox + ", y: " + oy);
       
-      stroke(255);
+      if (rotateWebcamImage) 
+      {
+        float t = h;
+        h = w;
+        w = t;
+      }
+      
+      //stroke(255);
       rect(ox,oy,w,h);
 
       tint(255, getImageTransparency());
-      translate(ox, oy+h);
-      rotate(radians(270));
-      image(processedLiveImage, 0, 0, h, w);
-      image(liveImage, h-(h/4), w+10, h/4, w/4);
-      rotate(radians(-270));
-      translate(-ox, -(oy+h));
+      if (rotateWebcamImage)
+      {
+        translate(ox, oy);
+        rotate(radians(270));
+        image(processedLiveImage, -w, 0, w, h);
+        image(liveImage, -w, (w-(w/4))+10, w/4, h/4);
+//        stroke(0,255,0);
+//        ellipse(0,0,80,40);
+//        stroke(0,0,255);
+//        ellipse(-w,0,80,40);
+        rotate(radians(-270));
+        translate(-ox, -oy);
+      }
+      else
+      {
+        translate(ox, oy);
+        image(processedLiveImage, 0, 0, h, w);
+        image(liveImage, h-(h/4), w+10, h/4, w/4);
+        translate(-ox, -oy);
+      }
       noTint();
       noFill();
     }
@@ -419,8 +443,10 @@ class DisplayMachine extends Machine
     float aspectRatio = vec.getWidth()/vec.getHeight(); // rotated, remember
     float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
     float w = h * aspectRatio;
-    float scaler = h / vec.getHeight();
-    PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10);
+    float scaler = h / vec.getWidth();
+    if (rotateWebcamImage)
+      scaler =  h / vec.getHeight();
+    PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, getPanel(PANEL_NAME_GENERAL).getOutline().getTop());
 
     noFill();
     RPoint[][] pointPaths = vec.getPointsInPaths();

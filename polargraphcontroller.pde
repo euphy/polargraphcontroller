@@ -50,8 +50,8 @@ import controlP5.*;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 4;
-int buildNo = 2;
+int minorVersionNo = 5;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -316,6 +316,9 @@ static final String MODE_LIVE_ADD_CAPTION = "button_mode_liveAddCaption";
 static final String MODE_LIVE_CONFIRM_DRAW = "button_mode_liveConfirmDraw";
 
 static final String MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF = "numberbox_mode_vectorPathLengthHighPassCutoff";
+static final String MODE_SHOW_WEBCAM_RAW_VIDEO = "toggle_mode_showWebcamRawVideo";
+static final String MODE_FLIP_WEBCAM_INPUT = "toggle_mode_flipWebcam";
+static final String MODE_ROTATE_WEBCAM_INPUT = "toggle_mode_rotateWebcam";
 
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
@@ -455,9 +458,10 @@ public static Console console;
 public boolean useWindowedConsole = false;
 
 static boolean webcamEnabled = false;
-static boolean drawingLiveVideo = false;
+static boolean drawingLiveVideo = true;
 static boolean drawingWebcamShape = true;
 static boolean flipWebcamImage = true;
+static boolean rotateWebcamImage = true;
 static boolean confirmedDraw = false;
 
 static PImage liveImage = null;

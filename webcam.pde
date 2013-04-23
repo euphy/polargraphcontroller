@@ -107,10 +107,13 @@ public RShape webcam_traceImage(Map<Integer, PImage> seps)
     }
   }
   // rotate image
-  allShapes.rotate(radians(-90));
-  // transform it so that top left is at 0,0.
-  RPoint topLeft = allShapes.getTopLeft();
-  allShapes.translate(-topLeft.x, -topLeft.y);
+  if (rotateWebcamImage)
+  {
+    allShapes.rotate(radians(-90));
+    // transform it so that top left is at 0,0.
+    RPoint topLeft = allShapes.getTopLeft();
+    allShapes.translate(-topLeft.x, -topLeft.y);
+  }
   return allShapes;
 }
 

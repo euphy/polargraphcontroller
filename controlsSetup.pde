@@ -274,7 +274,7 @@ Map<String, Controller> buildAllControls()
     }
   }
 
-  initialiseMiniToggleValues(map);
+  initialiseToggleValues(map);
   initialiseNumberboxValues(map);
   return map;
 }
@@ -506,7 +506,7 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
 }
 
 
-Map<String, Controller> initialiseMiniToggleValues(Map<String, Controller> map)
+Map<String, Controller> initialiseToggleValues(Map<String, Controller> map)
 {
   for (String key : map.keySet())
   {
@@ -515,26 +515,42 @@ Map<String, Controller> initialiseMiniToggleValues(Map<String, Controller> map)
       Toggle t = (Toggle) map.get(key);
       t.setValue((displayingDensityPreview) ? 1 : 0);
     }
-    if (MODE_SHOW_QUEUE_PREVIEW.equals(key))
+    else if (MODE_SHOW_QUEUE_PREVIEW.equals(key))
     {
       Toggle t = (Toggle) map.get(key);
       t.setValue((displayingQueuePreview) ? 1 : 0);
     }
-    if (MODE_SHOW_IMAGE.equals(key))
+    else if (MODE_SHOW_IMAGE.equals(key))
     {
       Toggle t = (Toggle) map.get(key);
       t.setValue((displayingImage) ? 1 : 0);
     }
-    if (MODE_SHOW_VECTOR.equals(key))
+    else if (MODE_SHOW_VECTOR.equals(key))
     {
       Toggle t = (Toggle) map.get(key);
       t.setValue((displayingVector) ? 1 : 0);
     }
-    if (MODE_SHOW_GUIDES.equals(key))
+    else if (MODE_SHOW_GUIDES.equals(key))
     {
       Toggle t = (Toggle) map.get(key);
       t.setValue((displayingGuides) ? 1 : 0);
     }
+    else if (MODE_SHOW_WEBCAM_RAW_VIDEO.equals(key))
+    {
+      Toggle t = (Toggle) map.get(key);
+      t.setValue((drawingLiveVideo) ? 1 : 0);
+    }
+    else if (MODE_FLIP_WEBCAM_INPUT.equals(key))
+    {
+      Toggle t = (Toggle) map.get(key);
+      t.setValue((flipWebcamImage) ? 1 : 0);
+    }
+    else if (MODE_ROTATE_WEBCAM_INPUT.equals(key))
+    {
+      Toggle t = (Toggle) map.get(key);
+      t.setValue((rotateWebcamImage) ? 1 : 0);
+    }
+    
   }
   return map;
 }
@@ -670,7 +686,7 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_RESIZE_VECTOR);
   controlNames.add(MODE_MOVE_VECTOR);
   controlNames.add(MODE_CHANGE_MIN_VECTOR_LINE_LENGTH);
-  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
+  //controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
   controlNames.add(MODE_RENDER_VECTORS);
 
   controlNames.add(MODE_SHOW_IMAGE);
@@ -712,9 +728,13 @@ List<String> getControlNamesForWebcamPanel()
   controlNames.add(MODE_LIVE_POSTERISE_VALUE);
   controlNames.add(MODE_LIVE_CAPTURE_FROM_LIVE);
   controlNames.add(MODE_LIVE_CANCEL_CAPTURE);
-  controlNames.add(MODE_LIVE_ADD_CAPTION);
+//  controlNames.add(MODE_LIVE_ADD_CAPTION);
   controlNames.add(MODE_LIVE_CONFIRM_DRAW);
-  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
+//  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
+
+  controlNames.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
+  controlNames.add(MODE_FLIP_WEBCAM_INPUT);
+  controlNames.add(MODE_ROTATE_WEBCAM_INPUT);
   return controlNames;
 }
 
@@ -923,6 +943,10 @@ Map<String, String> buildControlLabels()
   result.put(MODE_LIVE_ADD_CAPTION, "Add caption");
   
   result.put(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF, "Path length cutoff");
+  result.put(MODE_SHOW_WEBCAM_RAW_VIDEO, "Show video");
+  result.put(MODE_FLIP_WEBCAM_INPUT, "Flip video");
+  result.put(MODE_ROTATE_WEBCAM_INPUT, "Rotate webcam");
+
   
 
   return result;
@@ -1056,6 +1080,11 @@ Set<String> buildControlNames()
   result.add(MODE_LIVE_CANCEL_CAPTURE);
   result.add(MODE_LIVE_ADD_CAPTION);
   result.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
+  
+  result.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
+  result.add(MODE_FLIP_WEBCAM_INPUT);
+  result.add(MODE_ROTATE_WEBCAM_INPUT);
+
   
   return result;
 }

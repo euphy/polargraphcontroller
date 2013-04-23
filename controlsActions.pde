@@ -158,7 +158,19 @@ void button_mode_liveConfirmDraw()
     //  save shape as SVG
     webcam_saveShape(captureShape);
   }
-}  
+} 
+void toggle_mode_showWebcamRawVideo(boolean flag)
+{
+  drawingLiveVideo = flag;
+}
+void toggle_mode_flipWebcam(boolean flag)
+{
+  flipWebcamImage = flag;
+}
+void toggle_mode_rotateWebcam(boolean flag)
+{
+  rotateWebcamImage = flag;
+}
 
 
 void toggle_mode_inputBoxTopLeft(boolean flag)

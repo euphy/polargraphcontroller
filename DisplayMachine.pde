@@ -382,8 +382,8 @@ class DisplayMachine extends Machine
       float aspectRatio = (rotateWebcamImage) ? 480.0/640.0 : 640.0/480.0; // rotated, remember
       float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
       float w = h * (480.0/640.0);
-      println("height: " + h + ", width: " + w);
-      println("origin x: " + ox + ", y: " + oy);
+//      println("height: " + h + ", width: " + w);
+//      println("origin x: " + ox + ", y: " + oy);
       
       if (rotateWebcamImage) 
       {

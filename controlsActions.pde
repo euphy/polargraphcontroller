@@ -650,6 +650,20 @@ void button_mode_sendRoveArea()
   }
 }
 
+void button_mode_selectRoveImageSource()
+{
+  addToCommandQueue(CMD_SELECT_ROVE_SOURCE_IMAGE+",w1.pbm,END");
+}
+void button_mode_startMarking()
+{
+  // C47,<start (1) or stop (0)>,<mark style>,END
+  addToCommandQueue(CMD_RENDER_ROVE+",1,1,END");
+}
+void button_mode_stopMarking()
+{
+  addToCommandQueue(CMD_RENDER_ROVE+",0,0,END");
+}
+
 void toggle_mode_sendStartText(boolean flag)
 {
   if (flag)

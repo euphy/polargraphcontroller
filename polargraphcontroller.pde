@@ -294,6 +294,7 @@ static final String MODE_SEND_PEN_LIFT_RANGE = "button_mode_sendPenliftRange";
 static final String MODE_SEND_PEN_LIFT_RANGE_PERSIST = "button_mode_sendPenliftRangePersist";
 
 static final String MODE_SEND_ROVE_AREA = "button_mode_sendRoveArea";
+static final String MODE_SELECT_ROVE_IMAGE_SOURCE = "button_mode_selectRoveImageSource";
 static final String MODE_SEND_START_TEXT = "toggle_mode_sendStartText";
 // controls to do with text start
 static final String MODE_CHANGE_TEXT_ROW_SIZE = "numberbox_mode_changeTextRowSize";
@@ -302,6 +303,8 @@ static final String MODE_CHANGE_TEXT_ROW_SPACING = "numberbox_mode_changeTextRow
 static final String MODE_SHOW_WRITING_DIALOG = "button_mode_drawWritingDialog";
 static final String MODE_START_SWIRLING = "button_mode_startSwirling";
 static final String MODE_STOP_SWIRLING = "button_mode_stopSwirling";
+static final String MODE_START_MARKING = "button_mode_startMarking";
+static final String MODE_STOP_MARKING = "button_mode_stopMarking";
 static final String MODE_START_SPRITE = "button_mode_drawSpriteDialog";
 static final String MODE_START_RANDOM_SPRITES = "button_mode_startRandomSprite";
 static final String MODE_STOP_RANDOM_SPRITES = "button_mode_stopRandomSprites";

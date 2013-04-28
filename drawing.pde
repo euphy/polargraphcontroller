@@ -70,6 +70,8 @@ static final String CMD_DRAW_RANDOM_SPRITE = "C42,";
 static final String CMD_DRAW_NORWEGIAN = "C43,";
 static final String CMD_DRAW_NORWEGIAN_OUTLINE = "C44,";
 static final String CMD_SETPENLIFTRANGE = "C45,";
+static final String CMD_SELECT_ROVE_SOURCE_IMAGE = "C46";
+static final String CMD_RENDER_ROVE = "C47";
 
 static final int PATH_SORT_NONE = 0;
 static final int PATH_SORT_MOST_POINTS_FIRST = 1;
@@ -632,20 +634,22 @@ void sendOutlineOfBox()
   tr = getDisplayMachine().asNativeCoords(tr);
   bl = getDisplayMachine().asNativeCoords(bl);
   br = getDisplayMachine().asNativeCoords(br);
+  
+  String cmd = (true) ? CMD_CHANGELENGTHDIRECT : CMD_CHANGELENGTH;
 
-  String command = CMD_CHANGELENGTHDIRECT+(int)tl.x+","+(int)tl.y+","+getMaxSegmentLength()+",END";
+  String command = cmd+(int)tl.x+","+(int)tl.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
 
-  command = CMD_CHANGELENGTHDIRECT+(int)tr.x+","+(int)tr.y+","+getMaxSegmentLength()+",END";
+  command = cmd+(int)tr.x+","+(int)tr.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
 
-  command = CMD_CHANGELENGTHDIRECT+(int)br.x+","+(int)br.y+","+getMaxSegmentLength()+",END";
+  command = cmd+(int)br.x+","+(int)br.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
 
-  command = CMD_CHANGELENGTHDIRECT+(int)bl.x+","+(int)bl.y+","+getMaxSegmentLength()+",END";
+  command = cmd+(int)bl.x+","+(int)bl.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
 
-  command = CMD_CHANGELENGTHDIRECT+(int)tl.x+","+(int)tl.y+","+getMaxSegmentLength()+",END";
+  command = cmd+(int)tl.x+","+(int)tl.y+","+getMaxSegmentLength()+",END";
   addToCommandQueue(command);
 }
 

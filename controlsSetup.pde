@@ -710,12 +710,16 @@ List<String> getControlNamesForRovingPanel()
   controlNames.add(MODE_SEND_START_TEXT);
   controlNames.add(MODE_CHANGE_GRID_SIZE);
   controlNames.add(MODE_SHOW_WRITING_DIALOG);
-//  controlNames.add(MODE_START_SWIRLING);
-//  controlNames.add(MODE_STOP_SWIRLING);
-//  controlNames.add(MODE_START_SPRITE);
-//  controlNames.add(MODE_START_RANDOM_SPRITES);
-//  controlNames.add(MODE_STOP_RANDOM_SPRITES);
+  controlNames.add(MODE_START_SWIRLING);
+  controlNames.add(MODE_STOP_SWIRLING);
+  controlNames.add(MODE_START_MARKING);
+  controlNames.add(MODE_STOP_MARKING);
+  controlNames.add(MODE_SELECT_ROVE_IMAGE_SOURCE);
+  controlNames.add(MODE_START_SPRITE);
+  controlNames.add(MODE_START_RANDOM_SPRITES);
+  controlNames.add(MODE_STOP_RANDOM_SPRITES);
   controlNames.add(MODE_DRAW_NORWEGIAN_DIALOG);
+  
   
   return controlNames;
 }
@@ -924,11 +928,14 @@ Map<String, String> buildControlLabels()
   result.put(MODE_SEND_PEN_LIFT_RANGE_PERSIST, "Upload lift range");
   
   result.put(MODE_SEND_ROVE_AREA, "Send Roving Area");
+  result.put(MODE_SELECT_ROVE_IMAGE_SOURCE, "Choose source image");
   result.put(MODE_SEND_START_TEXT, "Start text at point");
   result.put(MODE_SHOW_WRITING_DIALOG, "Render writing...");
 
   result.put(MODE_START_SWIRLING, "Swirl");
   result.put(MODE_STOP_SWIRLING, "Stop swirl");
+  result.put(MODE_START_MARKING, "Mark");
+  result.put(MODE_STOP_MARKING, "Stop marking");
   result.put(MODE_START_SPRITE, "Choose sprite...");
   result.put(MODE_START_RANDOM_SPRITES, "Random sprites");
   result.put(MODE_STOP_RANDOM_SPRITES, "Stop sprites");
@@ -1063,10 +1070,13 @@ Set<String> buildControlNames()
   result.add(MODE_SEND_PEN_LIFT_RANGE_PERSIST);
   
   result.add(MODE_SEND_ROVE_AREA);
+  result.add(MODE_SELECT_ROVE_IMAGE_SOURCE);
   result.add(MODE_SEND_START_TEXT);
   result.add(MODE_SHOW_WRITING_DIALOG);
   result.add(MODE_START_SWIRLING);
   result.add(MODE_STOP_SWIRLING);
+  result.add(MODE_START_MARKING);
+  result.add(MODE_STOP_MARKING);
   result.add(MODE_START_SPRITE);
   result.add(MODE_START_RANDOM_SPRITES);
   result.add(MODE_STOP_RANDOM_SPRITES);

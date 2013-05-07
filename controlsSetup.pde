@@ -736,9 +736,9 @@ List<String> getControlNamesForWebcamPanel()
   controlNames.add(MODE_LIVE_CONFIRM_DRAW);
 //  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
 
-  controlNames.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
-  controlNames.add(MODE_FLIP_WEBCAM_INPUT);
-  controlNames.add(MODE_ROTATE_WEBCAM_INPUT);
+//  controlNames.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
+//  controlNames.add(MODE_FLIP_WEBCAM_INPUT);
+//  controlNames.add(MODE_ROTATE_WEBCAM_INPUT);
   return controlNames;
 }
 

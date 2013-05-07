@@ -203,7 +203,8 @@ public void webcam_captureCurrentImage(PImage inImage)
 public void webcam_captureCurrentImage()
 {
 //  capturedImage = webcam_buildLiveImage();
-//  webcam_captureCurrentImage(capturedImage);
+  if (getDisplayMachine().imageIsReady())
+    webcam_captureCurrentImage(getDisplayMachine().getImage());
 }
 
 public void webcam_processLoadedImage()

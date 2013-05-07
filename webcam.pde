@@ -1,42 +1,73 @@
-public PImage webcam_buildLiveImage()
+public void webcam_initCamera()
 {
-  //liveCamera.start();
-  PImage pimg = createImage(640, 480, RGB);
-  pimg.loadPixels();
-  if (liveCamera.available()) {
-    liveCamera.read();
-  }
-  pimg.pixels = liveCamera.pixels;
-  // flip the image left to right
-  if (flipWebcamImage)
-  {
-
-    List<int[]> list = new ArrayList<int[]>(480);
-
-    for (int r=0; r<pimg.pixels.length; r+=640)
-    {
-      int[] temp = new int[640];
-      for (int c=0; c<640; c++)
-      {
-        temp[c] = pimg.pixels[r+c];
-      }
-      list.add(temp);
-    }
-
-    // reverse the list
-    Collections.reverse(list);
-
-    for (int r=0; r<list.size(); r++)
-    {
-      for (int c=0; c<640; c++)
-      {
-        pimg.pixels[(r*640)+c] = list.get(r)[c];
-      }
-    }
-  }
-  pimg.updatePixels();
-  return pimg;
+  // dummy initCamera(), does nothing
+  webcamEnabled = true;
+  blob_detector = new BlobDetector( 640, 480);
+  blob_detector.setResolution(1);
+  blob_detector.computeContours(true);
+  blob_detector.computeBlobPixels(true);
+  blob_detector.setMinMaxPixels(10*10, 640*480);
+  
+  blob_detector.setBLOBable(new BLOBable_blueBlobs(liveImage));
 }
+
+public void webcam_initCameraProcCam()
+{
+//  try
+//  {
+//    String[] cameras = Capture.list();
+//    if (cameras.length > 0) {
+//      liveCamera = new Capture(this, 640, 480, cameras[0]);
+//      //liveCamera.start();
+//      webcamEnabled = true;
+//    }
+//  }
+//  catch (Exception e)
+//  {
+//    println("Exception occurred trying to look for attached webcams.  Webcam will not be used. " + e.getMessage());
+//    webcamEnabled = false;
+//  }
+
+}  
+//public PImage webcam_buildLiveImage()
+//{
+//  //liveCamera.start();
+//  PImage pimg = createImage(640, 480, RGB);
+//  pimg.loadPixels();
+//  if (liveCamera.available()) {
+//    liveCamera.read();
+//  }
+//  pimg.pixels = liveCamera.pixels;
+//  // flip the image left to right
+//  if (flipWebcamImage)
+//  {
+//
+//    List<int[]> list = new ArrayList<int[]>(480);
+//
+//    for (int r=0; r<pimg.pixels.length; r+=640)
+//    {
+//      int[] temp = new int[640];
+//      for (int c=0; c<640; c++)
+//      {
+//        temp[c] = pimg.pixels[r+c];
+//      }
+//      list.add(temp);
+//    }
+//
+//    // reverse the list
+//    Collections.reverse(list);
+//
+//    for (int r=0; r<list.size(); r++)
+//    {
+//      for (int c=0; c<640; c++)
+//      {
+//        pimg.pixels[(r*640)+c] = list.get(r)[c];
+//      }
+//    }
+//  }
+//  pimg.updatePixels();
+//  return pimg;
+//}
 
 public PImage webcam_processImageForTrace(PImage in)
 {
@@ -171,8 +202,13 @@ public void webcam_captureCurrentImage(PImage inImage)
 
 public void webcam_captureCurrentImage()
 {
-  capturedImage = webcam_buildLiveImage();
-  webcam_captureCurrentImage(capturedImage);
+//  capturedImage = webcam_buildLiveImage();
+//  webcam_captureCurrentImage(capturedImage);
+}
+
+public void webcam_processLoadedImage()
+{
+  webcam_captureCurrentImage(getDisplayMachine().getImage());
 }
 
 public void webcam_saveShape(RShape sh)
@@ -183,8 +219,8 @@ public void webcam_saveShape(RShape sh)
   RG.saveShape(filename, sh);
 }
 
-public void stop() {
-  liveCamera.stop();
-  super.stop();
-}
+//public void stop() {
+//  liveCamera.stop();
+//  super.stop();
+//}
 

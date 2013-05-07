@@ -521,8 +521,17 @@ class Machine
     {
       // check for format etc here
       println("loading from filename: " + filename);
-      this.imageBitmap = loadImage(filename);
-      this.imageFilename = filename;
+      try
+      {
+        this.imageBitmap = loadImage(filename);
+        this.imageFilename = filename;
+      }
+      catch (Exception e)
+      {
+        println("Image failed to load: " + e.getMessage());
+        this.imageBitmap = null;
+      }
+      
     }
     else
     {

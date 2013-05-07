@@ -1,6 +1,6 @@
 /**
   Polargraph controller
-  Copyright Sandy Noble 2012.
+  Copyright Sandy Noble 2013.
 
   This file is part of Polargraph Controller.
 
@@ -27,7 +27,7 @@
   http://code.google.com/p/polargraph/
 
 */
-import processing.video.*;
+//import processing.video.*;
 import diewald_CV_kit.libraryinfo.*;
 import diewald_CV_kit.utility.*;
 import diewald_CV_kit.blobdetection.*;
@@ -50,7 +50,7 @@ import controlP5.*;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 5;
+int minorVersionNo = 6;
 int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
@@ -461,10 +461,10 @@ public static Console console;
 public boolean useWindowedConsole = false;
 
 static boolean webcamEnabled = false;
-static boolean drawingLiveVideo = true;
+static boolean drawingLiveVideo = false;
 static boolean drawingWebcamShape = true;
-static boolean flipWebcamImage = true;
-static boolean rotateWebcamImage = true;
+static boolean flipWebcamImage = false;
+static boolean rotateWebcamImage = false;
 static boolean confirmedDraw = false;
 
 static PImage liveImage = null;
@@ -479,7 +479,7 @@ static int pathLengthHighPassCutoff = 0;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MAX = 10000;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MIN = 0;
 
-Capture liveCamera;
+//Capture liveCamera;
 //JMyron liveCamera;
 BlobDetector blob_detector;
 int liveSimplification = 5;
@@ -576,29 +576,7 @@ void setup()
   addEventListeners();
 
   //gamepad_init();
-  try
-  {
-    String[] cameras = Capture.list();
-    if (cameras.length > 0) {
-      liveCamera = new Capture(this, 640, 480, cameras[0]);
-      //liveCamera.start();
-      webcamEnabled = true;
-    }
-  }
-  catch (Exception e)
-  {
-    println("Exception occurred trying to look for attached webcams.  Webcam will not be used. " + e.getMessage());
-    webcamEnabled = false;
-  }
-
-  blob_detector = new BlobDetector( 640, 480);
-  blob_detector.setResolution(1);
-  blob_detector.computeContours(true);
-  blob_detector.computeBlobPixels(true);
-  blob_detector.setMinMaxPixels(10*10, 640*480);
-  
-  blob_detector.setBLOBable(new BLOBable_blueBlobs(liveImage));
-  
+  webcam_initCamera();
 }
 void addEventListeners()
 {
@@ -2777,7 +2755,16 @@ void loadFromPropertiesFile()
   setVectorFilename(getStringProperty("controller.vector.filename", null));
   if (getVectorFilename() != null)
   {
-    RShape shape = RG.loadShape(getVectorFilename());
+    RShape shape = null;
+    try
+    {
+      shape = RG.loadShape(getVectorFilename());
+    }
+    catch (Exception e)
+    {
+      shape = null;
+    }
+    
     if (shape != null) 
     {
       setVectorShape(shape);

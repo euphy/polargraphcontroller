@@ -352,20 +352,28 @@ class DisplayMachine extends Machine
     noStroke();
     // draw machine outline
     
-    liveImage = webcam_buildLiveImage();
-    processedLiveImage = webcam_processImageForTrace(liveImage);
-
-    colourSeparations = webcam_buildSeps(processedLiveImage, sepKeyColour);
-    webcamShape = webcam_traceImage(colourSeparations);
-
-    if (drawingLiveVideo)
+//    liveImage = webcam_buildLiveImage();
+    // draw actual image
+    if (displayingImage && imageIsReady() && webcamShape != null)
     {
-      displayLiveVideo();
+      processedLiveImage = webcam_processImageForTrace(getImage());
+  
+      colourSeparations = webcam_buildSeps(processedLiveImage, sepKeyColour);
+      webcamShape = webcam_traceImage(colourSeparations);
     }
+
+//    if (drawingLiveVideo)
+//    {
+//      displayLiveVideo();
+//    }
     
     if (drawingWebcamShape && webcamShape != null)
     {
       displayWebcamShape();
+    }
+    else
+    {
+      
     }
   }
   

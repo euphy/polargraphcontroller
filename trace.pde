@@ -201,8 +201,9 @@ public void trace_captureCurrentImage(PImage inImage)
 
 public void trace_captureCurrentImage()
 {
-//  capturedImage = trace_buildLiveImage();
-  trace_captureCurrentImage(getDisplayMachine().getImage());
+//  capturedImage = webcam_buildLiveImage();
+  if (getDisplayMachine().imageIsReady())
+    webcam_captureCurrentImage(getDisplayMachine().getImage());
 }
 
 public void trace_processLoadedImage()

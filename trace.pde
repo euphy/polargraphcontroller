@@ -1,17 +1,18 @@
-public void webcam_initCamera()
+public void trace_initTrace(PImage img)
 {
   // dummy initCamera(), does nothing
-  webcamEnabled = true;
-  blob_detector = new BlobDetector( 640, 480);
+  //  tracetraceEnabled = true;
+  img.loadPixels();
+  blob_detector = new BlobDetector(img.width, img.height);
   blob_detector.setResolution(1);
   blob_detector.computeContours(true);
   blob_detector.computeBlobPixels(true);
-  blob_detector.setMinMaxPixels(10*10, 640*480);
+  blob_detector.setMinMaxPixels(10*10, img.width * img.height);
   
   blob_detector.setBLOBable(new BLOBable_blueBlobs(liveImage));
 }
 
-public void webcam_initCameraProcCam()
+public void trace_initCameraProcCam()
 {
 //  try
 //  {
@@ -19,17 +20,17 @@ public void webcam_initCameraProcCam()
 //    if (cameras.length > 0) {
 //      liveCamera = new Capture(this, 640, 480, cameras[0]);
 //      //liveCamera.start();
-//      webcamEnabled = true;
+//      traceEnabled = true;
 //    }
 //  }
 //  catch (Exception e)
 //  {
 //    println("Exception occurred trying to look for attached webcams.  Webcam will not be used. " + e.getMessage());
-//    webcamEnabled = false;
+//    traceEnabled = false;
 //  }
 
 }  
-//public PImage webcam_buildLiveImage()
+//public PImage trace_buildLiveImage()
 //{
 //  //liveCamera.start();
 //  PImage pimg = createImage(640, 480, RGB);
@@ -69,7 +70,7 @@ public void webcam_initCameraProcCam()
 //  return pimg;
 //}
 
-public PImage webcam_processImageForTrace(PImage in)
+public PImage trace_processImageForTrace(PImage in)
 {
   PImage out = createImage(in.width, in.height, RGB);
   out.loadPixels();
@@ -83,7 +84,7 @@ public PImage webcam_processImageForTrace(PImage in)
   return out;
 }
 
-public RShape webcam_traceImage(Map<Integer, PImage> seps)
+public RShape trace_traceImage(Map<Integer, PImage> seps)
 {
   RShape allShapes = null;
   if (seps != null)
@@ -119,7 +120,7 @@ public RShape webcam_traceImage(Map<Integer, PImage> seps)
             for (int simple_cnt = 0; simple_cnt < liveSimplification; simple_cnt++) {
               contour_simple= Polyline.SIMPLIFY(contour_simple, 2, simple_cnt);
             }
-            RShape shp = webcam_convertDiewaldToRShape(contour_simple);
+            RShape shp = trace_convertDiewaldToRShape(contour_simple);
             if (shp != null)
             {
               shapeNo++;
@@ -129,7 +130,7 @@ public RShape webcam_traceImage(Map<Integer, PImage> seps)
           }
           else
           {
-            RShape shp = webcam_convertDiewaldToRShape(contour.getPixels());
+            RShape shp = trace_convertDiewaldToRShape(contour.getPixels());
             if (shp != null)
               allShapes.addChild(shp);
           }
@@ -148,7 +149,7 @@ public RShape webcam_traceImage(Map<Integer, PImage> seps)
   return allShapes;
 }
 
-Map<Integer, PImage> webcam_buildSeps(PImage img, Integer keyColour)
+Map<Integer, PImage> trace_buildSeps(PImage img, Integer keyColour)
 {
   // create separations
   // pull out number of colours
@@ -176,7 +177,7 @@ Map<Integer, PImage> webcam_buildSeps(PImage img, Integer keyColour)
   return seps;
 }
 
-RShape webcam_convertDiewaldToRShape(List<Pixel> points)
+RShape trace_convertDiewaldToRShape(List<Pixel> points)
 {
   RShape shp = null;
   if (points.size() > 2) {
@@ -193,25 +194,23 @@ RShape webcam_convertDiewaldToRShape(List<Pixel> points)
 }
 
 
-public void webcam_captureCurrentImage(PImage inImage)
+public void trace_captureCurrentImage(PImage inImage)
 {
-  processedCapturedImage = webcam_processImageForTrace(inImage);
-  colourSeparations = webcam_buildSeps(processedCapturedImage, sepKeyColour);
-  captureShape = webcam_traceImage(colourSeparations);
+  captureShape = traceShape;
 }
 
-public void webcam_captureCurrentImage()
+public void trace_captureCurrentImage()
 {
-//  capturedImage = webcam_buildLiveImage();
-//  webcam_captureCurrentImage(capturedImage);
+//  capturedImage = trace_buildLiveImage();
+  trace_captureCurrentImage(getDisplayMachine().getImage());
 }
 
-public void webcam_processLoadedImage()
+public void trace_processLoadedImage()
 {
-  webcam_captureCurrentImage(getDisplayMachine().getImage());
+  trace_captureCurrentImage(getDisplayMachine().getImage());
 }
 
-public void webcam_saveShape(RShape sh)
+public void trace_saveShape(RShape sh)
 {
   SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
   String dateCode = sdf.format(new java.util.Date());

@@ -114,19 +114,31 @@ void button_mode_sendPenliftRangePersist()
 
 void numberbox_mode_liveBlurValue(int value)
 {
-  blurValue =  value;
+  if (value != blurValue)
+  {
+    blurValue =  value;
+    retraceShape = true;
+  }
 }
 void numberbox_mode_liveSimplificationValue(int value)
 {
-  liveSimplification =  value;
+  if (value != liveSimplification)
+  {
+    liveSimplification =  value;
+    retraceShape = true;
+  }
 }
 void numberbox_mode_livePosteriseValue(int value)
 {
-  posterizeValue =  value;
+  if (value != posterizeValue)
+  {
+    posterizeValue =  value;
+    retraceShape = true;
+  }
 }
 void button_mode_liveCaptureFromLive()
 {
-  webcam_captureCurrentImage();
+  trace_captureCurrentImage();
 }
 void button_mode_liveClearCapture()
 {
@@ -148,20 +160,20 @@ void button_mode_liveConfirmDraw()
     confirmedDraw = true;
     
     // work out scaling and position
-    float scaling = getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getWidth()) / captureShape.getWidth();
-    PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().x), 
-    getDisplayMachine().inMM(getDisplayMachine().getPictureFrame().getPosition().y));
+    float scaling = getDisplayMachine().inMM(getDisplayMachine().getImageFrame().getWidth()) / captureShape.getWidth();
+    PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getImageFrame().getPosition().x), 
+    getDisplayMachine().inMM(getDisplayMachine().getImageFrame().getPosition().y));
   
     sendVectorShapes(captureShape, scaling, position, PATH_SORT_CENTRE_FIRST);
     button_mode_penUp();
 
     //  save shape as SVG
-    webcam_saveShape(captureShape);
+    trace_saveShape(captureShape);
   }
 } 
 void toggle_mode_showWebcamRawVideo(boolean flag)
 {
-  drawingLiveVideo = flag;
+//  drawingLiveVideo = flag;
 }
 void toggle_mode_flipWebcam(boolean flag)
 {

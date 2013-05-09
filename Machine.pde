@@ -525,6 +525,7 @@ class Machine
       {
         this.imageBitmap = loadImage(filename);
         this.imageFilename = filename;
+        trace_initTrace(this.imageBitmap);
       }
       catch (Exception e)
       {

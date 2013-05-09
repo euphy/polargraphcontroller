@@ -346,30 +346,23 @@ class DisplayMachine extends Machine
     }
   }
   
-  public void drawForWebcam()
+  public void drawForTrace()
   {
     // work out the scaling factor.
     noStroke();
     // draw machine outline
     
-//    liveImage = webcam_buildLiveImage();
+//    liveImage = trace_buildLiveImage();
     // draw actual image
-    if (displayingImage && imageIsReady() && webcamShape != null)
-    {
-      processedLiveImage = webcam_processImageForTrace(getImage());
-  
-      colourSeparations = webcam_buildSeps(processedLiveImage, sepKeyColour);
-      webcamShape = webcam_traceImage(colourSeparations);
-    }
 
 //    if (drawingLiveVideo)
 //    {
 //      displayLiveVideo();
 //    }
     
-    if (drawingWebcamShape && webcamShape != null)
+    if (drawingTraceShape && traceShape != null)
     {
-      displayWebcamShape();
+      displaytraceShape();
     }
     else
     {
@@ -377,74 +370,74 @@ class DisplayMachine extends Machine
     }
   }
   
-  public void displayLiveVideo()
-  {
-    // draw actual image, maximum size
-    if (processedLiveImage != null)
-    {
-      // origin - top left of the corner
-      float ox = getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7;
-      float oy = getPanel(PANEL_NAME_GENERAL).getOutline().getTop();
-      
-      // calculate size to display at.
-      float aspectRatio = (rotateWebcamImage) ? 480.0/640.0 : 640.0/480.0; // rotated, remember
-      float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
-      float w = h * (480.0/640.0);
-//      println("height: " + h + ", width: " + w);
-//      println("origin x: " + ox + ", y: " + oy);
-      
-      if (rotateWebcamImage) 
-      {
-        float t = h;
-        h = w;
-        w = t;
-      }
-      
-      //stroke(255);
-      rect(ox,oy,w,h);
-
-      tint(255, getImageTransparency());
-      if (rotateWebcamImage)
-      {
-        translate(ox, oy);
-        rotate(radians(270));
-        image(processedLiveImage, -w, 0, w, h);
-        image(liveImage, -w, (w-(w/4))+10, w/4, h/4);
-//        stroke(0,255,0);
-//        ellipse(0,0,80,40);
-//        stroke(0,0,255);
-//        ellipse(-w,0,80,40);
-        rotate(radians(-270));
-        translate(-ox, -oy);
-      }
-      else
-      {
-        translate(ox, oy);
-        image(processedLiveImage, 0, 0, h, w);
-        image(liveImage, h-(h/4), w+10, h/4, w/4);
-        translate(-ox, -oy);
-      }
-      noTint();
-      noFill();
-    }
-  }
+//  public void displayLiveVideo()
+//  {
+//    // draw actual image, maximum size
+//    if (processedLiveImage != null)
+//    {
+//      // origin - top left of the corner
+//      float ox = getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7;
+//      float oy = getPanel(PANEL_NAME_GENERAL).getOutline().getTop();
+//      
+//      // calculate size to display at.
+//      float aspectRatio = (rotateWebcamImage) ? 480.0/640.0 : 640.0/480.0; // rotated, remember
+//      float h = height - getPanel(PANEL_NAME_GENERAL).getOutline().getTop() -10;
+//      float w = h * (480.0/640.0);
+////      println("height: " + h + ", width: " + w);
+////      println("origin x: " + ox + ", y: " + oy);
+//      
+//      if (rotateWebcamImage) 
+//      {
+//        float t = h;
+//        h = w;
+//        w = t;
+//      }
+//      
+//      //stroke(255);
+//      rect(ox,oy,w,h);
+//
+//      tint(255, getImageTransparency());
+//      if (rotateWebcamImage)
+//      {
+//        translate(ox, oy);
+//        rotate(radians(270));
+//        image(processedLiveImage, -w, 0, w, h);
+//        image(liveImage, -w, (w-(w/4))+10, w/4, h/4);
+////        stroke(0,255,0);
+////        ellipse(0,0,80,40);
+////        stroke(0,0,255);
+////        ellipse(-w,0,80,40);
+//        rotate(radians(-270));
+//        translate(-ox, -oy);
+//      }
+//      else
+//      {
+//        translate(ox, oy);
+//        image(processedLiveImage, 0, 0, h, w);
+//        image(liveImage, h-(h/4), w+10, h/4, w/4);
+//        translate(-ox, -oy);
+//      }
+//      noTint();
+//      noFill();
+//    }
+//  }
   
-  public void displayWebcamShape()
+  public void displaytraceShape()
   {
     strokeWeight(1);
     
     if (captureShape != null)
     {
-      //displayWebcamShapeAtFullSize(webcamShape, false, color(150,150,150));
-      displayWebcamShapeAtFullSize(captureShape, true, color(0,0,0));
+      //displaytraceShapeAtFullSize(traceShape, false, color(150,150,150));
+      displaytraceShapeAtFullSize(captureShape, true, color(0,0,0));
     }
     else
     {
-      displayWebcamShapeAtFullSize(webcamShape, false, color(255,255,255));
+      displaytraceShapeAtFullSize(traceShape, false, color(255,255,255));
     }
   }
   
-  public void displayWebcamShapeAtFullSize(RShape vec, boolean illustrateSequence, Integer colour)
+  public void displaytraceShapeAtFullSize(RShape vec, boolean illustrateSequence, Integer colour)
   {
     RG.ignoreStyles();
     // work out scaling to make it full size on the screen
@@ -454,7 +447,7 @@ class DisplayMachine extends Machine
     float scaler = h / vec.getWidth();
     if (rotateWebcamImage)
       scaler =  h / vec.getHeight();
-    PVector position = new PVector(getPanel(PANEL_NAME_WEBCAM).getOutline().getRight()+7, getPanel(PANEL_NAME_GENERAL).getOutline().getTop());
+    PVector position = new PVector(getPanel(PANEL_NAME_TRACE).getOutline().getRight()+7, getPanel(PANEL_NAME_GENERAL).getOutline().getTop());
 
     noFill();
     RPoint[][] pointPaths = vec.getPointsInPaths();

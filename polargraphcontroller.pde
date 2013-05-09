@@ -406,8 +406,8 @@ public static final String TAB_NAME_DETAILS = "tab_details";
 public static final String TAB_LABEL_DETAILS = "Setup";
 public static final String TAB_NAME_QUEUE = "tab_queue";
 public static final String TAB_LABEL_QUEUE = "Queue";
-public static final String TAB_NAME_WEBCAM = "tab_webcam";
-public static final String TAB_LABEL_WEBCAM = "Camera";
+public static final String TAB_NAME_TRACE = "tab_trace";
+public static final String TAB_LABEL_TRACE = "Trace";
 
 // Page states
 public String currentTab = TAB_NAME_INPUT;
@@ -417,7 +417,7 @@ public static final String PANEL_NAME_INPUT = "panel_input";
 public static final String PANEL_NAME_ROVING = "panel_roving";
 public static final String PANEL_NAME_DETAILS = "panel_details";
 public static final String PANEL_NAME_QUEUE = "panel_queue";
-public static final String PANEL_NAME_WEBCAM = "panel_webcam";
+public static final String PANEL_NAME_TRACE = "panel_trace";
 
 public static final String PANEL_NAME_GENERAL = "panel_general";
 
@@ -460,9 +460,8 @@ boolean overwriteExistingStoreFile = true;
 public static Console console;
 public boolean useWindowedConsole = false;
 
-static boolean webcamEnabled = false;
-static boolean drawingLiveVideo = false;
-static boolean drawingWebcamShape = true;
+static boolean drawingTraceShape = true;
+static boolean retraceShape = true;
 static boolean flipWebcamImage = false;
 static boolean rotateWebcamImage = false;
 static boolean confirmedDraw = false;
@@ -488,7 +487,7 @@ int posterizeValue = 5;
 int sepKeyColour = color(0, 0, 255);
 
 Map<Integer, PImage> colourSeparations = null;
-RShape webcamShape = null;
+RShape traceShape = null;
 RShape captureShape = null;
 
 String shapeSavePath = "../../savedcaptures/";
@@ -576,7 +575,6 @@ void setup()
   addEventListeners();
 
   //gamepad_init();
-  webcam_initCamera();
 }
 void addEventListeners()
 {
@@ -638,9 +636,9 @@ void draw()
   {
     drawRovingPage();
   }
-  else if (getCurrentTab() == TAB_NAME_WEBCAM)
+  else if (getCurrentTab() == TAB_NAME_TRACE)
   {
-    drawWebcamPage();
+    drawTracePage();
   }
   else
   {
@@ -817,7 +815,7 @@ void drawRovingPage()
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
 }
 
-void drawWebcamPage()
+void drawTracePage()
 {
   strokeWeight(1);
   background(100);
@@ -826,25 +824,29 @@ void drawWebcamPage()
   strokeWeight(3);
   stroke(150);
   noFill();
-  if (webcamEnabled) 
+  getDisplayMachine().drawForTrace();
+  if (displayingImage && getDisplayMachine().imageIsReady() && retraceShape)
   {
-    getDisplayMachine().drawForWebcam();
-    stroke(255, 0, 0);
-   
-    for (Panel panel : getPanelsForTab(TAB_NAME_WEBCAM))
-    {
-      panel.draw();
-    }
+    processedLiveImage = trace_processImageForTrace(getDisplayMachine().getImage());
+    colourSeparations = trace_buildSeps(processedLiveImage, sepKeyColour);
+    traceShape = trace_traceImage(colourSeparations);
+    drawingTraceShape = true;
   }
-  else
+
+  stroke(255, 0, 0);
+ 
+  for (Panel panel : getPanelsForTab(TAB_NAME_TRACE))
   {
-    text("No camera attached.", 250, 100);
+    panel.draw();
   }
+  text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
+
 
   if (displayingInfoTextOnInputPage)
     showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
   showCommandQueue((int) width-200, 20);
+
 
 //  processGamepadInput();
 //

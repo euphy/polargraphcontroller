@@ -130,15 +130,15 @@ Map<String, Panel> buildPanels()
   rovingPanel.setControlSizes(buildControlSizesForPanel(rovingPanel));
   panels.put(PANEL_NAME_ROVING, rovingPanel);
 
-  Panel webcamPanel = new Panel(PANEL_NAME_WEBCAM, panelOutline);
-  webcamPanel.setOutlineColour(color(200,200,200));
+  Panel tracePanel = new Panel(PANEL_NAME_TRACE, panelOutline);
+  tracePanel.setOutlineColour(color(200,200,200));
   // get controls
-  webcamPanel.setResizable(true);
-  webcamPanel.setControls(getControlsForPanels().get(PANEL_NAME_WEBCAM));
+  tracePanel.setResizable(true);
+  tracePanel.setControls(getControlsForPanels().get(PANEL_NAME_TRACE));
   // get control positions
-  webcamPanel.setControlPositions(buildControlPositionsForPanel(webcamPanel));
-  webcamPanel.setControlSizes(buildControlSizesForPanel(webcamPanel));
-  panels.put(PANEL_NAME_WEBCAM, webcamPanel);
+  tracePanel.setControlPositions(buildControlPositionsForPanel(tracePanel));
+  tracePanel.setControlSizes(buildControlSizesForPanel(tracePanel));
+  panels.put(PANEL_NAME_TRACE, tracePanel);
 
   Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutline);
   detailsPanel.setOutlineColour(color(200, 200, 200));
@@ -538,7 +538,7 @@ Map<String, Controller> initialiseToggleValues(Map<String, Controller> map)
     else if (MODE_SHOW_WEBCAM_RAW_VIDEO.equals(key))
     {
       Toggle t = (Toggle) map.get(key);
-      t.setValue((drawingLiveVideo) ? 1 : 0);
+//      t.setValue((drawingLiveVideo) ? 1 : 0);
     }
     else if (MODE_FLIP_WEBCAM_INPUT.equals(key))
     {
@@ -635,7 +635,7 @@ Map<String, List<Controller>> buildControlsForPanels()
   map.put(PANEL_NAME_DETAILS, getControllersForControllerNames(getControlNamesForDetailPanel()));
   map.put(PANEL_NAME_QUEUE, getControllersForControllerNames(getControlNamesForQueuePanel()));
   map.put(PANEL_NAME_GENERAL, getControllersForControllerNames(getControlNamesForGeneralPanel()));
-  map.put(PANEL_NAME_WEBCAM, getControllersForControllerNames(getControlNamesForWebcamPanel()));
+  map.put(PANEL_NAME_TRACE, getControllersForControllerNames(getControlNamesForTracePanel()));
   return map;
 }
 
@@ -724,7 +724,7 @@ List<String> getControlNamesForRovingPanel()
   return controlNames;
 }
 
-List<String> getControlNamesForWebcamPanel()
+List<String> getControlNamesForTracePanel()
 {
   List<String> controlNames = new ArrayList<String>();
   controlNames.add(MODE_LIVE_BLUR_VALUE);
@@ -736,9 +736,9 @@ List<String> getControlNamesForWebcamPanel()
   controlNames.add(MODE_LIVE_CONFIRM_DRAW);
 //  controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
 
-  controlNames.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
-  controlNames.add(MODE_FLIP_WEBCAM_INPUT);
-  controlNames.add(MODE_ROTATE_WEBCAM_INPUT);
+//  controlNames.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
+//  controlNames.add(MODE_FLIP_WEBCAM_INPUT);
+//  controlNames.add(MODE_ROTATE_WEBCAM_INPUT);
   return controlNames;
 }
 

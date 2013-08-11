@@ -51,7 +51,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 6;
+int minorVersionNo = 61;
 int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;

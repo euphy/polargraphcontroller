@@ -33,8 +33,8 @@ import diewald_CV_kit.utility.*;
 import diewald_CV_kit.blobdetection.*;
 
 import geomerative.*;
-import org.apache.batik.svggen.font.table.*;
-import org.apache.batik.svggen.font.*;
+//import org.apache.batik.svggen.font.table.*;
+//import org.apache.batik.svggen.font.*;
 import java.util.zip.CRC32;
 
 
@@ -47,6 +47,7 @@ import java.util.logging.*;
 import javax.swing.*;
 import processing.serial.*;
 import controlP5.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
@@ -3061,4 +3062,3 @@ PImage makeColourImage(int w, int h, int colour)
   }
   return img;
 }
-

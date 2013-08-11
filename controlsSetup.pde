@@ -296,7 +296,7 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       else if (MODE_CHANGE_GRID_SIZE.equals(key))
       {
         n.setValue(getGridSize());
-        n.setMin(20);
+        n.setMin(5);
         n.setMultiplier(0.5);
       }
       else if (MODE_CHANGE_MACHINE_WIDTH.equals(key))
@@ -458,7 +458,7 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setValue(penLiftUpPosition);
         n.setMin(0);
         n.setMax(360);
-        n.setMultiplier(1);
+        n.setMultiplier(0.5);
       }
       else if (MODE_PEN_LIFT_POS_DOWN.equals(key))
       {
@@ -466,7 +466,7 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setValue(penLiftDownPosition);
         n.setMin(0);
         n.setMax(360);
-        n.setMultiplier(0.1);
+        n.setMultiplier(0.5);
       }
       else if (MODE_LIVE_BLUR_VALUE.equals(key))
       {

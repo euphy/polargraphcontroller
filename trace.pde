@@ -203,7 +203,7 @@ public void trace_captureCurrentImage()
 {
 //  capturedImage = webcam_buildLiveImage();
   if (getDisplayMachine().imageIsReady())
-    webcam_captureCurrentImage(getDisplayMachine().getImage());
+    trace_captureCurrentImage(getDisplayMachine().getImage());
 }
 
 public void trace_processLoadedImage()

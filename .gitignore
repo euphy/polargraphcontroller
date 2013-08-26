@@ -1,2 +1,7 @@
 
 /default.properties.txt
+/application.windows32
+/application.windows64
+/application.linux32
+/application.linux64
+/application.macosx

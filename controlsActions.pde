@@ -249,8 +249,11 @@ void button_mode_renderSquarePixel()
 }
 void button_mode_renderSawPixel()
 {
-//  if (pixelCentresForMachine != null && !pixelCentresForMachine.isEmpty())
-//    sendSawtoothPixels();
+  if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
+  {
+    Set<PVector> pixels = getDisplayMachine().extractNativePixelsFromArea(getBoxVector1(), getBoxVectorSize(), getGridSize(), sampleArea);
+    sendSawtoothPixels(pixels);
+  }
 }
 void button_mode_renderCirclePixel()
 {

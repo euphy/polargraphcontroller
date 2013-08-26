@@ -1372,7 +1372,9 @@ void keyPressed()
 {
 
   keys[keyCode] = true;
-  println(KeyEvent.getKeyText(keyCode));
+  //println("key: " + KeyEvent.getKeyText(keyCode));
+  //println("Keys: " + keys);
+  //println("Keycode: " + keyCode);
   
   if (checkKey(CONTROL) && checkKey(KeyEvent.VK_PAGE_UP)) 
     changeMachineScaling(1);

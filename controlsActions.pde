@@ -446,11 +446,11 @@ void button_mode_selectPictureframe()
 }
 void button_mode_exportQueue()
 {
-  exportQueueToFile();
+  selectOutput("Save queue as...", "exportQueueToFile");  // Opens file chooser
 }
 void button_mode_importQueue()
 {
-  importQueueFromFile();
+  selectInput("Choose a file to import a queue from...", "importQueueFromFile");
 }
 void toggle_mode_drawDirect(boolean flag)
 {

@@ -504,6 +504,9 @@ String shapeSaveExtension = ".svg";
 //PImage dpadXImage = null;
 //PImage dpadYImage = null;
 
+// The block of text imported from file, used for the vector sprite writing
+String textForVectorSprite = "";
+
 void setup()
 {
   println("Running polargraph controller");
@@ -1819,12 +1822,11 @@ void sizeImageToFitBox()
   getDisplayMachine().setImageFrame(r);
 }
 
-void exportQueueToFile()
+void exportQueueToFile(File selectedFile)
 {
   if (!commandQueue.isEmpty() || !realtimeCommandQueue.isEmpty())
   {
-    String savePath = selectOutput();  // Opens file chooser
-    if (savePath == null) 
+    if (selectedFile == null) 
     {
       // If a file was not selected
       println("No output file was selected...");
@@ -1832,38 +1834,36 @@ void exportQueueToFile()
     else 
     {
       // If a file was selected, print path to folder
-      println("Output file: " + savePath);
+      println("Output file: " + selectedFile);
       List<String> allCommands = new ArrayList<String>(realtimeCommandQueue);
       allCommands.addAll(commandQueue);
       
       String[] list = (String[]) allCommands.toArray(new String[0]);
-      saveStrings(savePath, list);
+      saveStrings(selectedFile, list);
       println("Completed queue export, " + list.length + " commands exported.");
     }  
   }
 }
-void importQueueFromFile()
+void importQueueFromFile(File selectedFile)
 {
   commandQueue.clear();
-  String loadPath = selectInput();
-  if (loadPath == null)
+  if (selectedFile == null)
   {
     // nothing selected
     println("No input file was selected.");
   }
   else
   {
-    println("Input file: " + loadPath);
-    String commands[] = loadStrings(loadPath);
+    println("Input file: " + selectedFile);
+    String commands[] = loadStrings(selectedFile);
 //    List<String> list = Arrays
     commandQueue.addAll(Arrays.asList(commands));
     println("Completed queue import, " + commandQueue.size() + " commands found.");
   }
 }
 
-String importTextToWriteFromFile()
+void importTextToWriteFromFile(File loadPath)
 {
-  String loadPath = selectInput();
   String result = "";
   if (loadPath == null)
   {
@@ -1882,8 +1882,8 @@ String importTextToWriteFromFile()
     result = sb.toString();
 
     println("Completed text import, " + result.length() + " characters found.");
+    textForVectorSprite = result;
   }
-  return result;
 }
 
 

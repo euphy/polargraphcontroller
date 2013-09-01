@@ -316,7 +316,6 @@ void submitDrawWindow(int theValue)
 /*------------------------------------------------------------------------
     Details about the "writing" subwindow
 ------------------------------------------------------------------------*/
-String textToWrite = "";
 String spriteFilePrefix = "sprite/let";
 String spriteFileSuffix = ".txt";
 
@@ -361,12 +360,12 @@ void spriteFilePrefixField(String value)
 }
 void textToWriteField(String value)
 {
-  textToWrite = value;
+  textForVectorSprite = value;
 }
 
 String getTextToWrite()
 {
-  return textToWrite;
+  return textForVectorSprite;
 }
 String getSpriteFilePrefix()
 {
@@ -379,7 +378,8 @@ String getSpriteFileSuffix()
 
 void importTextButton()
 {
-  textToWrite = importTextToWriteFromFile();
+  // This loads the file contents into the variable called textForVectorSprite
+  selectInput("Choose a text file to load from...", "importTextToWriteFromFile");
   Textfield tf = (Textfield) cp5.controller("textToWriteField");
   tf.setText(getTextToWrite());
   tf.submit();

@@ -399,7 +399,7 @@ void submitWritingWindow(int theValue)
   
   println("Start dir: " + renderStartDirection);
   println("Sprite file prefix: " + spriteFilePrefix);
-  println("Text: " + textToWrite);
+  println("Text: " + getTextToWrite());
 
   for (int i=0; i<getTextToWrite().length(); i++)
   {

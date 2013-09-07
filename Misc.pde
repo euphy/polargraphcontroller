@@ -57,6 +57,7 @@ class PreviewVector extends PVector
 import java.awt.Toolkit;
 import java.awt.BorderLayout;
 import java.awt.GraphicsEnvironment;
+import java.awt.Dimension;
 
 public class Console extends WindowAdapter implements WindowListener, ActionListener, Runnable
 {

@@ -36,7 +36,7 @@ import geomerative.*;
 //import org.apache.batik.svggen.font.table.*;
 //import org.apache.batik.svggen.font.*;
 import java.util.zip.CRC32;
-
+import java.util.zip.Checksum;
 
 // for OSX
 import java.text.*;

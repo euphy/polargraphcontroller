@@ -1,4 +1,4 @@
-/**
+Frame/**
   Polargraph controller
   Copyright Sandy Noble 2012.
 

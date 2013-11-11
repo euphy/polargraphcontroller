@@ -1,30 +1,20 @@
 polargraphcontroller
 ====================
-/**
-  Polargraph controller
-  Copyright Sandy Noble 2012.
 
-  Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
-  Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
-  
-  This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
+Polargraph controller
+Copyright Sandy Noble 2013.
 
-  sandy.noble@gmail.com
-  http://www.polargraph.co.uk/
-  http://code.google.com/p/polargraph/
+- Requires v0.5.4 of the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/ 
+  - (http://code.google.com/p/controlp5/downloads/detail?name=controlP5_0.5.4.zip&can=2&q=).
+- Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
+- Currently only runs on Processing v1.5
 
-  Polargraph Controller is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+This is a desktop application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
 
-  Polargraph Controller is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+Very sorry that this doesn't work with newest versions of the libraries and Processing.
 
-  You should have received a copy of the GNU General Public License
-  along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
-    
+The zip file at http://code.google.com/p/polargraph/downloads/detail?name=Polargraph 1.7-1.6.zip contains 
+copies of all the libraries.
 
-*/
+sandy.noble@gmail.com
+http://www.polargraph.co.uk/

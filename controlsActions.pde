@@ -333,11 +333,11 @@ void button_mode_loadVectorFile()
 }
 void numberbox_mode_pixelBrightThreshold(float value)
 {
-  pixelExtractBrightThreshold = int(value+0.5);
+  pixelExtractBrightThreshold = (int) value;
 }
 void numberbox_mode_pixelDarkThreshold(float value)
 {
-  pixelExtractDarkThreshold = int(value+0.5);
+  pixelExtractDarkThreshold = (int) value;
 }
 
 void button_mode_pauseQueue()
@@ -524,13 +524,13 @@ void toggle_mode_moveVector(boolean flag)
 void numberbox_mode_changeMachineWidth(float value)
 {
   clearBoxVectors();
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getSize().x = steps;
 }
 void numberbox_mode_changeMachineHeight(float value)
 {
   clearBoxVectors();
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getSize().y = steps;
 }
 void numberbox_mode_changeMMPerRev(float value)
@@ -553,22 +553,22 @@ void numberbox_mode_changeMinVectorLineLength(float value)
 }
 void numberbox_mode_changePageWidth(float value)
 {
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getPage().setWidth(steps);
 }
 void numberbox_mode_changePageHeight(float value)
 {
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getPage().setHeight(steps);
 }
 void numberbox_mode_changePageOffsetX(float value)
 {
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getPage().getTopLeft().x = steps;
 }
 void numberbox_mode_changePageOffsetY(float value)
 {
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getPage().getTopLeft().y = steps;
 }
 void button_mode_changePageOffsetXCentre()
@@ -576,25 +576,25 @@ void button_mode_changePageOffsetXCentre()
   float pageWidth = getDisplayMachine().getPage().getWidth();
   float machineWidth = getDisplayMachine().getSize().x;
   float diff = (machineWidth - pageWidth) / 2.0;
-  getDisplayMachine().getPage().getTopLeft().x = diff;
+  getDisplayMachine().getPage().getTopLeft().x = (int) diff;
   initialiseNumberboxValues(getAllControls());
 }
 
 void numberbox_mode_changeHomePointX(float value)
 {
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getHomePoint().x = steps;
 }
 void numberbox_mode_changeHomePointY(float value)
 {
-  float steps = getDisplayMachine().inSteps(value);
+  float steps = getDisplayMachine().inSteps((int) value);
   getHomePoint().y = steps;
 }
 void button_mode_changeHomePointXCentre()
 {
   float halfWay = getDisplayMachine().getSize().x / 2.0;
-  getHomePoint().x = halfWay;
-  getHomePoint().y = getDisplayMachine().getPage().getTop();
+  getHomePoint().x = (int) halfWay;
+  getHomePoint().y = (int) getDisplayMachine().getPage().getTop();
   initialiseNumberboxValues(getAllControls());
 }
 

@@ -34,7 +34,7 @@
 
 void button_mode_serialPortDialog()
 {
-  ControlWindow serialPortWindow = cp5.addControlWindow("changeSerialPortWindow",100,100,150,150);
+  ControlWindow serialPortWindow = cp5.addControlWindow("changeSerialPortWindow",100,100,150,350);
   serialPortWindow.hideCoordinates();
   
   serialPortWindow.setBackground(getBackgroundColour());

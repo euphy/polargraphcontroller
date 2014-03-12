@@ -1202,7 +1202,7 @@ float getGridSize()
 void setGridSize(float s)
 {
   // round it down
-  this.gridSize = s;//(int)s;
+  this.gridSize = (int)s;
 }
 
 void setSampleArea(float v)

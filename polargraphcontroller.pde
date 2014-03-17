@@ -445,7 +445,7 @@ public Map<String, Panel> panels = null;
 PVector machineDragOffset = new PVector (0.0, 0.0);
 PVector lastMachineDragPosition = new PVector (0.0, 0.0);
 public final float MIN_SCALING = 0.1;
-public final float MAX_SCALING = 5.0;
+public final float MAX_SCALING = 15.0;
 
 RShape vectorShape = null;
 String vectorFilename = null;

@@ -350,9 +350,9 @@ void button_mode_clearQueue()
 {
   resetQueue();
 }
-void button_mode_setPositionHome()
+void button_mode_autoCalibrate()
 {
-  sendSetHomePosition();
+  sendCalibrate();
 }
 void button_mode_drawTestPenWidth()
 {

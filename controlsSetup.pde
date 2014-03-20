@@ -656,7 +656,7 @@ List<String> getControlNamesForInputPanel()
 {
   List<String> controlNames = new ArrayList<String>();
   controlNames.add(MODE_CLEAR_QUEUE);
-  controlNames.add(MODE_SET_POSITION_HOME);
+  controlNames.add(MODE_AUTO_CALIBRATE);
   controlNames.add(MODE_SET_POSITION);
   controlNames.add(MODE_DRAW_TO_POSITION);
   controlNames.add(MODE_DRAW_DIRECT);
@@ -838,7 +838,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_DRAW_TESTPATTERN, "test pattern");
   result.put(MODE_PLACE_IMAGE, "place image");
   result.put(MODE_LOAD_IMAGE, "Load image file");
-  result.put(MODE_SET_POSITION_HOME, "Set home");
+  result.put(MODE_AUTO_CALIBRATE, "Calibrate");
   result.put(MODE_RETURN_TO_HOME, "Return to home");
   result.put(MODE_INPUT_SINGLE_PIXEL, "Choose pixel");
   result.put(MODE_DRAW_TEST_PENWIDTH, "Test pen widths");
@@ -954,8 +954,6 @@ Map<String, String> buildControlLabels()
   result.put(MODE_FLIP_WEBCAM_INPUT, "Flip video");
   result.put(MODE_ROTATE_WEBCAM_INPUT, "Rotate webcam");
 
-  
-
   return result;
 }
 
@@ -984,7 +982,7 @@ Set<String> buildControlNames()
   result.add(MODE_DRAW_TESTPATTERN);
   result.add(MODE_PLACE_IMAGE);
   result.add(MODE_LOAD_IMAGE);
-  result.add(MODE_SET_POSITION_HOME);
+  result.add(MODE_AUTO_CALIBRATE);
   result.add(MODE_RETURN_TO_HOME);
   result.add(MODE_INPUT_SINGLE_PIXEL);
   result.add(MODE_DRAW_TEST_PENWIDTH);
@@ -1094,7 +1092,6 @@ Set<String> buildControlNames()
   result.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
   result.add(MODE_FLIP_WEBCAM_INPUT);
   result.add(MODE_ROTATE_WEBCAM_INPUT);
-
   
   return result;
 }

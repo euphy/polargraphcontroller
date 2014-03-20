@@ -60,6 +60,7 @@ ControlP5 cp5;
 boolean drawbotReady = false;
 boolean drawbotConnected = false;
 
+boolean cartesianOutput = true;
 static final int HARDWARE_VER_UNO = 1;
 static final int HARDWARE_VER_MEGA = 100;
 static final int HARDWARE_VER_MEGA_POLARSHIELD = 200;
@@ -200,7 +201,7 @@ static final String MODE_PLACE_IMAGE = "button_mode_placeImage";
 static final String MODE_LOAD_IMAGE = "button_mode_loadImage";
 static final String MODE_PAUSE_QUEUE = "button_mode_pauseQueue";
 static final String MODE_RUN_QUEUE = "button_mode_runQueue";
-static final String MODE_SET_POSITION_HOME = "button_mode_setPositionHome";
+static final String MODE_AUTO_CALIBRATE = "button_mode_autoCalibrate";
 static final String MODE_RETURN_TO_HOME = "button_mode_returnToHome";
 static final String MODE_INPUT_SINGLE_PIXEL = "button_mode_inputSinglePixel";
 static final String MODE_DRAW_TEST_PENWIDTH = "button_mode_drawTestPenWidth";
@@ -323,7 +324,6 @@ static final String MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF = "numberbox_mode_ve
 static final String MODE_SHOW_WEBCAM_RAW_VIDEO = "toggle_mode_showWebcamRawVideo";
 static final String MODE_FLIP_WEBCAM_INPUT = "toggle_mode_flipWebcam";
 static final String MODE_ROTATE_WEBCAM_INPUT = "toggle_mode_rotateWebcam";
-
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -575,6 +575,7 @@ void setup()
 
   addEventListeners();
 
+  noLoop();
   //gamepad_init();
 }
 void addEventListeners()
@@ -603,9 +604,7 @@ void addEventListeners()
 
 void preLoadCommandQueue()
 {
-  addToCommandQueue(CMD_CHANGEPENWIDTH+currentPenWidth+",END");
-  addToCommandQueue(CMD_SETMOTORSPEED+currentMachineMaxSpeed+",END");
-  addToCommandQueue(CMD_SETMOTORACCEL+currentMachineAccel+",END");
+  addToCommandQueue(CMD_AUTO_CALIBRATE+",END");
 }
 
 void windowResized()
@@ -949,13 +948,9 @@ void drawMoveImageOutline()
 void showCurrentMachinePosition()
 {
   noStroke();
-  fill(255,0,255,150);
-  PVector pgCoord = getDisplayMachine().scaleToScreen(currentMachinePos);
-  ellipse(pgCoord.x, pgCoord.y, 20, 20);
-
-  // also show cartesian position if reported
   fill(255,255,0,150);
-  ellipse(currentCartesianMachinePos.x, currentCartesianMachinePos.y, 15, 15);
+  PVector pgCoord = getDisplayMachine().scaleToScreen(currentCartesianMachinePos);
+  ellipse(pgCoord.x, pgCoord.y, 20, 20);
 
   noFill();
 }
@@ -2612,7 +2607,8 @@ void dispatchCommandQueue()
     }
     Checksum crc = new CRC32();
     crc.update(lastCommand.getBytes(), 0, lastCommand.length());
-    lastCommand = lastCommand+":"+crc.getValue();
+    lastCommand = lastCommand+";";
+//    lastCommand = lastCommand+":"+crc.getValue();
     println("Last command:" + lastCommand);
     myPort.write(lastCommand);
     drawbotReady = false;

@@ -72,6 +72,7 @@ static final String CMD_DRAW_NORWEGIAN_OUTLINE = "C44,";
 static final String CMD_SETPENLIFTRANGE = "C45,";
 static final String CMD_SELECT_ROVE_SOURCE_IMAGE = "C46";
 static final String CMD_RENDER_ROVE = "C47";
+static final String CMD_AUTO_CALIBRATE = "C48";
 
 static final int PATH_SORT_NONE = 0;
 static final int PATH_SORT_MOST_POINTS_FIRST = 1;
@@ -160,8 +161,10 @@ void sendMoveToPosition(boolean direct, PVector position)
 {
   String command = null;
   PVector p = getDisplayMachine().scaleToDisplayMachine(position);
-  p = getDisplayMachine().inSteps(p);
-  p = getDisplayMachine().asNativeCoords(p);
+  if (!cartesianOutput) {
+    p = getDisplayMachine().inSteps(p);
+    p = getDisplayMachine().asNativeCoords(p);
+  }
   sendMoveToNativePosition(direct, p);
 }
 
@@ -184,7 +187,10 @@ int getMaxSegmentLength()
 
 void sendTestPattern()
 {
-  String command = CMD_DRAWDIRECTIONTEST+int(gridSize)+",6,END";
+  float gSize = gridSize;
+  if (cartesianOutput)
+    gSize = getDisplayMachine().inMM(int(gridSize));
+  String command = CMD_DRAWDIRECTIONTEST+int(gSize)+",6,END";
   addToCommandQueue(command);
 }
 
@@ -209,8 +215,11 @@ void sendTestPenWidth()
 void sendSetPosition()
 {
   PVector p = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
-  p = getDisplayMachine().convertToNative(p);
-  p = getDisplayMachine().inSteps(p);
+  if (!cartesianOutput) {
+    p = getDisplayMachine().convertToNative(p);
+    p = getDisplayMachine().inSteps(p);
+  }
+  print(p);
 
   String command = CMD_SETPOSITION+int(p.x+0.5)+","+int(p.y+0.5)+",END";
   addToCommandQueue(command);
@@ -228,10 +237,16 @@ void sendStartTextAtPoint()
 
 void sendSetHomePosition()
 {
-  PVector pgCoords = getDisplayMachine().asNativeCoords(getHomePoint());
+  PVector pgCoords;
+  if (cartesianOutput) pgCoords = getDisplayMachine().inMM(getHomePoint());
+  else pgCoords = getDisplayMachine().asNativeCoords(getHomePoint());
 
   String command = CMD_SETPOSITION+int(pgCoords.x+0.5)+","+int(pgCoords.y+0.5)+",END";
   addToCommandQueue(command);
+}
+void sendCalibrate()
+{
+  addToCommandQueue(CMD_AUTO_CALIBRATE+",END");
 }
 
 int scaleDensity(int inDens, int inMax, int outMax)
@@ -892,10 +907,10 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scali
     PVector p = new PVector(firstPoint.x, firstPoint.y);
     p = PVector.mult(p, scaling);
     p = PVector.add(p, position);
-    p = getDisplayMachine().inSteps(p);
-    if (getDisplayMachine().getPage().surrounds(p))
+//    p = getDisplayMachine().inSteps(p);
+    if (getDisplayMachine().getPage().surrounds(getDisplayMachine().inSteps(p)))
     {
-      p = getDisplayMachine().asNativeCoords(p);
+//      p = getDisplayMachine().asNativeCoords(p);
       scaled.add(p);
     }
   }

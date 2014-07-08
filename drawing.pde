@@ -717,6 +717,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSorti
       }
     }
   }
+  addToCommandQueue(CMD_PENUP+"END");
   println("finished.");
 }
 

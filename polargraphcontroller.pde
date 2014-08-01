@@ -51,8 +51,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 7;
-int buildNo = 1;
+int minorVersionNo = 8;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -360,7 +360,12 @@ boolean displayingGuides = true;
 
 static final int DENSITY_PREVIEW_ROUND = 0;
 static final int DENSITY_PREVIEW_DIAMOND = 1;
-static final int DEFAULT_DENSITY_PREVIEW_STYLE = DENSITY_PREVIEW_DIAMOND;
+static final int DENSITY_PREVIEW_NATIVE = 2;
+static final int DENSITY_PREVIEW_NATIVE_ARC = 3;
+static final int DENSITY_PREVIEW_ROUND_SIZE = 4;
+static final int DENSITY_PREVIEW_NATIVE_SIZE = 5;
+
+static final int DEFAULT_DENSITY_PREVIEW_STYLE = DENSITY_PREVIEW_NATIVE;
 int densityPreviewStyle = DEFAULT_DENSITY_PREVIEW_STYLE;
 
 static final byte COORD_MODE_NATIVE_STEPS = 0;

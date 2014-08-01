@@ -710,13 +710,27 @@ class DisplayMachine extends Machine
           switch (getDensityPreviewStyle())
           {
             case DENSITY_PREVIEW_ROUND: 
-              previewRoundPixel(scaledPos, pixelSize, pixelSize);
+              previewRoundPixel(scaledPos, pixelSize);
+              break;
+            case DENSITY_PREVIEW_ROUND_SIZE:
+              fill(0);
+              previewRoundPixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1));
               break;
             case DENSITY_PREVIEW_DIAMOND:
               previewDiamondPixel(scaledPos, pixelSize, pixelSize, cartesianPos.z);
               break;
+            case DENSITY_PREVIEW_NATIVE:
+              previewNativePixel(scaledPos, pixelSize, cartesianPos.z);
+              break; 
+            case DENSITY_PREVIEW_NATIVE_SIZE:
+              previewNativePixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1), 0);
+              break; 
+            case DENSITY_PREVIEW_NATIVE_ARC:
+              previewRoundPixel(scaledPos, pixelSize*0.8);
+              previewNativeArcPixel(scaledPos, pixelSize, cartesianPos.z);
+              break; 
             default:
-              previewRoundPixel(scaledPos, pixelSize, pixelSize);
+              previewRoundPixel(scaledPos, pixelSize);
               break;
           }
         }
@@ -736,17 +750,131 @@ class DisplayMachine extends Machine
     quad(pos.x, pos.y-halfHeight, pos.x+halfWidth, pos.y, pos.x, pos.y+halfHeight, pos.x-halfWidth, pos.y);
     
   }
-  void previewNativePixel(PVector pos, float wide, float high)
+  
+  void previewNativePixel(PVector pos, float size, float brightness)
   {
-    // shall I try and draw a diamond here instead? OK! I'll do it! Ha!
-    float halfWidth = wide / 2.0;
-    float halfHeight = high / 2.0;
-    quad(pos.x, pos.y-halfHeight, pos.x+halfWidth, pos.y, pos.x, pos.y+halfHeight, pos.x-halfWidth, pos.y);
+    float half = size / 2.0;
+    fill(0,0,0, 255-brightness);
+    beginShape();
     
+    // arcs from the left-hand corner
+    float distFromPointA = getOutline().getTopLeft().dist(pos);
+    float distFromPointB = getOutline().getTopRight().dist(pos);
+
+    List<PVector> int1 = findIntersections(getOutline().getLeft(), distFromPointA-half, getOutline().getRight(), distFromPointB-half, size);
+    List<PVector> int2 = findIntersections(getOutline().getLeft(), distFromPointA+half, getOutline().getRight(), distFromPointB-half, size);
+
+    // plot out the vertexes    
+    vertex(int1.get(0).x, int1.get(0).y);
+    vertex(int2.get(0).x, int2.get(0).y);
+    vertex(int2.get(1).x, int2.get(1).y);
+    vertex(int1.get(1).x, int1.get(1).y);
+    vertex(int1.get(0).x, int1.get(0).y);
+    endShape();
   }
-  void previewRoundPixel(PVector pos, float wide, float high)
+
+  void previewNativeArcPixel(PVector pos, float size, float brightness)
   {
-     ellipse(pos.x, pos.y, wide*1.1, high*1.1);
+    float half = size / 2.0;
+//    fill(0,0,0, 255-brightness);
+    beginShape();
+    
+    // arcs from the left-hand corner
+    float distFromPointA = getOutline().getTopLeft().dist(pos);
+    float distFromPointB = getOutline().getTopRight().dist(pos);
+
+    List<PVector> int1 = findIntersections(getOutline().getLeft(), distFromPointA-half, getOutline().getRight(), distFromPointB-half, size);
+    List<PVector> int2 = findIntersections(getOutline().getLeft(), distFromPointA+half, getOutline().getRight(), distFromPointB-half, size);
+
+    // plot out the vertexes    
+    noFill();
+    stroke(0,0,0, 255-brightness);
+    
+    float i1Angle1 = atan2(int1.get(0).y-getOutline().getTop(), int1.get(0).x-getOutline().getLeft());
+    float i1Angle2 = atan2(int1.get(1).y-getOutline().getTop(), int1.get(1).x-getOutline().getLeft());
+    arc(getOutline().getLeft(), getOutline().getTop(), (distFromPointA-half)*2, (distFromPointA-half)*2, i1Angle1, i1Angle2);
+
+    i1Angle1 = atan2(int2.get(0).y-getOutline().getTop(), int2.get(0).x-getOutline().getLeft());
+    i1Angle2 = atan2(int2.get(1).y-getOutline().getTop(), int2.get(1).x-getOutline().getLeft());
+    arc(getOutline().getLeft(), getOutline().getTop(), (distFromPointA+half)*2, (distFromPointA+half)*2, i1Angle1, i1Angle2);
+
+    i1Angle1 = atan2( int1.get(0).y-getOutline().getTop(), int1.get(0).x-getOutline().getRight());
+    i1Angle2 = atan2( int2.get(0).y-getOutline().getTop(), int2.get(0).x-getOutline().getRight());
+    arc(getOutline().getRight(), getOutline().getTop(), (distFromPointB-half)*2, (distFromPointB-half)*2, i1Angle2, i1Angle1);
+
+    i1Angle1 = atan2( int1.get(1).y-getOutline().getTop(), int1.get(1).x-getOutline().getRight());
+    i1Angle2 = atan2( int2.get(1).y-getOutline().getTop(), int2.get(1).x-getOutline().getRight());
+    arc(getOutline().getRight(), getOutline().getTop(), (distFromPointB+half)*2, (distFromPointB+half)*2, i1Angle2, i1Angle1);
+
+    
+    endShape();
+  }
+  
+  
+        
+
+  void previewRoundPixel(PVector pos, float dia)
+  {
+     ellipse(pos.x, pos.y, dia*1.1, dia*1.1);
+  }
+  
+  // compute and draw intersections
+  /**
+  circle1 = c1x is the centre, and r1 is the radius of the arc to be drawn.
+  circle2 = c2x, r2 describe the arc that is used to calculate the start and 
+  end point of the drawn arc.
+  
+  circle3 = c2x, r3 is calculated by adding size to r2.
+  
+  The drawn arc should start at the intersection with the circle1, 
+  and end at the intersection with circle3.
+  
+  The clever bits of this are nicked off http://processing.org/discourse/beta/num_1223494826.html
+  */
+  List<PVector> findIntersections(float c1x, float r1, float c2x, float r2, float pixelSize)
+  {
+    float c1y = getOutline().getTop();
+    float c2y = getOutline().getTop();
+    float d=getOutline().getWidth(); // distance between centers
+    float base1, h1, base2, h2; // auxiliary distances
+    //  p, middle point between q1 and q2
+    // q1 dn q2 intersection points
+    float p1x,p1y,p2x,p2y, q1x,q1y,q2x,q2y; 
+  
+    if(d<abs(r1-r2) || d>r1+r2)
+    {
+      println("C1 and C2 do not intersect");
+      return new ArrayList();
+    }
+    else if(d==r1+r2)
+    { // outside each other, intersect in one point
+      return new ArrayList();
+    }
+    else
+    {
+      // intersect in two points
+      base1 = (r1*r1-r2*r2+d*d) / (2*d);
+      h1 = sqrt(r1*r1-base1*base1);
+  
+      p1x = c1x+base1*(c2x-c1x)/d;
+      p1y = c1y+base1*(c2y-c1y)/d;
+      q1x=abs(p1x-h1*(c2y-c1y)/d);
+      q1y=abs(p1y+h1*(c2x-c1x)/d);
+
+      float r3 = r2+pixelSize;
+      base2 = (r1*r1-r3*r3+d*d) / (2*d);
+      h2 = sqrt(r1*r1-base2*base2);
+  
+      p2x = c1x+base2*(c2x-c1x)/d;
+      p2y = c1y+base2*(c2y-c1y)/d;
+      q2x=abs(p2x-h2*(c2y-c1y)/d);
+      q2y=abs(p2y+h2*(c2x-c1x)/d);
+
+      List<PVector> l = new ArrayList<PVector>(2);
+      l.add(new PVector(q1x, q1y));
+      l.add(new PVector(q2x, q2y));
+      return l;
+     }
   }
   
   color getPixelAtScreenCoords(PVector pos)

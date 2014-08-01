@@ -190,15 +190,15 @@ Set<String> buildControlsToLockIfBoxNotSpecified()
 {
   Set<String> result = new HashSet<String>();
   result.add(MODE_DRAW_OUTLINE_BOX);
-  result.add(MODE_DRAW_OUTLINE_BOX_ROWS);
-  result.add(MODE_DRAW_SHADE_BOX_ROWS_PIXELS);
+//  result.add(MODE_DRAW_OUTLINE_BOX_ROWS);
+//  result.add(MODE_DRAW_SHADE_BOX_ROWS_PIXELS);
   result.add(MODE_RENDER_SQUARE_PIXELS);
   result.add(MODE_RENDER_SCALED_SQUARE_PIXELS);
   result.add(MODE_RENDER_SAW_PIXELS);
   result.add(MODE_RENDER_CIRCLE_PIXELS);
   result.add(MODE_RENDER_PIXEL_DIALOG);
-  result.add(MODE_DRAW_GRID);
-  result.add(MODE_DRAW_TESTPATTERN);
+//  result.add(MODE_DRAW_GRID);
+//  result.add(MODE_DRAW_TESTPATTERN);
   result.add(MODE_RENDER_SOLID_SQUARE_PIXELS);
   result.add(MODE_RENDER_SCRIBBLE_PIXELS);
   result.add(MODE_CONVERT_BOX_TO_PICTUREFRAME);
@@ -677,10 +677,10 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_CHANGE_PIXEL_SCALING);
   
   controlNames.add(MODE_RENDER_PIXEL_DIALOG);
-  controlNames.add(MODE_DRAW_GRID);
+//  controlNames.add(MODE_DRAW_GRID);
   controlNames.add(MODE_DRAW_OUTLINE_BOX);
-  controlNames.add(MODE_DRAW_OUTLINE_BOX_ROWS);
-  controlNames.add(MODE_DRAW_SHADE_BOX_ROWS_PIXELS);
+//  controlNames.add(MODE_DRAW_OUTLINE_BOX_ROWS);
+//  controlNames.add(MODE_DRAW_SHADE_BOX_ROWS_PIXELS);
 
   controlNames.add(MODE_LOAD_VECTOR_FILE);
   controlNames.add(MODE_RESIZE_VECTOR);
@@ -822,7 +822,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_BEGIN, "Reset queue");
   result.put(MODE_INPUT_BOX_TOP_LEFT, "Select Area");
   result.put(MODE_INPUT_BOX_BOT_RIGHT, "Select BotRight");
-  result.put(MODE_DRAW_OUTLINE_BOX, "Draw Outline box");
+  result.put(MODE_DRAW_OUTLINE_BOX, "Draw Outline selected");
   result.put(MODE_DRAW_OUTLINE_BOX_ROWS, "Draw Outline rows");
   result.put(MODE_DRAW_SHADE_BOX_ROWS_PIXELS, "Draw Outline pixels");
   result.put(MODE_DRAW_TO_POSITION, "Move pen to point");

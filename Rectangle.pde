@@ -75,6 +75,10 @@ class Rectangle
   {
     return getPosition();
   }
+  public PVector getTopRight()
+  {
+    return new PVector(this.size.x+this.position.x, this.position.y);
+  }
   public PVector getBotRight()
   {
     return PVector.add(this.position, this.size);

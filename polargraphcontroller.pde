@@ -2210,12 +2210,6 @@ void showmachineMessageLog(int xPos, int yPos)
   int tRowNo = 1;
 
   int pos = textPositionY+(tRow*tRowNo++);
-
-  topEdgeOfQueue = pos-queueRowHeight;
-  leftEdgeOfQueue = textPositionX;
-  rightEdgeOfQueue = textPositionX+300;
-  bottomEdgeOfQueue = height;
-  
   pos+=queueRowHeight;
   
   fill(255);
@@ -2855,6 +2849,10 @@ void savePropertiesFile()
   
   props = getDisplayMachine().loadDefinitionIntoProperties(props);
 
+  NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+  DecimalFormat df = (DecimalFormat)nf;  
+  df.applyPattern("###.##");
+  
   props.setProperty("controller.page.colour", hex(this.pageColour, 6));
   props.setProperty("controller.frame.colour", hex(this.frameColour,6));
   props.setProperty("controller.machine.colour", hex(this.machineColour,6));
@@ -2864,15 +2862,15 @@ void savePropertiesFile()
 
   
   // pen size
-  props.setProperty("machine.pen.size", new Float(currentPenWidth).toString());
+  props.setProperty("machine.pen.size", df.format(currentPenWidth));
   // serial port
   props.setProperty("controller.machine.serialport", getSerialPortNumber().toString());
   props.setProperty("controller.machine.baudrate", getBaudRate().toString());
 
   // row size
   props.setProperty("controller.grid.size", new Float(gridSize).toString());
-  props.setProperty("controller.pixel.samplearea", new Float(sampleArea).toString());
-  props.setProperty("controller.pixel.scaling", new Float(pixelScalingOverGridSize).toString());
+  props.setProperty("controller.pixel.samplearea", df.format(sampleArea));
+  props.setProperty("controller.pixel.scaling", df.format(pixelScalingOverGridSize));
 
   // density preview style
   props.setProperty("controller.density.preview.style", new Integer(getDensityPreviewStyle()).toString());
@@ -2881,14 +2879,14 @@ void savePropertiesFile()
   props.setProperty("controller.window.width", new Integer((windowWidth < 50) ? 50 : windowWidth-16).toString());
   props.setProperty("controller.window.height", new Integer((windowWidth < 50) ? 50 : windowHeight-38).toString());
 
-  props.setProperty("controller.testPenWidth.startSize", new Float(testPenWidthStartSize).toString());
-  props.setProperty("controller.testPenWidth.endSize", new Float(testPenWidthEndSize).toString());
-  props.setProperty("controller.testPenWidth.incrementSize", new Float(testPenWidthIncrementSize).toString());
+  props.setProperty("controller.testPenWidth.startSize", df.format(testPenWidthStartSize));
+  props.setProperty("controller.testPenWidth.endSize", df.format(testPenWidthEndSize));
+  props.setProperty("controller.testPenWidth.incrementSize", df.format(testPenWidthIncrementSize));
   
   props.setProperty("controller.maxSegmentLength", new Integer(getMaxSegmentLength()).toString());
   
-  props.setProperty("machine.motors.maxSpeed", new Float(currentMachineMaxSpeed).toString());
-  props.setProperty("machine.motors.accel", new Float(currentMachineAccel).toString());
+  props.setProperty("machine.motors.maxSpeed", df.format(currentMachineMaxSpeed));
+  props.setProperty("machine.motors.accel", df.format(currentMachineAccel));
   props.setProperty("machine.step.multiplier", new Integer(machineStepMultiplier).toString());
   
   props.setProperty("controller.pixel.mask.color", hex(this.chromaKeyColour, 6));
@@ -2903,15 +2901,15 @@ void savePropertiesFile()
     
   hp = getDisplayMachine().inMM(hp);
   
-  props.setProperty("controller.homepoint.x", new Float(hp.x).toString());
-  props.setProperty("controller.homepoint.y", new Float(hp.y).toString());
+  props.setProperty("controller.homepoint.x", df.format(hp.x));
+  props.setProperty("controller.homepoint.y", df.format(hp.y));
   
   if (getVectorFilename() != null)
     props.setProperty("controller.vector.filename", getVectorFilename());
     
-  props.setProperty("controller.vector.scaling", new Float(vectorScaling).toString());
-  props.setProperty("controller.vector.position.x", new Float(getVectorPosition().x).toString());
-  props.setProperty("controller.vector.position.y", new Float(getVectorPosition().y).toString());
+  props.setProperty("controller.vector.scaling", df.format(vectorScaling));
+  props.setProperty("controller.vector.position.x", df.format(getVectorPosition().x));
+  props.setProperty("controller.vector.position.y", df.format(getVectorPosition().y));
   props.setProperty("controller.vector.minLineLength", new Integer(this.minimumVectorLineLength).toString());
 
  

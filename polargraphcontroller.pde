@@ -762,7 +762,6 @@ void drawImagePage()
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
-  showmachineMessageLog((int) getDisplayMachine().getOutline().getRight()+306, 20);
 }
 
 void drawMachineOutline()
@@ -2179,6 +2178,8 @@ void showCommandQueue(int xPos, int yPos)
     // not doing anything with this exception - I don't mind if it's wrong on the screen for a second or two.
     println("Caught the pesky ConcurrentModificationException: " + cme.getMessage());
   }
+  showmachineMessageLog(rightEdgeOfQueue, 20);
+  
 }
 
 void drawCommandQueueStatus(int x, int y, int tSize)

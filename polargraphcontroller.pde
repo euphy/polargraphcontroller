@@ -51,7 +51,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 8;
+int minorVersionNo = 9;
 int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
@@ -136,6 +136,7 @@ float MACHINE_MAXSPEED_INCREMENT = 25.0;
 List<String> commandQueue = new ArrayList<String>();
 List<String> realtimeCommandQueue = new ArrayList<String>();
 List<String> commandHistory = new ArrayList<String>();
+List<String> machineMessageLog = new ArrayList<String>();
 
 List<PreviewVector> previewCommandList = new ArrayList<PreviewVector>();
 long lastCommandQueueHash = 0L;
@@ -761,6 +762,7 @@ void drawImagePage()
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
+  showmachineMessageLog((int) getDisplayMachine().getOutline().getRight()+306, 20);
 }
 
 void drawMachineOutline()
@@ -2198,6 +2200,40 @@ void drawCommandQueueStatus(int x, int y, int tSize)
   setCommandQueueFont();
 }
 
+void showmachineMessageLog(int xPos, int yPos)
+{
+  setCommandQueueFont();
+  int tRow = 15;
+  int textPositionX = xPos;
+  int textPositionY = yPos;
+  int tRowNo = 1;
+
+  int pos = textPositionY+(tRow*tRowNo++);
+
+  topEdgeOfQueue = pos-queueRowHeight;
+  leftEdgeOfQueue = textPositionX;
+  rightEdgeOfQueue = textPositionX+300;
+  bottomEdgeOfQueue = height;
+  
+  pos+=queueRowHeight;
+  
+  fill(255);
+  // Write out the commands into the window, stop when you fall off the bottom of the window
+  // Or run out of commands
+  int entryNo = machineMessageLog.size()-1;
+  while (pos <= height && entryNo >= 0)
+  {
+    String s = machineMessageLog.get(entryNo);
+    String type = s.substring(0,1);
+    if ("E".equals(type)) fill(255,128,128);
+    else if ("D".equals(type)) fill(50,50,50);
+    else if ("I".equals(type)) fill(255);
+    text(s, textPositionX, pos);
+    pos+=queueRowHeight;
+    entryNo--;
+  }
+}
+
 long getCurrentPixelTime()
 {
   if (pixelTimerRunning)
@@ -2415,6 +2451,8 @@ void serialEvent(Serial myPort)
     drawbotReady = true;
     setHardwareVersionFromIncoming(incoming);
   }
+  else if (incoming.startsWith("MSG"))
+    readMachineMessage(incoming);
   else if (incoming.startsWith("SYNC"))
     readMachinePosition(incoming);
   else if (incoming.startsWith("CARTESIAN"))
@@ -2454,6 +2492,21 @@ void extractMemoryUsage(String mem)
     machineUsedMem = currentSram - machineAvailMem;
     if (machineAvailMem < machineMinAvailMem)
       machineMinAvailMem = machineAvailMem;
+  }
+}
+
+void readMachineMessage(String msg)
+{
+  msg = msg.substring(4, msg.length());
+  String type = msg.substring(0,1);
+  msg = msg.substring(2, msg.length());
+  String timestamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
+  
+  msg = type + timestamp + " " + msg;
+  machineMessageLog.add(msg);
+  if (machineMessageLog.size() > 200) 
+  {
+    machineMessageLog.remove(0);
   }
 }
 

@@ -723,7 +723,7 @@ class DisplayMachine extends Machine
               previewNativePixel(scaledPos, pixelSize, cartesianPos.z);
               break; 
             case DENSITY_PREVIEW_NATIVE_SIZE:
-              previewNativePixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1), 0);
+              previewNativePixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1), 50);
               break; 
             case DENSITY_PREVIEW_NATIVE_ARC:
               previewRoundPixel(scaledPos, pixelSize*0.8);

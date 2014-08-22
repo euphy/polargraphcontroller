@@ -519,21 +519,34 @@ class DisplayMachine extends Machine
       {
         if (pointPaths[i] != null) 
         {
-          beginShape();
+          boolean inShape = false;
           for (int j = 0; j<pointPaths[i].length; j++)
           {
             PVector p = new PVector(pointPaths[i][j].x, pointPaths[i][j].y);
             p = PVector.mult(p, scaling);
             p = PVector.add(p, position);
-            if (getPage().surrounds(inSteps(p)))
+            if (getPictureFrame().surrounds(inSteps(p)))
             {
+              if (!inShape) 
+              {
+                beginShape();
+                inShape = true;
+              }
               p = scaleToScreen(p);
               stroke(strokeColour);
               vertex(p.x, p.y);
               //ellipse(p.x, p.y, 3, 3);
             }
+            else
+            {
+              if (inShape) 
+              {
+                endShape();
+                inShape = false;
+              }
+            }
           }
-          endShape();
+          if (inShape) endShape();
         }
       }
       if (drawCentroid)

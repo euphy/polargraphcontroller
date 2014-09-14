@@ -51,7 +51,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.*;
 
 int majorVersionNo = 1;
-int minorVersionNo = 9;
+int minorVersionNo = 10;
 int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
@@ -2669,6 +2669,7 @@ void dispatchCommandQueue()
     lastCommand = lastCommand+":"+crc.getValue();
     println("Last command:" + lastCommand);
     myPort.write(lastCommand);
+    myPort.write(10); // OH *$%! of COURSE you should terminate it.
     drawbotReady = false;
   }
   else if (commandQueue.isEmpty())

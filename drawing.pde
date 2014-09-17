@@ -674,7 +674,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSorti
   String command = "";
   PVector lastPoint = new PVector();
   boolean liftToGetToNewPoint = true;
-  
+
   // go through and get each path
   for (int i = 0; i<pointPaths.length; i++)
   {
@@ -684,38 +684,35 @@ void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSorti
 
       if (pointPaths[i].length > pathLengthHighPassCutoff)
       {
-        List<List<PVector>> filteredPaths = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
-        for (List<PVector> filteredPoints : filteredPaths)
+        List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
+        if (!filteredPoints.isEmpty())
         {
-          if (!filteredPoints.isEmpty())
+          // draw the first one with a pen up and down to get to it
+          PVector p = filteredPoints.get(0);
+          if ( p.x == lastPoint.x && p.y == lastPoint.y )
+            liftToGetToNewPoint = false;
+          else
+            liftToGetToNewPoint = true;
+
+          // pen UP! (IF THE NEW POINT IS DIFFERENT FROM THE LAST ONE!)
+          if (liftToGetToNewPoint)
+            addToCommandQueue(CMD_PENUP+"END");
+          // move to this point and put the pen down
+          command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
+          addToCommandQueue(command);
+          if (liftToGetToNewPoint)
+            addToCommandQueue(CMD_PENDOWN+"END");
+
+
+
+          // then just iterate through the rest
+          for (int j=1; j<filteredPoints.size(); j++)
           {
-            // draw the first one with a pen up and down to get to it
-            PVector p = filteredPoints.get(0);
-            if ( p.x == lastPoint.x && p.y == lastPoint.y )
-              liftToGetToNewPoint = false;
-            else
-              liftToGetToNewPoint = true;
-  
-            // pen UP! (IF THE NEW POINT IS DIFFERENT FROM THE LAST ONE!)
-            if (liftToGetToNewPoint)
-              addToCommandQueue(CMD_PENUP+"END");
-            // move to this point and put the pen down
+            p = filteredPoints.get(j);
             command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
             addToCommandQueue(command);
-            if (liftToGetToNewPoint)
-              addToCommandQueue(CMD_PENDOWN+"END");
-  
-  
-  
-            // then just iterate through the rest
-            for (int j=1; j<filteredPoints.size(); j++)
-            {
-              p = filteredPoints.get(j);
-              command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
-              addToCommandQueue(command);
-            }
-            lastPoint = new PVector(p.x, p.y);
           }
+          lastPoint = new PVector(p.x, p.y);
         }
       }
     }
@@ -879,18 +876,17 @@ List<RPoint[]> removeShortPaths(List<RPoint[]> list, int cutoff)
   return list;
 }  
 
-List<List<PVector>> filterPoints(RPoint[] points, int filterToUse, long filterParam, float scaling, PVector position)
+List<PVector> filterPoints(RPoint[] points, int filterToUse, long filterParam, float scaling, PVector position)
 {
   return filterPointsLowPass(points, filterParam, scaling, position);
 }
 
-List<List<PVector>> filterPointsLowPass(RPoint[] points, long filterParam, float scaling, PVector position)
+List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scaling, PVector position)
 {
-  List<List<PVector>> result = new ArrayList<List<PVector>>();
+  List<PVector> result = new ArrayList<PVector>();
 
-  // scale and convert all the points first, and filter them by area.
-  List<List<PVector>> areaFiltered = new ArrayList<List<PVector>>();
-  List<PVector> scaledPoints = null;
+  // scale and convert all the points first
+  List<PVector> scaled = new ArrayList<PVector>(points.length);
   for (int j = 0; j<points.length; j++)
   {
     RPoint firstPoint = points[j];
@@ -898,64 +894,37 @@ List<List<PVector>> filterPointsLowPass(RPoint[] points, long filterParam, float
     p = PVector.mult(p, scaling);
     p = PVector.add(p, position);
     p = getDisplayMachine().inSteps(p);
-    
-    // Check if the point is on the drawable area
     if (getDisplayMachine().getPictureFrame().surrounds(p))
     {
-      if (scaledPoints == null)
-      {
-        scaledPoints = new ArrayList<PVector>(points.length);
-      }
       p = getDisplayMachine().asNativeCoords(p);
-      scaledPoints.add(p);
-    }
-    else
-    { // if the point is NOT in the drawable area, then check to see if there is a 
-      // scaledPoints list, and if there is, that means this is the first point in
-      // the current path that is NOT in the drawable area. That is, the line was on
-      // the drawable area, but it's just gone off it.
-      // In this case, append the current list of scaled points into the results list,
-      // and then nullify scaledPoints so it'll be restarted as a new list if a 
-      // subsequent point ends up coming back on the drawable area.
-      if (scaledPoints != null && scaledPoints.size() > 0)
-      {
-        areaFiltered.add(scaledPoints);
-        scaledPoints = null;
-      }
+      scaled.add(p);
     }
   }
 
-
-  // Now filter by length 
-  if (!areaFiltered.isEmpty())
+  if (scaled.size() > 1)
   {
-    for (List<PVector> filteredPoints : areaFiltered)
+    PVector p = scaled.get(0);
+    result.add(p);
+
+    for (int j = 1; j<scaled.size(); j++)
     {
-      List<PVector> lengthFiltered = new ArrayList<PVector>();
-      PVector p = filteredPoints.get(0);
-      lengthFiltered.add(p);
-  
-      for (int j = 1; j<filteredPoints.size(); j++)
+      p = scaled.get(j);
+      // and even then, only bother drawing if it's a move of over "x" steps
+      int diffx = int(p.x) - int(result.get(result.size()-1).x);
+      int diffy = int(p.y) - int(result.get(result.size()-1).y);
+
+      if (abs(diffx) > filterParam || abs(diffy) > filterParam)
       {
-        p = filteredPoints.get(j);
-        // and even then, only bother drawing if it's a move of over "x" steps
-        int diffx = int(p.x) - int(lengthFiltered.get(lengthFiltered.size()-1).x);
-        int diffy = int(p.y) - int(lengthFiltered.get(lengthFiltered.size()-1).y);
-  
-        if (abs(diffx) > filterParam || abs(diffy) > filterParam)
-        {
-          //println("Adding point " + p + ", last: " + result.get(result.size()-1));
-          lengthFiltered.add(p);
-        }
-      }
-      if (lengthFiltered.size() >= 2)
-      {
-        result.add(lengthFiltered);
+        //println("Adding point " + p + ", last: " + result.get(result.size()-1));
+        result.add(p);
       }
     }
   }
-  
-  println("finished filter.");
+
+  if (result.size() < 2)
+    result.clear();
+
+  //println("finished filter.");
   return result;
 }
 

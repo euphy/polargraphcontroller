@@ -1,6 +1,6 @@
 /**
   Polargraph controller
-  Copyright Sandy Noble 2013.
+  Copyright Sandy Noble 2014.
 
   This file is part of Polargraph Controller.
 

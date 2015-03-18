@@ -63,6 +63,7 @@ boolean drawbotConnected = false;
 static final int HARDWARE_VER_UNO = 1;
 static final int HARDWARE_VER_MEGA = 100;
 static final int HARDWARE_VER_MEGA_POLARSHIELD = 200;
+static final int HARDWARE_VER_POLARPRO = 300;
 int currentHardware = HARDWARE_VER_MEGA_POLARSHIELD;
 
 final int HARDWARE_ATMEGA328_SRAM = 2048;
@@ -324,6 +325,9 @@ static final String MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF = "numberbox_mode_ve
 static final String MODE_SHOW_WEBCAM_RAW_VIDEO = "toggle_mode_showWebcamRawVideo";
 static final String MODE_FLIP_WEBCAM_INPUT = "toggle_mode_flipWebcam";
 static final String MODE_ROTATE_WEBCAM_INPUT = "toggle_mode_rotateWebcam";
+
+static final String MODE_SEND_BUTTON_ACTIVATE = "button_mode_sendButtonActivate";
+static final String MODE_SEND_BUTTON_DEACTIVATE = "button_mode_sendButtonDeactivate";
 
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
@@ -2096,6 +2100,8 @@ void drawStatusText(int x, int y)
           drawbotStatus = "Polargraph READY! (PolargraphSD)";
         else if (currentHardware >= HARDWARE_VER_MEGA)
           drawbotStatus = "Polargraph READY! (Mega)";
+        else if (currentHardware >= HARDWARE_VER_POLARPRO)
+          drawbotStatus = "Polargraph READY! (PRO)";
         else
           drawbotStatus = "Polargraph READY! (Uno)";
       }
@@ -2473,9 +2479,17 @@ void serialEvent(Serial myPort)
     drawbotReady = false;
   else if (incoming.startsWith("MEMORY"))
     extractMemoryUsage(incoming);
+    
+  else if (incoming.startsWith("BUTTON"))
+    handleMachineButton(incoming);
 
   if (drawbotReady)
     drawbotConnected = true;
+}
+
+void handleMachineButton(String msg)
+{
+  machineMessageLog.add(msg);
 }
 
 void extractMemoryUsage(String mem)
@@ -2664,9 +2678,9 @@ void dispatchCommandQueue()
       commandQueue.remove(0);
       println("Dispatching command: " + command);
     }
-    Checksum crc = new CRC32();
-    crc.update(lastCommand.getBytes(), 0, lastCommand.length());
-    lastCommand = lastCommand+":"+crc.getValue();
+//    Checksum crc = new CRC32();
+//    crc.update(lastCommand.getBytes(), 0, lastCommand.length());
+//    lastCommand = lastCommand+":"+crc.getValue();
     println("Last command:" + lastCommand);
     myPort.write(lastCommand);
     myPort.write(10); // OH *$%! of COURSE you should terminate it.

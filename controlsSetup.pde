@@ -781,6 +781,9 @@ List<String> getControlNamesForDetailPanel()
   controlNames.add(MODE_CHANGE_MACHINE_ACCELERATION);
   controlNames.add(MODE_SEND_MACHINE_SPEED);
   controlNames.add(MODE_SEND_MACHINE_SPEED_PERSIST);
+  
+  controlNames.add(MODE_SEND_BUTTON_ACTIVATE);
+  controlNames.add(MODE_SEND_BUTTON_DEACTIVATE);
 
   controlNames.add(MODE_CHANGE_SERIAL_PORT);
 
@@ -954,6 +957,8 @@ Map<String, String> buildControlLabels()
   result.put(MODE_FLIP_WEBCAM_INPUT, "Flip video");
   result.put(MODE_ROTATE_WEBCAM_INPUT, "Rotate webcam");
 
+  result.put(MODE_SEND_BUTTON_ACTIVATE, "Activate button");
+  result.put(MODE_SEND_BUTTON_DEACTIVATE, "Deactivate button");
   
 
   return result;
@@ -1094,6 +1099,9 @@ Set<String> buildControlNames()
   result.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
   result.add(MODE_FLIP_WEBCAM_INPUT);
   result.add(MODE_ROTATE_WEBCAM_INPUT);
+  
+  result.add(MODE_SEND_BUTTON_ACTIVATE);
+  result.add(MODE_SEND_BUTTON_DEACTIVATE);
 
   
   return result;

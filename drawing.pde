@@ -73,6 +73,9 @@ static final String CMD_SETPENLIFTRANGE = "C45,";
 static final String CMD_SELECT_ROVE_SOURCE_IMAGE = "C46";
 static final String CMD_RENDER_ROVE = "C47";
 
+static final String CMD_ACTIVATE_MACHINE_BUTTON = "C49";
+static final String CMD_DEACTIVATE_MACHINE_BUTTON = "C50";
+
 static final int PATH_SORT_NONE = 0;
 static final int PATH_SORT_MOST_POINTS_FIRST = 1;
 static final int PATH_SORT_GREATEST_AREA_FIRST = 2;

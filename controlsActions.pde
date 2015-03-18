@@ -710,4 +710,13 @@ void revertToLastMode()
   currentMode = lastMode;
 }
 
+void button_mode_sendButtonActivate()
+{
+  addToCommandQueue(CMD_ACTIVATE_MACHINE_BUTTON+",END");
+}
+void button_mode_sendButtonDeactivate()
+{
+  addToCommandQueue(CMD_DEACTIVATE_MACHINE_BUTTON+",END");
+}
+
 

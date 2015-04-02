@@ -2096,12 +2096,12 @@ void drawStatusText(int x, int y)
       if (drawbotReady)
       {
         fill(0, 200, 0);
-        if (currentHardware >= HARDWARE_VER_MEGA_POLARSHIELD)
+        if (currentHardware >= HARDWARE_VER_POLARPRO)
+          drawbotStatus = "Polargraph READY! (PRO)";        
+        else if (currentHardware >= HARDWARE_VER_MEGA_POLARSHIELD)
           drawbotStatus = "Polargraph READY! (PolargraphSD)";
         else if (currentHardware >= HARDWARE_VER_MEGA)
           drawbotStatus = "Polargraph READY! (Mega)";
-        else if (currentHardware >= HARDWARE_VER_POLARPRO)
-          drawbotStatus = "Polargraph READY! (PRO)";
         else
           drawbotStatus = "Polargraph READY! (Uno)";
       }
@@ -2424,7 +2424,8 @@ void setHardwareVersionFromIncoming(String readyString)
     }
     
     if (HARDWARE_VER_MEGA == verInt 
-    || HARDWARE_VER_MEGA_POLARSHIELD == verInt)
+    || HARDWARE_VER_MEGA_POLARSHIELD == verInt
+    || HARDWARE_VER_POLARPRO == verInt)
       newHardwareVersion = verInt;
     else
       newHardwareVersion = HARDWARE_VER_UNO;
@@ -2678,9 +2679,11 @@ void dispatchCommandQueue()
       commandQueue.remove(0);
       println("Dispatching command: " + command);
     }
-//    Checksum crc = new CRC32();
-//    crc.update(lastCommand.getBytes(), 0, lastCommand.length());
-//    lastCommand = lastCommand+":"+crc.getValue();
+    if (useChecksum()) {
+      Checksum crc = new CRC32();
+      crc.update(lastCommand.getBytes(), 0, lastCommand.length());
+      lastCommand = lastCommand+":"+crc.getValue();
+    }
     println("Last command:" + lastCommand);
     myPort.write(lastCommand);
     myPort.write(10); // OH *$%! of COURSE you should terminate it.
@@ -2690,6 +2693,10 @@ void dispatchCommandQueue()
   {
     stopPixelTimer();
   }  
+}
+
+boolean useChecksum() {
+  return currentHardware == 200;
 }
 
 void addToCommandQueue(String command)

@@ -1861,8 +1861,8 @@ void fileSelected(File selection) {
     println("Window was closed or the user hit cancel.");
     filePath = null;
   } else {
-    println("User selected " + selection.getAbsolutePath());
     filePath = selection.getAbsolutePath();
+    println("User selected " + filePath);
   }
 }
 

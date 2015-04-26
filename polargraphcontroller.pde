@@ -1,6 +1,6 @@
 /**
   Polargraph controller
-  Copyright Sandy Noble 2014.
+  Copyright Sandy Noble 2015.
 
   This file is part of Polargraph Controller.
 
@@ -24,8 +24,7 @@
 
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
-  http://code.google.com/p/polargraph/
-
+  https://github.com/euphy/polargraphcontroller
 */
 //import processing.video.*;
 import diewald_CV_kit.libraryinfo.*;
@@ -49,10 +48,14 @@ import processing.serial.*;
 import controlP5.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.*;
+import java.awt.Frame;
+import java.awt.BorderLayout;
 
-int majorVersionNo = 1;
-int minorVersionNo = 10;
-int buildNo = 2;
+import java.lang.reflect.Method;
+
+int majorVersionNo = 2;
+int minorVersionNo = 0;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -329,6 +332,8 @@ static final String MODE_ROTATE_WEBCAM_INPUT = "toggle_mode_rotateWebcam";
 static final String MODE_SEND_BUTTON_ACTIVATE = "button_mode_sendButtonActivate";
 static final String MODE_SEND_BUTTON_DEACTIVATE = "button_mode_sendButtonDeactivate";
 
+static final String MODE_ADJUST_PREVIEW_CORD_OFFSET = "numberbox_mode_previewCordOffsetValue";
+
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -395,6 +400,8 @@ public color guideColour = color(255);
 public color backgroundColour = color(100);
 public color densityPreviewColour = color(0);
 
+public Integer previewCordOffset = 0;
+
 
 public boolean showingSummaryOverlay = true;
 public boolean showingDialogBox = false;
@@ -433,7 +440,7 @@ public static final String PANEL_NAME_TRACE = "panel_trace";
 public static final String PANEL_NAME_GENERAL = "panel_general";
 
 public final PVector DEFAULT_CONTROL_SIZE = new PVector(100.0, 20.0);
-public final PVector CONTROL_SPACING = new PVector(2.0, 2.0);
+public final PVector CONTROL_SPACING = new PVector(4.0, 4.0);
 public PVector mainPanelPosition = new PVector(10.0, 85.0);
 
 public final Integer PANEL_MIN_HEIGHT = 400;
@@ -451,11 +458,13 @@ public Set<String> controlsToLockIfImageNotLoaded = null;
 public Map<String, Set<Panel>> panelsForTabs = null;
 public Map<String, Panel> panels = null;
 
+public Map<String, ControlFrame> controlFrames = new HashMap<String, ControlFrame>();
+
 // machine moving
 PVector machineDragOffset = new PVector (0.0, 0.0);
 PVector lastMachineDragPosition = new PVector (0.0, 0.0);
-public final float MIN_SCALING = 0.1;
-public final float MAX_SCALING = 15.0;
+public final float MIN_SCALING = 0.01;
+public final float MAX_SCALING = 30.0;
 
 RShape vectorShape = null;
 String vectorFilename = null;
@@ -489,8 +498,6 @@ static int pathLengthHighPassCutoff = 0;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MAX = 10000;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MIN = 0;
 
-//Capture liveCamera;
-//JMyron liveCamera;
 BlobDetector blob_detector;
 int liveSimplification = 5;
 int blurValue = 1;
@@ -505,20 +512,16 @@ String shapeSavePath = "../../savedcaptures/";
 String shapeSavePrefix = "shape-";
 String shapeSaveExtension = ".svg";
 
-//boolean displayGamepadOverlay = false;
-//PImage yButtonImage = null;
-//PImage xButtonImage = null;
-//PImage aButtonImage = null;
-//PImage bButtonImage = null;
-//
-//PImage dpadXImage = null;
-//PImage dpadYImage = null;
+String filePath = null;
+
+static PApplet parentPapplet = null;
 
 void setup()
 {
   println("Running polargraph controller");
   frame.setResizable(true);
   initLogging();
+  parentPapplet = this;
   
   initImages();
   
@@ -535,6 +538,7 @@ void setup()
   }
   loadFromPropertiesFile();
   
+  size(windowWidth, windowHeight, JAVA2D );
   this.cp5 = new ControlP5(this);
   initTabs();
 
@@ -580,7 +584,6 @@ void setup()
 
   currentMode = MODE_BEGIN;
   preLoadCommandQueue();
-  size(windowWidth, windowHeight, JAVA2D );
   changeTab(TAB_NAME_INPUT, TAB_NAME_INPUT);
 
   addEventListeners();
@@ -1224,34 +1227,32 @@ void controlEvent(ControlEvent controlEvent)
 {
   if (controlEvent.isTab()) 
   {
-    if (controlEvent.tab().name() == getCurrentTab())
+    if (controlEvent.tab().getName() == getCurrentTab())
     {
       // already here.
       println("Already here.");
     }
     else
     {
-      changeTab(currentTab, controlEvent.tab().name());
+      changeTab(currentTab, controlEvent.tab().getName());
     }
   }
   else if(controlEvent.isGroup()) 
   {
-    print("got an event from "+controlEvent.group().name()+"\t");
+    print("got an event from "+controlEvent.group().getName()+"\t");
 
     // checkbox uses arrayValue to store the state of 
     // individual checkbox-items. usage:
-    for (int i=0; i<controlEvent.group().arrayValue().length; i++) 
+    for (int i=0; i<controlEvent.group().getArrayValue().length; i++) 
     {
-      int n = (int)controlEvent.group().arrayValue()[i];
+      int n = (int)controlEvent.group().getArrayValue()[i];
     }
     println();
-  }
-  
+  } 
 }
 
 void changeTab(String from, String to)
 {
-  
   // hide old panels
   currentTab = to;
   for (Panel panel : getPanelsForTab(currentTab))
@@ -1262,7 +1263,6 @@ void changeTab(String from, String to)
       c.show();
     }
   }
-  
 }
 
 
@@ -1334,8 +1334,12 @@ boolean mouseOverPanel()
   boolean result = false;
   for (Panel panel : getPanelsForTab(currentTab))
   {
-    if (panel.getOutline().surrounds(getMouseVector()))
+    if (panel.getOutline().surrounds(getMouseVector())) {
+      println("Outline: " + panel.getOutline().toString());
+      println("OVER PANEL!" + panel.getName());
       result = true;
+	  break;
+    }
   }
   return result;
 }
@@ -1745,7 +1749,7 @@ void previewQueue()
         String aLenStr = splitted[1];
         String bLenStr = splitted[2];
         
-        PVector endPoint = new PVector(Integer.parseInt(aLenStr), Integer.parseInt(bLenStr));
+        PVector endPoint = new PVector(Integer.parseInt(aLenStr)+previewCordOffset, Integer.parseInt(bLenStr)+previewCordOffset);
         endPoint = getDisplayMachine().asCartesianCoords(endPoint);
         endPoint = getDisplayMachine().inMM(endPoint);
         
@@ -1834,8 +1838,8 @@ void exportQueueToFile()
 {
   if (!commandQueue.isEmpty() || !realtimeCommandQueue.isEmpty())
   {
-    String savePath = selectOutput();  // Opens file chooser
-    if (savePath == null) 
+    selectOutput("Enter a filename to save to:", "fileSelected");  // Opens file chooser
+    if (filePath == null) 
     {
       // If a file was not selected
       println("No output file was selected...");
@@ -1843,29 +1847,41 @@ void exportQueueToFile()
     else 
     {
       // If a file was selected, print path to folder
-      println("Output file: " + savePath);
+      println("Output file: " + filePath);
       List<String> allCommands = new ArrayList<String>(realtimeCommandQueue);
       allCommands.addAll(commandQueue);
       
       String[] list = (String[]) allCommands.toArray(new String[0]);
-      saveStrings(savePath, list);
+      saveStrings(filePath, list);
       println("Completed queue export, " + list.length + " commands exported.");
     }  
   }
 }
+
+void fileSelected(File selection) {
+  if (selection == null) {
+    println("Window was closed or the user hit cancel.");
+    filePath = null;
+  } else {
+    println("User selected " + selection.getAbsolutePath());
+    filePath = selection.getAbsolutePath();
+  }
+}
+
+
 void importQueueFromFile()
 {
   commandQueue.clear();
-  String loadPath = selectInput();
-  if (loadPath == null)
+  selectInput("Select file to import queue from", "fileSelected");
+  if (filePath == null)
   {
     // nothing selected
     println("No input file was selected.");
   }
   else
   {
-    println("Input file: " + loadPath);
-    String commands[] = loadStrings(loadPath);
+    println("Input file: " + filePath);
+    String commands[] = loadStrings(filePath);
 //    List<String> list = Arrays
     commandQueue.addAll(Arrays.asList(commands));
     println("Completed queue import, " + commandQueue.size() + " commands found.");
@@ -1874,17 +1890,17 @@ void importQueueFromFile()
 
 String importTextToWriteFromFile()
 {
-  String loadPath = selectInput();
+  selectInput("Select the text file to load the text from:", "fileSelected");
   String result = "";
-  if (loadPath == null)
+  if (filePath == null)
   {
     // nothing selected
     println("No input file was selected.");
   }
   else
   {
-    println("Input file: " + loadPath);
-    List<String> rows = java.util.Arrays.asList(loadStrings(loadPath));
+    println("Input file: " + filePath);
+    List<String> rows = java.util.Arrays.asList(loadStrings(filePath));
     StringBuilder sb = new StringBuilder(200);
     for (String row : rows) 
     {
@@ -3063,10 +3079,12 @@ float getPixelScalingOverGridSize()
 {
   return pixelScalingOverGridSize;
 }
+
 void setPixelScalingOverGridSize(float scaling)
 {
   pixelScalingOverGridSize = scaling;
 }
+
 int getDensityPreviewStyle()
 {
   return densityPreviewStyle;
@@ -3076,14 +3094,17 @@ Integer getBaudRate()
 {
   return baudRate;
 }
+
 boolean isUseWindowedConsole()
 {
   return this.useWindowedConsole;
 }
+
 void setUseWindowedConsole(boolean use)
 {
   this.useWindowedConsole = use;
 }
+
 void initLogging()
 {
   try
@@ -3094,21 +3115,22 @@ void initLogging()
 //    logger.addHandler(fileHandler);
 //    logger.setLevel(Level.INFO);
 //    logger.info("Hello");
-    if (isUseWindowedConsole())
-    {
-      console = new Console();
-    }
-    else
-    {
-      console.close();
-      console = null;
-    }
+//    if (isUseWindowedConsole())
+//    {
+//      console = new Console();
+//    }
+//    else
+//    {
+//      console.close();
+//      console = null;
+//    }
   }
   catch(Exception e)
   {
     println("Exception setting up logger: " + e.getMessage());
   }
 }
+
 void initImages()
 {
 //  try

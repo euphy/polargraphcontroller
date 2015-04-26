@@ -1,6 +1,6 @@
 /**
   Polargraph controller
-  Copyright Sandy Noble 2012.
+  Copyright Sandy Noble 2015.
 
   This file is part of Polargraph Controller.
 
@@ -24,7 +24,7 @@
 
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
-  http://code.google.com/p/polargraph/
+  https://github.com/euphy/polargraphcontroller
 */
 
 Set<Panel> getPanelsForTab(String tabName)
@@ -83,25 +83,25 @@ List<String> buildTabNames()
 
 void initTabs()
 {
-  cp5.tab(TAB_NAME_INPUT).setLabel(TAB_LABEL_INPUT);
-  cp5.tab(TAB_NAME_INPUT).activateEvent(true);
-  cp5.tab(TAB_NAME_INPUT).setId(1);
+  cp5.getTab(TAB_NAME_INPUT).setLabel(TAB_LABEL_INPUT);
+  cp5.getTab(TAB_NAME_INPUT).activateEvent(true);
+  cp5.getTab(TAB_NAME_INPUT).setId(1);
 
-  cp5.tab(TAB_NAME_DETAILS).setLabel(TAB_LABEL_DETAILS);
-  cp5.tab(TAB_NAME_DETAILS).activateEvent(true);
-  cp5.tab(TAB_NAME_DETAILS).setId(2);
+  cp5.getTab(TAB_NAME_DETAILS).setLabel(TAB_LABEL_DETAILS);
+  cp5.getTab(TAB_NAME_DETAILS).activateEvent(true);
+  cp5.getTab(TAB_NAME_DETAILS).setId(2);
 
-  cp5.tab(TAB_NAME_ROVING).setLabel(TAB_LABEL_ROVING);
-  cp5.tab(TAB_NAME_ROVING).activateEvent(true);
-  cp5.tab(TAB_NAME_ROVING).setId(3);
+  cp5.getTab(TAB_NAME_ROVING).setLabel(TAB_LABEL_ROVING);
+  cp5.getTab(TAB_NAME_ROVING).activateEvent(true);
+  cp5.getTab(TAB_NAME_ROVING).setId(3);
 
-  cp5.tab(TAB_NAME_TRACE).setLabel(TAB_LABEL_TRACE);
-  cp5.tab(TAB_NAME_TRACE).activateEvent(true);
-  cp5.tab(TAB_NAME_TRACE).setId(4);
+  cp5.getTab(TAB_NAME_TRACE).setLabel(TAB_LABEL_TRACE);
+  cp5.getTab(TAB_NAME_TRACE).activateEvent(true);
+  cp5.getTab(TAB_NAME_TRACE).setId(4);
 
-  cp5.tab(TAB_NAME_QUEUE).setLabel(TAB_LABEL_QUEUE);
-  cp5.tab(TAB_NAME_QUEUE).activateEvent(true);
-  cp5.tab(TAB_NAME_QUEUE).setId(5);
+  cp5.getTab(TAB_NAME_QUEUE).setLabel(TAB_LABEL_QUEUE);
+  cp5.getTab(TAB_NAME_QUEUE).activateEvent(true);
+  cp5.getTab(TAB_NAME_QUEUE).setId(5);
 }
 
 public Set<String> buildPanelNames()

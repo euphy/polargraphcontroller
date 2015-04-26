@@ -1,82 +1,73 @@
 /**
- Polargraph controller
- Copyright Sandy Noble 2012.
- 
- This file is part of Polargraph Controller.
- 
- Polargraph Controller is free software: you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
- 
- Polargraph Controller is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
- 
- You should have received a copy of the GNU General Public License
- along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
- 
- Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
- Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
- 
- This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
- 
- sandy.noble@gmail.com
- http://www.polargraph.co.uk/
- http://code.google.com/p/polargraph/
- */
-Set<String> getPanelNames()
-{
+  Polargraph controller
+  Copyright Sandy Noble 2015.
+
+  This file is part of Polargraph Controller.
+
+  Polargraph Controller is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  Polargraph Controller is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
+    
+  Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
+  Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
+  
+  This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
+
+  sandy.noble@gmail.com
+  http://www.polargraph.co.uk/
+  https://github.com/euphy/polargraphcontroller
+*/
+Set<String> getPanelNames() {
   if (this.panelNames == null)
     this.panelNames = buildPanelNames();
   return this.panelNames;
 }
-List<String> getTabNames()
-{
+List<String> getTabNames() {
   if (this.tabNames == null)
     this.tabNames = buildTabNames();
   return this.tabNames;
 }
-Set<String> getControlNames()
-{
+Set<String> getControlNames() {
   if (this.controlNames == null)
     this.controlNames = buildControlNames();
   return this.controlNames;
 }
-Map<String, List<Controller>> getControlsForPanels()
-{
+Map<String, List<Controller>> getControlsForPanels() {
   if (this.controlsForPanels == null)
     this.controlsForPanels = buildControlsForPanels();
   return this.controlsForPanels;
 }
-Map<String, Controller> getAllControls()
-{
+Map<String, Controller> getAllControls() {
   if (this.allControls == null)
     this.allControls = buildAllControls();
   return this.allControls;
 }
-Map<String, String> getControlLabels()
-{
+Map<String, String> getControlLabels() {
   if (this.controlLabels == null)
     this.controlLabels = buildControlLabels();
   return this.controlLabels;
 }
-Map<String, Set<Panel>> getPanelsForTabs()
-{
+Map<String, Set<Panel>> getPanelsForTabs() {
   if (this.panelsForTabs == null)
     this.panelsForTabs = buildPanelsForTabs();
   return this.panelsForTabs;
 }
-Map<String, Panel> getPanels()
-{
+Map<String, Panel> getPanels() {
   if (this.panels == null)
     this.panels = buildPanels();
   return this.panels;
 }
 
-Set<String> getControlsToLockIfBoxNotSpecified()
-{
+Set<String> getControlsToLockIfBoxNotSpecified() {
   if (this.controlsToLockIfBoxNotSpecified == null)
   {
     this.controlsToLockIfBoxNotSpecified = buildControlsToLockIfBoxNotSpecified();
@@ -84,8 +75,7 @@ Set<String> getControlsToLockIfBoxNotSpecified()
   return this.controlsToLockIfBoxNotSpecified;
 }
 
-Set<String> getControlsToLockIfImageNotLoaded()
-{
+Set<String> getControlsToLockIfImageNotLoaded() {
   if (this.controlsToLockIfImageNotLoaded == null)
   {
     this.controlsToLockIfImageNotLoaded = buildControlsToLockIfImageNotLoaded();
@@ -93,9 +83,7 @@ Set<String> getControlsToLockIfImageNotLoaded()
   return this.controlsToLockIfImageNotLoaded;
 }
 
-
-void hideAllControls()
-{
+void hideAllControls() {
   for (String key : allControls.keySet())
   {
     Controller c = allControls.get(key);
@@ -103,8 +91,7 @@ void hideAllControls()
   }
 }
 
-Map<String, Panel> buildPanels()
-{
+Map<String, Panel> buildPanels() {
   Map<String, Panel> panels = new HashMap<String, Panel>();
 
   float panelHeight = frame.getHeight() - getMainPanelPosition().y - (DEFAULT_CONTROL_SIZE.y*3);
@@ -121,7 +108,7 @@ Map<String, Panel> buildPanels()
   panels.put(PANEL_NAME_INPUT, inputPanel);
 
   Panel rovingPanel = new Panel(PANEL_NAME_ROVING, panelOutline);
-  rovingPanel.setOutlineColour(color(200,200,200));
+  rovingPanel.setOutlineColour(color(100,200,200));
   // get controls
   rovingPanel.setResizable(true);
   rovingPanel.setControls(getControlsForPanels().get(PANEL_NAME_ROVING));
@@ -131,7 +118,7 @@ Map<String, Panel> buildPanels()
   panels.put(PANEL_NAME_ROVING, rovingPanel);
 
   Panel tracePanel = new Panel(PANEL_NAME_TRACE, panelOutline);
-  tracePanel.setOutlineColour(color(200,200,200));
+  tracePanel.setOutlineColour(color(200,255,200));
   // get controls
   tracePanel.setResizable(true);
   tracePanel.setControls(getControlsForPanels().get(PANEL_NAME_TRACE));
@@ -141,7 +128,7 @@ Map<String, Panel> buildPanels()
   panels.put(PANEL_NAME_TRACE, tracePanel);
 
   Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutline);
-  detailsPanel.setOutlineColour(color(200, 200, 200));
+  detailsPanel.setOutlineColour(color(200, 200, 255));
   // get controls
   detailsPanel.setResizable(true);
   detailsPanel.setControls(getControlsForPanels().get(PANEL_NAME_DETAILS));
@@ -151,7 +138,7 @@ Map<String, Panel> buildPanels()
   panels.put(PANEL_NAME_DETAILS, detailsPanel);
 
   Panel queuePanel = new Panel(PANEL_NAME_QUEUE, panelOutline);
-  queuePanel.setOutlineColour(color(200, 200, 200));
+  queuePanel.setOutlineColour(color(200, 200, 50));
   // get controls
   queuePanel.setResizable(true);
   queuePanel.setControls(getControlsForPanels().get(PANEL_NAME_QUEUE));
@@ -165,7 +152,7 @@ Map<String, Panel> buildPanels()
     new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, (DEFAULT_CONTROL_SIZE.y+CONTROL_SPACING.y)*2));
   Panel generalPanel = new Panel(PANEL_NAME_GENERAL, panelOutline);
   generalPanel.setResizable(false);
-  generalPanel.setOutlineColour(color(200, 200, 200));
+  generalPanel.setOutlineColour(color(200, 50, 200));
   // get controls
   generalPanel.setControls(getControlsForPanels().get(PANEL_NAME_GENERAL));
   // get control positions
@@ -241,9 +228,9 @@ Map<String, Controller> buildAllControls()
       Toggle t = cp5.addToggle(controlName, false, 100, 100, 100, 100);
       t.setLabel(getControlLabels().get(controlName));
       t.hide();
-      controlP5.Label l = t.captionLabel();
-      l.style().marginTop = -17; //move upwards (relative to button size)
-      l.style().marginLeft = 4; //move to the right
+      controlP5.Label l = t.getCaptionLabel();
+      l.getStyle().marginTop = -17; //move upwards (relative to button size)
+      l.getStyle().marginLeft = 4; //move to the right
       map.put(controlName, t);
       //      println("Added toggle " + controlName);
     }
@@ -252,9 +239,9 @@ Map<String, Controller> buildAllControls()
       Toggle t = cp5.addToggle(controlName, false, 100, 100, 100, 100);
       t.setLabel(getControlLabels().get(controlName));
       t.hide();
-      controlP5.Label l = t.captionLabel();
-      l.style().marginTop = -17; //move upwards (relative to button size)
-      l.style().marginLeft = 4; //move to the right
+      controlP5.Label l = t.getCaptionLabel();
+      l.getStyle().marginTop = -17; //move upwards (relative to button size)
+      l.getStyle().marginLeft = 4; //move to the right
       map.put(controlName, t);
       //      println("Added minitoggle " + controlName);
     }
@@ -264,9 +251,9 @@ Map<String, Controller> buildAllControls()
       n.setLabel(getControlLabels().get(controlName));
       n.hide();
       n.setDecimalPrecision(0);
-      controlP5.Label l = n.captionLabel();
-      l.style().marginTop = -17; //move upwards (relative to button size)
-      l.style().marginLeft = 40; //move to the right
+      controlP5.Label l = n.getCaptionLabel();
+      l.getStyle().marginTop = -17; //move upwards (relative to button size)
+      l.getStyle().marginLeft = 40; //move to the right
       // change the control direction to left/right
       n.setDirection(Controller.VERTICAL);
       map.put(controlName, n);
@@ -500,6 +487,12 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setMax(PATH_LENGTH_HIGHPASS_CUTOFF_MAX);
         n.setMultiplier(0.5);
       }
+      else if (MODE_ADJUST_PREVIEW_CORD_OFFSET.equals(key))
+      {
+        n.setDecimalPrecision(0);
+        n.setValue(0);
+        n.setMultiplier(0.5);
+      }
     }
   }
   return map;
@@ -555,9 +548,6 @@ Map<String, Controller> initialiseToggleValues(Map<String, Controller> map)
   return map;
 }
 
-
-
-
 String getControlLabel(String butName)
 {
   if (controlLabels.containsKey(butName))
@@ -574,10 +564,10 @@ Map<String, PVector> buildControlPositionsForPanel(Panel panel)
   int row = 0;
   for (Controller controller : panel.getControls())
   {
-    if (controller.name().startsWith("minitoggle_"))
+    if (controller.getName().startsWith("minitoggle_"))
     {
       PVector p = new PVector(col*(DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x), row*(DEFAULT_CONTROL_SIZE.y+CONTROL_SPACING.y));
-      map.put(controller.name(), p);
+      map.put(controller.getName(), p);
       row++;
       if (p.y + (DEFAULT_CONTROL_SIZE.y*2) >= panel.getOutline().getHeight())
       {
@@ -588,7 +578,7 @@ Map<String, PVector> buildControlPositionsForPanel(Panel panel)
     else
     {
       PVector p = new PVector(col*(DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x), row*(DEFAULT_CONTROL_SIZE.y+CONTROL_SPACING.y));
-      map.put(controller.name(), p);
+      map.put(controller.getName(), p);
       row++;
       if (p.y + (DEFAULT_CONTROL_SIZE.y*2) >= panel.getOutline().getHeight())
       {
@@ -597,9 +587,9 @@ Map<String, PVector> buildControlPositionsForPanel(Panel panel)
       }
     }
   }
-
   return map;
 }
+
 Map<String, PVector> buildControlSizesForPanel(Panel panel)
 {
   //println("Building control sizes for panel " + panel.getName());
@@ -609,16 +599,16 @@ Map<String, PVector> buildControlSizesForPanel(Panel panel)
   int row = 0;
   for (Controller controller : panel.getControls())
   {
-    if (controller.name().startsWith("minitoggle_"))
+    if (controller.getName().startsWith("minitoggle_"))
     {
       PVector s = new PVector(DEFAULT_CONTROL_SIZE.y, DEFAULT_CONTROL_SIZE.y);
-      map.put(controller.name(), s);
+      map.put(controller.getName(), s);
     }
     else
     {
       PVector s = new PVector(DEFAULT_CONTROL_SIZE.x, DEFAULT_CONTROL_SIZE.y);
-      map.put(controller.name(), s);
-      //println("Added size of " + controller.name() + " to panel. " + s);
+      map.put(controller.getName(), s);
+      //println("Added size of " + controller.getName() + " to panel. " + s);
     }
   }
 
@@ -688,6 +678,8 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_CHANGE_MIN_VECTOR_LINE_LENGTH);
   //controlNames.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
   controlNames.add(MODE_RENDER_VECTORS);
+  
+  controlNames.add(MODE_ADJUST_PREVIEW_CORD_OFFSET);
 
   controlNames.add(MODE_SHOW_IMAGE);
   controlNames.add(MODE_SHOW_VECTOR);
@@ -784,7 +776,7 @@ List<String> getControlNamesForDetailPanel()
   
   controlNames.add(MODE_SEND_BUTTON_ACTIVATE);
   controlNames.add(MODE_SEND_BUTTON_DEACTIVATE);
-
+  
   controlNames.add(MODE_CHANGE_SERIAL_PORT);
 
   return controlNames;
@@ -960,6 +952,8 @@ Map<String, String> buildControlLabels()
   result.put(MODE_SEND_BUTTON_ACTIVATE, "Activate button");
   result.put(MODE_SEND_BUTTON_DEACTIVATE, "Deactivate button");
   
+  result.put(MODE_ADJUST_PREVIEW_CORD_OFFSET, "Cord offset");
+  
 
   return result;
 }
@@ -1103,6 +1097,7 @@ Set<String> buildControlNames()
   result.add(MODE_SEND_BUTTON_ACTIVATE);
   result.add(MODE_SEND_BUTTON_DEACTIVATE);
 
+  result.add(MODE_ADJUST_PREVIEW_CORD_OFFSET);
   
   return result;
 }

@@ -27,30 +27,32 @@
   https://github.com/euphy/polargraphcontroller
 */
 
-
-/*------------------------------------------------------------------------
-    Details about the "serial port" subwindow
-------------------------------------------------------------------------*/
-
+void button_mode_sendMachineLiveMode() {
+	sendMachineLiveMode();
+}
+	
 String CHANGE_SERIAL_PORT_WINDOW_NAME = "changeSerialPortWindow";
+String MACHINE_STORE_WINDOW_NAME = "chooseStoreFilenameWindow";
+String MACHINE_EXEC_WINDOW_NAME = "chooseExecFilenameWindow";
 
 void button_mode_serialPortDialog() {
-	if (controlFrames.containsKey(CHANGE_SERIAL_PORT_WINDOW_NAME)) {
-		println("NOT OPENING ANOTHER ONE!");
-	}
-	else {
-		final SerialPortWindow serialPortWindow = new SerialPortWindow();
-		controlFrames.put(CHANGE_SERIAL_PORT_WINDOW_NAME, serialPortWindow);
-	}
+	final SerialPortWindow serialPortWindow = new SerialPortWindow();
 }
 
-class SerialPortWindow extends ControlFrame {
-	
-	@Override
-	public ControlP5 cp5() {
-		return super.cp5();
-	}
-	public SerialPortWindow() {
+void button_mode_machineStoreDialog() {
+	final MachineStoreWindow machineStoreWindow = new MachineStoreWindow();
+}
+
+void button_mode_machineExecDialog() {
+	final MachineExecWindow machineExecWindow = new MachineExecWindow();
+}
+
+void button_mode_drawPixelsDialog() {
+	final DrawPixelsWindow drawPixelsWindow = new DrawPixelsWindow();
+}
+
+class DrawPixelsWindow extends ControlFrame {
+	public DrawPixelsWindow() {
 		super(parentPapplet, 150, 350);
 		
 		int xPos = 100;
@@ -68,223 +70,10 @@ class SerialPortWindow extends ControlFrame {
 		f.addWindowListener( new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent we) {
-				
 				f.dispose();
 			}
 		});
-
-		RadioButton r = cp5().addRadioButton("radio_serialPort")
-			.setPosition(10, 10)
-			.setSize(15,15)
-			.setSpacingRow(5)
-			.plugTo(parentPapplet, "radio_serialPort");
-  
-		String[] ports = Serial.list();
-		
-		for (int i = 0; i < ports.length; i++) {
-			println("Adding " + ports[i]);
-			r.addItem(ports[i], i);
-		}
-
-		int portNo = getSerialPortNumber();
-		if (portNo >= 0 && portNo < ports.length)
-			r.activate(ports[portNo]);
-		else
-			r.activate("No serial connection");		
-
-	}
-	
-
 }
-
-void radio_serialPort(int newSerialPort) 
-{
-  println("In radio_serialPort");
-  if (newSerialPort == -2)
-  {
-  }
-  else if (newSerialPort == -1)
-  {
-	println("Disconnecting serial port.");
-	useSerialPortConnection = false;
-	if (myPort != null)
-	{
-	  myPort.stop();
-	  myPort = null;
-	}
-	drawbotReady = false;
-	drawbotConnected = false;
-	serialPortNumber = newSerialPort;
-  }
-  else if (newSerialPort != getSerialPortNumber())
-  {
-	println("About to connect to serial port in slot " + newSerialPort);
-	// Print a list of the serial ports, for debugging purposes:
-	if (newSerialPort < Serial.list().length)
-	{
-	  try 
-	  {
-		drawbotReady = false;
-		drawbotConnected = false;
-		if (myPort != null)
-		{
-		  myPort.stop();
-		  myPort = null;
-		}
-		if (getSerialPortNumber() >= 0)
-		  println("closing " + Serial.list()[getSerialPortNumber()]);
-		
-		serialPortNumber = newSerialPort;
-		String portName = Serial.list()[serialPortNumber];
-  
-		myPort = new Serial(this, portName, getBaudRate());
-		//read bytes into a buffer until you get a linefeed (ASCII 10):
-		myPort.bufferUntil('\n');
-		useSerialPortConnection = true;
-		println("Successfully connected to port " + portName);
-	  }
-	  catch (Exception e)
-	  {
-		println("Attempting to connect to serial port in slot " + getSerialPortNumber() 
-		+ " caused an exception: " + e.getMessage());
-	  }
-	}
-	else
-	{
-	  println("No serial ports found.");
-	  useSerialPortConnection = false;
-	}
-  }
-  else
-  {
-	println("no serial port change.");
-  }
-}
-/*
-ControlFrame newControlFrame(String name, int xPos, int yPos, int width, int height) {
-  final Frame f = new Frame(name);
-  final ControlFrame p = new ControlFrame(this, width, height);
-  f.add(p);
-  p.init();
-  f.setTitle(name);
-  f.setSize(p.w, p.h);
-  f.setLocation(xPos, yPos);
-  f.setResizable(false);
-  f.setVisible(true);
-  
-  f.addWindowListener( new WindowAdapter() {
-    @Override
-      public void windowClosing(WindowEvent we) {
-      p.dispose();
-      f.dispose();
-	  if (controlFrames.containsKey(f.getName())) {
-        controlFrames.remove(f.getName());
-      }
-  
-    }
-  });
-  
-  return p;
-}
-
-*/
-
-
-/*------------------------------------------------------------------------
-    Details about the "machine store" subwindow
-------------------------------------------------------------------------*/
-//
-//ControlWindow dialogWindow = null;
-//
-//void button_mode_machineStoreDialog()
-//{
-//  this.dialogWindow = cp5.addControlWindow("chooseStoreFilenameWindow",100,100,450,150);
-//  dialogWindow.hideCoordinates();
-//  
-//  dialogWindow.setBackground(getBackgroundColour());
-//
-//  Textfield filenameField = cp5.addTextfield("storeFilename",20,20,150,20);
-//  filenameField.setText(getStoreFilename());
-//  filenameField.setLabel("Filename to store to");
-//  filenameField.setWindow(dialogWindow);
-//
-//  Button submitButton = cp5.addButton("submitStoreFilenameWindow",0,180,20,60,20);
-//  submitButton.setLabel("Submit");
-//  submitButton.setWindow(dialogWindow);
-//
-//  Toggle overwriteToggle = cp5.addToggle("toggleAppendToFile",true,180,50,20,20);
-//  overwriteToggle.setCaptionLabel("Overwrite existing file");
-//  overwriteToggle.setWindow(dialogWindow);
-//
-//  filenameField.setFocus(true);
-//
-//}
-//
-//void storeFilename(String filename)
-//{
-//  println("Filename event: "+ filename);
-//  if (filename != null && filename.length() <= 12)
-//  {
-//    setStoreFilename(filename);
-//    sendMachineStoreMode();
-//  }
-//}
-//
-//void toggleAppendToFile(boolean theFlag) 
-//{
-//  setOverwriteExistingStoreFile(theFlag);
-//}
-//
-//void submitStoreFilenameWindow(int theValue) 
-//{
-//  Textfield tf = (Textfield) cp5.controller("storeFilename");
-//  tf.submit();
-//}
-//
-//void button_mode_machineExecDialog()
-//{
-//  this.dialogWindow = cp5.addControlWindow("chooseExecFilenameWindow",100,100,450,150);
-//  dialogWindow.hideCoordinates();
-//  
-//  dialogWindow.setBackground(getBackgroundColour());
-//
-//  Textfield filenameField = cp5.addTextfield("execFilename",20,20,150,20);
-//  filenameField.setText(getStoreFilename());
-//  filenameField.setLabel("Filename to execute from");
-//  filenameField.setWindow(dialogWindow);
-//
-//  Button submitButton = cp5.addButton("submitExecFilenameWindow",0,180,20,60,20);
-//  submitButton.setLabel("Submit");
-//  submitButton.setWindow(dialogWindow);
-//
-//  filenameField.setFocus(true);
-//
-//}
-//
-//void execFilename(String filename)
-//{
-//  println("Filename event: "+ filename);
-//  if (filename != null && filename.length() <= 12)
-//  {
-//    setStoreFilename(filename);
-//    sendMachineExecMode();
-//  }
-//}
-//void submitExecFilenameWindow(int theValue) 
-//{
-//  Textfield tf = (Textfield) cp5.controller("execFilename");
-//  tf.submit();
-//}
-//
-//void button_mode_sendMachineLiveMode()
-//{
-//  sendMachineLiveMode();
-//}
-//
-//
-//
-//
-//
 ///*------------------------------------------------------------------------
 //    Details about the "drawing" subwindow
 //------------------------------------------------------------------------*/

@@ -458,8 +458,6 @@ public Set<String> controlsToLockIfImageNotLoaded = null;
 public Map<String, Set<Panel>> panelsForTabs = null;
 public Map<String, Panel> panels = null;
 
-public Map<String, ControlFrame> controlFrames = new HashMap<String, ControlFrame>();
-
 // machine moving
 PVector machineDragOffset = new PVector (0.0, 0.0);
 PVector lastMachineDragPosition = new PVector (0.0, 0.0);

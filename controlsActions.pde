@@ -1,6 +1,6 @@
 /**
   Polargraph controller
-  Copyright Sandy Noble 2012.
+  Copyright Sandy Noble 2015.
 
   This file is part of Polargraph Controller.
 
@@ -24,9 +24,10 @@
 
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
-  http://code.google.com/p/polargraph/
+  https://github.com/euphy/polargraphcontroller
+
 */
-void   button_mode_begin()
+void button_mode_begin()
 {
   button_mode_clearQueue();
 }
@@ -717,6 +718,12 @@ void button_mode_sendButtonActivate()
 void button_mode_sendButtonDeactivate()
 {
   addToCommandQueue(CMD_DEACTIVATE_MACHINE_BUTTON+",END");
+}
+
+void numberbox_mode_previewCordOffsetValue(int value)
+{
+  previewCordOffset = value;
+  lastCommandQueueHash = 0;
 }
 
 

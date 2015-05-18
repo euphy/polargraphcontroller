@@ -2963,7 +2963,7 @@ void loadFromPropertiesFile()
     RShape shape = null;
     try
     {
-      shape = RG.loadShape(getVectorFilename());
+      shape =loadShapeFromFile(getVectorFilename());
     }
     catch (Exception e)
     {

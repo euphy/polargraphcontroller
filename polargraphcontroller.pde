@@ -52,7 +52,7 @@ import java.awt.event.*;
 
 int majorVersionNo = 1;
 int minorVersionNo = 2;
-int buildNo = 1;
+int buildNo = 2;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -1185,12 +1185,37 @@ RShape loadShapeFromFile(String filename) {
   return sh;
 }
 
+int countLines(String filename) throws IOException {
+    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+    try {
+        byte[] c = new byte[1024];
+        int count = 0;
+        int readChars = 0;
+        boolean empty = true;
+        while ((readChars = is.read(c)) != -1) {
+            empty = false;
+            for (int i = 0; i < readChars; ++i) {
+                if (c[i] == '\n') {
+                    ++count;
+                }
+            }
+        }
+        return (count == 0 && !empty) ? 1 : count;
+    } finally {
+        is.close();
+    }
+}
+
 RShape loadShapeFromGCodeFile(String filename) {
+  noLoop();
   RShape parent = null;
   BufferedReader reader = null;
-  RShape child = null;
+  long totalPoints = 0;
+  long time = millis();
 
   try {
+    long countLines = countLines(filename);
+    println("" + countLines + " lines found.");
     reader = createReader(filename);
     parent = new RShape();
     String line;
@@ -1198,10 +1223,23 @@ RShape loadShapeFromGCodeFile(String filename) {
     int gCodeZAxisChanges = 0;
     
     long lineNo = 0;
+    float lastPercent = 0.0f;
     while ((line = reader.readLine ()) != null) {
       lineNo++;
       if (line.toUpperCase().startsWith("G")) {
-        println("" + lineNo + ": " + line);
+        if ((millis() - time) > 500) {
+          println(new StringBuilder().append(lineNo).append(" of ").append(countLines).append(": ").append(line).append(". Points: ").append(totalPoints).toString());
+          long free = Runtime.getRuntime().freeMemory();
+          long maximum = Runtime.getRuntime().maxMemory();
+          println(new StringBuilder().append("Free: ").append(free).append(", max: ").append(maximum).toString());
+          time = millis();
+        }
+//        float percent = (lineNo / countLines) * 100;
+//        if (percent != lastPercent) {
+//          println("" + percent + "% of the way through.");
+//          lastPercent = percent;
+//        }
+        
         Map<String, Float> ins = null;
         try {
           ins = unpackGCodeInstruction(line);
@@ -1235,24 +1273,15 @@ RShape loadShapeFromGCodeFile(String filename) {
         
         Float x = ins.get("X");
         Float y = ins.get("Y");
-        RPoint[][] points = parent.getPointsInPaths();
-        if (points != null) {
-          for (int i = 0; i<points.length; i++) {
-            if (points[i] != null) {
-              for (int j = 0; j<points[i].length; j++) {
-                //println("..." + i + "-" + j + ". Point: " + points[i][j]);
-              }
-            }
-          }
-        }
-        
         if (x != null && y == null) {
           // move x axis only, use y of last
+          RPoint[][] points = parent.getPointsInPaths();
           RPoint rp = points[points.length-1][points[points.length-1].length-1];
           y = rp.y;
         }
         else if (x == null && y != null) {
           // move y axis only, use x of last
+          RPoint[][] points = parent.getPointsInPaths();
           RPoint rp = points[points.length-1][points[points.length-1].length-1];
           x = rp.x;
         }
@@ -1266,6 +1295,19 @@ RShape loadShapeFromGCodeFile(String filename) {
             parent.addMoveTo(x, y);
           }
         }
+//        RPoint[][] points = parent.getPointsInPaths();
+//        totalPoints = 0;
+//        if (points != null) {
+//          for (int i = 0; i<points.length; i++) {
+//            if (points[i] != null) {
+//              for (int j = 0; j<points[i].length; j++) {
+//                totalPoints++;
+//              }
+//            }
+//          }
+//        }
+//        points = null;
+//        println("" + totalPoints + " points.");
       }
     }
   }
@@ -1281,8 +1323,23 @@ RShape loadShapeFromGCodeFile(String filename) {
       println("Exception closing the gcode file " + filename);
       e.printStackTrace();
     }
+    loop();
   }
+  
+  RPoint[][] points = parent.getPointsInPaths();
+  totalPoints = 0;
+  if (points != null) {
+    for (int i = 0; i<points.length; i++) {
+      if (points[i] != null) {
+        for (int j = 0; j<points[i].length; j++) {
+          totalPoints++;
+        }
+      }
+    }
+  }
+  println("Total points in shape: " + totalPoints);
 
+  loop();
   return parent;
 }
 
@@ -1291,7 +1348,7 @@ Boolean isGCodeZAxisForDrawing(float z) {
 }
 
 Map<String, Float> unpackGCodeInstruction(String line) throws NumberFormatException {
-  Map<String, Float> instruction = new HashMap<String, Float>();
+  Map<String, Float> instruction = new HashMap<String, Float>(4);
   try {
     String[] splitted = line.trim().split(" ");
     for (int i = 0; i < splitted.length; i++) {

@@ -16,5 +16,7 @@ Very sorry that this doesn't work with newest versions of the libraries and Proc
 The [latest releases bundle] (https://github.com/euphy/polargraphcontroller/releases/latest) contains 
 copies of all the libraries that I use, as well as all the source, and compiled versions of the code where sensible.
 
+This project (polargraphcontroller) is the "owner" of the bundle, in that bundle releases show up as events against this project. But not every bundle release actually includes an update from polargraphcontroller, but still requires one to keep the release sequence in order. So there's some fake changes. Just be chill.
+
 sandy.noble@gmail.com
 http://www.polargraph.co.uk/

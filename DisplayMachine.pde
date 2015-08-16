@@ -767,8 +767,6 @@ class DisplayMachine extends Machine
   void previewNativePixel(PVector pos, float size, float brightness)
   {
     float half = size / 2.0;
-    fill(0,0,0, 255-brightness);
-    beginShape();
     
     // arcs from the left-hand corner
     float distFromPointA = getOutline().getTopLeft().dist(pos);
@@ -776,14 +774,19 @@ class DisplayMachine extends Machine
 
     List<PVector> int1 = findIntersections(getOutline().getLeft(), distFromPointA-half, getOutline().getRight(), distFromPointB-half, size);
     List<PVector> int2 = findIntersections(getOutline().getLeft(), distFromPointA+half, getOutline().getRight(), distFromPointB-half, size);
-
-    // plot out the vertexes    
-    vertex(int1.get(0).x, int1.get(0).y);
-    vertex(int2.get(0).x, int2.get(0).y);
-    vertex(int2.get(1).x, int2.get(1).y);
-    vertex(int1.get(1).x, int1.get(1).y);
-    vertex(int1.get(0).x, int1.get(0).y);
-    endShape();
+    
+    if (!int1.isEmpty() && !int2.isEmpty()) {
+      fill(0,0,0, 255-brightness);
+      beginShape();
+  
+      // plot out the vertexes    
+      vertex(int1.get(0).x, int1.get(0).y);
+      vertex(int2.get(0).x, int2.get(0).y);
+      vertex(int2.get(1).x, int2.get(1).y);
+      vertex(int1.get(1).x, int1.get(1).y);
+      vertex(int1.get(0).x, int1.get(0).y);
+      endShape();
+    }
   }
 
   void previewNativeArcPixel(PVector pos, float size, float brightness)

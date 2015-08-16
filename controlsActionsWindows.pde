@@ -63,7 +63,7 @@ void button_mode_drawWritingDialog() {
 String textToWrite = "";
 String spriteFilePrefix = "sprite/let";
 String spriteFileSuffix = ".txt";
-class DrawWritingWindow extends ControlFrame {
+public class DrawWritingWindow extends ControlFrame {
 	public DrawWritingWindow() {
 		super(parentPapplet, 450, 250);
 		int xPos = 100;
@@ -110,66 +110,71 @@ class DrawWritingWindow extends ControlFrame {
 			.setLabel("Generate commands")
 			.plugTo("submitWritingWindow");
 	}
-	
 
-	void spriteFilePrefixField(String value)
-	{
-	 spriteFilePrefix = value;
+	void spriteFilePrefixField(String value) {
+		spriteFilePrefix = value;
 	}
-	void textToWriteField(String value)
-	{
-	 textToWrite = value;
+	void textToWriteField(String value) {
+		textToWrite = value;
 	}
 
-	String getTextToWrite()
-	{
-	 return textToWrite;
+	String getTextToWrite() {
+		return textToWrite;
 	}
-	String getSpriteFilePrefix()
-	{
-	 return spriteFilePrefix;
+	String getSpriteFilePrefix() {
+		return spriteFilePrefix;
 	}
-	String getSpriteFileSuffix()
-	{
-	 return spriteFileSuffix;
+	String getSpriteFileSuffix() {
+		return spriteFileSuffix;
 	}
 
-	void importTextButton()
-	{
+	void importTextButton() {
 		println("Text!");
-		textToWrite = importTextToWriteFromFile();
-		println(textToWrite);
-		Textfield tf = cp5().get(Textfield.class, "textToWriteField");
-		tf.setText(getTextToWrite());
-		tf.submit();
+		selectInput("Select the text file to load the text from:", "importTextToWriteFromFile", null, this);
 	}
-
+	
+	public void importTextToWriteFromFile(File selection) {
+		if (selection != null) {
+			String fp = selection.getAbsolutePath();
+			println("Input file: " + fp);
+			List<String> rows = java.util.Arrays.asList(loadStrings(fp));
+			StringBuilder sb = new StringBuilder(200);
+			for (String row : rows) {
+				sb.append(row);
+			}
+			textToWriteField(sb.toString());
+			println("Completed text import, " + getTextToWrite().length() + " characters found.");
+			
+			println("Text: " + getTextToWrite());
+			
+			Textfield tf = cp5().get(Textfield.class, "textToWriteField");
+			tf.setText(getTextToWrite());
+			tf.submit();
+		}
+	}
 
 	void submitWritingWindow(int theValue) 
 	{
-	 println("Write.");
-	 
-	 Textfield tf = cp5().get(Textfield.class, "spriteFilePrefixField");
-	 tf.submit();
-	 tf.setText(getSpriteFilePrefix());
-	 
-	 Textfield wf = cp5.get(Textfield.class, "textToWriteField");
-	 wf.submit();
-	 wf.setText(getTextToWrite());
-	 
-	 println("Start dir: " + renderStartDirection);
-	 println("Sprite file prefix: " + spriteFilePrefix);
-	 println("Text: " + textToWrite);
+		println("Write.");
+		 
+		Textfield tf = cp5().get(Textfield.class, "spriteFilePrefixField");
+		tf.submit();
+		tf.setText(getSpriteFilePrefix());
+		 
+		Textfield wf = cp5.get(Textfield.class, "textToWriteField");
+		wf.submit();
+		wf.setText(getTextToWrite());
+		 
+		println("Start dir: " + renderStartDirection);
+		println("Sprite file prefix: " + spriteFilePrefix);
+		println("Text: " + textToWrite);
 
-	 for (int i=0; i<getTextToWrite().length(); i++)
-	 {
-	   String filename = getSpriteFilePrefix() + (int) getTextToWrite().charAt(i) + getSpriteFileSuffix();
-	   addToCommandQueue(CMD_DRAW_SPRITE + int(gridSize * pixelScalingOverGridSize) + "," + filename+",END");
-	   println(filename);
-	 }
-	 
+		for (int i=0; i<getTextToWrite().length(); i++) {
+			String filename = getSpriteFilePrefix() + (int) getTextToWrite().charAt(i) + getSpriteFileSuffix();
+			addToCommandQueue(CMD_DRAW_SPRITE + int(gridSize * pixelScalingOverGridSize) + "," + filename+",END");
+			println(filename);
+		}
 	}
-	
 }
 //
 //void button_mode_drawWritingDialog()

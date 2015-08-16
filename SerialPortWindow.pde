@@ -15,7 +15,7 @@ class SerialPortWindow extends ControlFrame {
 		f.setTitle(CHANGE_SERIAL_PORT_WINDOW_NAME);
 		f.setSize(super.w, super.h);
 		f.setLocation(xPos, yPos);
-		f.setResizable(false);
+		f.setResizable(true);
 		f.setVisible(true);
 
 		f.addWindowListener( new WindowAdapter() {
@@ -30,6 +30,8 @@ class SerialPortWindow extends ControlFrame {
 			.setSize(15,15)
 			.setSpacingRow(5)
 			.plugTo(parentPapplet, "radio_serialPort");
+  
+                r.addItem("No serial connection", -1);
   
 		String[] ports = Serial.list();
 		

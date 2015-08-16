@@ -1815,15 +1815,8 @@ boolean isHiddenPixel(PVector p)
   else
     return false;
 }
-  
 
-
-void sizeImageToFitBox()
-{
-//  PVector mmBoxSize = getDisplayMachine().inSteps(getBoxSize());
-//  PVector mmBoxPos = getDisplayMachine().inSteps(getBoxVector1());
-//  println("mm box: " + mmBoxSize);
-  
+void sizeImageToFitBox() {
   PVector boxSize = getDisplayMachine().inSteps(getBoxSize());
   PVector boxPos = getDisplayMachine().inSteps(getBoxVector1());
   println("image: " + boxSize);
@@ -1832,84 +1825,51 @@ void sizeImageToFitBox()
   getDisplayMachine().setImageFrame(r);
 }
 
-void exportQueueToFile()
-{
-  if (!commandQueue.isEmpty() || !realtimeCommandQueue.isEmpty())
-  {
-    selectOutput("Enter a filename to save to:", "fileSelected");  // Opens file chooser
-    if (filePath == null) 
-    {
-      // If a file was not selected
-      println("No output file was selected...");
-    } 
-    else 
-    {
-      // If a file was selected, print path to folder
-      println("Output file: " + filePath);
-      List<String> allCommands = new ArrayList<String>(realtimeCommandQueue);
-      allCommands.addAll(commandQueue);
-      
-      String[] list = (String[]) allCommands.toArray(new String[0]);
-      saveStrings(filePath, list);
-      println("Completed queue export, " + list.length + " commands exported.");
-    }  
-  }
+void exportQueueToFile() {
+	if (!commandQueue.isEmpty() || !realtimeCommandQueue.isEmpty()) {
+		selectOutput("Enter a filename to save to:", "exportQueueToFile");  // Opens file chooser
+	}
+}
+
+void exportQueueToFile(File selection) {
+	if (selection != null) {
+		filePath = selection.getAbsolutePath();
+		println("User selected " + filePath);
+		// If a file was selected, print path to folder
+		println("Output file: " + filePath);
+		List<String> allCommands = new ArrayList<String>(realtimeCommandQueue);
+		allCommands.addAll(commandQueue);
+  
+		String[] list = (String[]) allCommands.toArray(new String[0]);
+		saveStrings(filePath, list);
+		println("Completed queue export, " + list.length + " commands exported.");
+	}  
 }
 
 void fileSelected(File selection) {
-  if (selection == null) {
-    println("Window was closed or the user hit cancel.");
-    filePath = null;
-  } else {
-    filePath = selection.getAbsolutePath();
-    println("User selected " + filePath);
-  }
+	if (selection == null) {
+		println("Window was closed or the user hit cancel.");
+		filePath = null;
+	} else {
+		filePath = selection.getAbsolutePath();
+		println("User selected " + filePath);
+	}
 }
 
-
-void importQueueFromFile()
-{
-  commandQueue.clear();
-  selectInput("Select file to import queue from", "fileSelected");
-  if (filePath == null)
-  {
-    // nothing selected
-    println("No input file was selected.");
-  }
-  else
-  {
-    println("Input file: " + filePath);
-    String commands[] = loadStrings(filePath);
-//    List<String> list = Arrays
-    commandQueue.addAll(Arrays.asList(commands));
-    println("Completed queue import, " + commandQueue.size() + " commands found.");
-  }
+void importQueueFromFile() {
+	commandQueue.clear();
+	selectInput("Select file to import queue from", "fileSelected");
+	if (filePath == null) {
+		// nothing selected
+		println("No input file was selected.");
+	} else {
+		println("Input file: " + filePath);
+		String commands[] = loadStrings(filePath);
+		commandQueue.addAll(Arrays.asList(commands));
+		println("Completed queue import, " + commandQueue.size() + " commands found.");
+	}
 }
 
-String importTextToWriteFromFile()
-{
-  selectInput("Select the text file to load the text from:", "fileSelected");
-  String result = "";
-  if (filePath == null)
-  {
-    // nothing selected
-    println("No input file was selected.");
-  }
-  else
-  {
-    println("Input file: " + filePath);
-    List<String> rows = java.util.Arrays.asList(loadStrings(filePath));
-    StringBuilder sb = new StringBuilder(200);
-    for (String row : rows) 
-    {
-      sb.append(row);
-    }
-    result = sb.toString();
-
-    println("Completed text import, " + result.length() + " characters found.");
-  }
-  return result;
-}
 
 
 

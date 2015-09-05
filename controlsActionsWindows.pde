@@ -57,6 +57,10 @@ void button_mode_drawWritingDialog() {
   ControlFrameSimple cf = addSpriteWritingControlFrame("Sprite Writing", 450, 250, 20, 240, color( 100 ) );
 }
 
+void button_mode_RandomSpriteDialog() {
+  ControlFrameSimple cf = addRandomSpriteControlFrame("Random Sprite", 450, 250, 20, 240, color( 100 ) );
+}
+
 void button_mode_drawNorwegianDialog() {
   ControlFrameSimple cf = addNorwegianPixelControlFrame("Norwegian Pixel", 450, 250, 20, 240, color( 100 ) );
 }
@@ -213,87 +217,100 @@ ControlFrameSimple addSpriteWritingControlFrame(String theName, int theWidth, in
 ///*------------------------------------------------------------------------
 //    Details about the "sprite" subwindow
 //------------------------------------------------------------------------*/
-//String spriteFilename;
-//int minSpriteSize = 100;
-//int maxSpriteSize = 500;
-//
-//void button_mode_drawSpriteDialog()
-//{
-//  this.dialogWindow = cp5.addControlWindow("drawSpriteWindow",100,100,450,200);
-//  dialogWindow.hideCoordinates();
-//  
-//  dialogWindow.setBackground(getBackgroundColour());
-//
-//  delay(200);
-//  Textfield spriteFilenameField = cp5.addTextfield("spriteFilenameField",20,20,400,20);
-//  spriteFilenameField.setText("filename.txt");
-//  spriteFilenameField.setLabel("Sprite filename");
-//  spriteFilenameField.setWindow(dialogWindow);
-//
-//  Numberbox minSizeField = cp5.addNumberbox("minimumSpriteSize",20,60,100,20);
-//  minSizeField.setValue(getMinimumSpriteSize());
-//  minSizeField.setMin(10);
-//  minSizeField.setMax(getMaximumSpriteSize());
-//  minSizeField.setMultiplier(0.5);  
-//  minSizeField.setLabel("Minimum size");
-//  minSizeField.setWindow(dialogWindow);
-//
-//  Numberbox maxSizeField = cp5.addNumberbox("maximumSpriteSize",20,100,100,20);
-//  maxSizeField.setValue(getMaximumSpriteSize());
-//  maxSizeField.setMin(getMinimumSpriteSize());
-//  maxSizeField.setMultiplier(0.5);  
-//  maxSizeField.setLabel("Maximum size");
-//  maxSizeField.setWindow(dialogWindow);
-//
-//  Radio rPos = cp5.addRadio("radio_drawWritingDirection",20,140);
-//  rPos.add("North-east", DRAW_DIR_NE);
-//  rPos.add("South-east", DRAW_DIR_SE);
-//  rPos.add("South-west", DRAW_DIR_SW);
-//  rPos.add("North-west", DRAW_DIR_NW);
-//  rPos.setWindow(dialogWindow);
-//  
-//
-//
-//  Button submitButton = cp5.addButton("submitSpriteWindow",0,300,100,120,20);
-//  submitButton.setLabel("Draw sprite");
-//  submitButton.setWindow(dialogWindow);
-//}
-//
-//void radio_drawWritingDirection(int dir)
-//{
-//  renderStartDirection = dir;
-//}
-//
-//String getSpriteFilename()
-//{
-//  return spriteFilename;
-//}
-//int getMinimumSpriteSize()
-//{
-//  return minSpriteSize;
-//}
-//int getMaximumSpriteSize()
-//{
-//  return maxSpriteSize;
-//}
-//
-//void submitSpriteWindow(int theValue) 
-//{
-//  println("Sprite.");
-//  
-//  Textfield tf = (Textfield) cp5.controller("spriteFilenameField");
-//  tf.submit();
-//  tf.setText(getSpriteFilename());
-//  
-//  println("Start dir: " + renderStartDirection);
-//  println("Filename: " + spriteFilename);
-//
-//  addToCommandQueue(CMD_DRAW_SPRITE + "," + spriteFilename + "," 
-//  + getMinimumSpriteSize() + "," + getMaximumSpriteSize() + "," + renderStartDirection + ",END");
-//  
-//}
-//
-//
+String sprite_spriteFilename;
+int sprite_minSpriteSize = 100;
+int sprite_maxSpriteSize = 500;
+
+ControlFrameSimple addRandomSpriteControlFrame(String theName, int theWidth, int theHeight, int theX, int theY, int theColor ) {
+  final Frame f = new Frame( theName );
+  final ControlFrameSimple p = new ControlFrameSimple( this, theWidth, theHeight, theColor );
+
+  f.add( p );
+  p.init();
+  f.setTitle(theName);
+  f.setSize( p.w, p.h );
+  f.setLocation( theX, theY );
+  f.addWindowListener( new WindowAdapter() {
+    @Override
+      public void windowClosing(WindowEvent we) {
+      p.dispose();
+      f.dispose();
+    }
+  }
+  );
+  f.setResizable( true );
+  f.setVisible( true );
+  // sleep a little bit to allow p to call setup.
+  // otherwise a nullpointerexception might be caused.
+  try {
+    Thread.sleep( 100 );
+  } 
+  catch(Exception e) {
+  }
+  
+  // set up controls
+
+  Textfield spriteFilenameField = p.cp5().addTextfield("sprite_spriteFilenameField",20,20,400,20)
+    .setText("filename.txt")
+    .setLabel("Sprite filename")
+    .plugTo(this, "sprite_spriteFilenameField");
+
+  Numberbox minSizeField = p.cp5().addNumberbox("sprite_minimumSpriteSize",20,60,100,20)
+    .setValue(sprite_getMinimumSpriteSize())
+    .setMin(10)
+    .setMax(sprite_getMaximumSpriteSize())
+    .setMultiplier(0.5)
+    .setLabel("Minimum size")
+    .plugTo(this, "sprite_minimumSpriteSize");
+
+  Numberbox maxSizeField = p.cp5().addNumberbox("sprite_maximumSpriteSize",20,100,100,20)
+    .setValue(sprite_getMaximumSpriteSize())
+    .setMin(sprite_getMinimumSpriteSize())
+    .setMultiplier(0.5)
+    .setLabel("Maximum size")
+    .plugTo(this, "sprite_maximumSpriteSize");
+
+  Button submitButton = p.cp5().addButton("sprite_submitSpriteWindow",0,300,100,120,20)
+    .setLabel("Draw sprite")
+    .addListener( new ControlListener() {
+      public void controlEvent( ControlEvent ev ) {
+        spriteWriting_submitWritingWindow(p.cp5());
+      }
+    });
+
+  spriteFilenameField.setFocus(true);
+           
+  return p;
+}
+
+String sprite_getSpriteFilename()
+{
+  return sprite_spriteFilename;
+}
+int sprite_getMinimumSpriteSize()
+{
+  return sprite_minSpriteSize;
+}
+int sprite_getMaximumSpriteSize()
+{
+  return sprite_maxSpriteSize;
+}
+
+void sprite_submitSpriteWindow(Textfield tf) 
+{
+  println("Sprite.");
+  
+  tf.submit();
+  tf.setText(sprite_getSpriteFilename());
+  
+  println("Filename: " + sprite_getSpriteFilename());
+
+  addToCommandQueue(CMD_DRAW_SPRITE + "," + sprite_getSpriteFilename() + "," 
+  + sprite_getMinimumSpriteSize() + "," + sprite_getMaximumSpriteSize() + "," + DRAW_DIR_NE + ",END");
+  
+}
+
+
 ///*------------------------------------------------------------------------
 //    Details about the "norwegian draw" subwindow
 //------------------------------------------------------------------------*/
@@ -315,7 +332,6 @@ ControlFrameSimple addNorwegianPixelControlFrame(String theName, int theWidth, i
       public void windowClosing(WindowEvent we) {
       p.dispose();
       f.dispose();
-      cp5s.remove(DRAW_WRITING_WINDOW_NAME);
     }
   }
   );
@@ -328,9 +344,6 @@ ControlFrameSimple addNorwegianPixelControlFrame(String theName, int theWidth, i
   } 
   catch(Exception e) {
   }
-  
-  cp5s.put(DRAW_WRITING_WINDOW_NAME, p.cp5());
-  println(cp5s);
   
   // set up controls
   Textfield filenameField = p.cp5().addTextfield("norwegian_execFilename",20,20,150,20)

@@ -590,6 +590,7 @@ void setup()
   addEventListeners();
 
   //gamepad_init();
+  frameRate(8);
 }
 void addEventListeners()
 {
@@ -1730,11 +1731,14 @@ boolean isPreviewable(String command)
   This will comb the command queue and attempt to draw a picture of what it contains.
   Coordinates here are in pixels.
 */
-void previewQueue()
+void previewQueue() {
+  previewQueue(false);
+}
+
+void previewQueue(boolean forceRebuild)
 {
   PVector startPoint = null;
-  
-  if (commandQueue.hashCode() != lastCommandQueueHash)
+  if (forceRebuild || (commandQueue.hashCode() != lastCommandQueueHash))
   {
     println("regenerating preview queue.");
     previewCommandList.clear();

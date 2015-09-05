@@ -722,7 +722,7 @@ void button_mode_sendButtonDeactivate()
 void numberbox_mode_previewCordOffsetValue(int value)
 {
   previewCordOffset = value;
-  previewQueue();
+  previewQueue(true);
 }
 
 

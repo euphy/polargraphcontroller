@@ -944,7 +944,7 @@ void sendMachineStoreMode()
 }
 void sendMachineLiveMode()
 {
-  addToRealtimeCommandQueue(CMD_MACHINE_MODE_LIVE+"END");
+  addToCommandQueue(CMD_MACHINE_MODE_LIVE+"END");
 }
 void sendMachineExecMode()
 {

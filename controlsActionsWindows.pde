@@ -1,36 +1,36 @@
 /**
-  Polargraph controller
-  Copyright Sandy Noble 2015.
-
-  This file is part of Polargraph Controller.
-
-  Polargraph Controller is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  Polargraph Controller is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
-    
-  Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
-  Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
-  
-  This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
-
-  sandy.noble@gmail.com
-  http://www.polargraph.co.uk/
-  https://github.com/euphy/polargraphcontroller
-*/
+ Polargraph controller
+ Copyright Sandy Noble 2015.
+ 
+ This file is part of Polargraph Controller.
+ 
+ Polargraph Controller is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ 
+ Polargraph Controller is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with Polargraph Controller.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ Requires the excellent ControlP5 GUI library available from http://www.sojamo.de/libraries/controlP5/.
+ Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
+ 
+ This is an application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
+ 
+ sandy.noble@gmail.com
+ http://www.polargraph.co.uk/
+ https://github.com/euphy/polargraphcontroller
+ */
 
 void button_mode_sendMachineLiveMode() {
-	sendMachineLiveMode();
+  sendMachineLiveMode();
 }
-	
+
 String CHANGE_SERIAL_PORT_WINDOW_NAME = "changeSerialPortWindow";
 String MACHINE_STORE_WINDOW_NAME = "chooseStoreFilenameWindow";
 String MACHINE_EXEC_WINDOW_NAME = "chooseExecFilenameWindow";
@@ -38,23 +38,26 @@ String DRAW_PIXELS_WINDOW_NAME = "drawPixelsWindow";
 String DRAW_WRITING_WINDOW_NAME = "drawWritingWindow";
 
 void button_mode_serialPortDialog() {
-	final SerialPortWindow serialPortWindow = new SerialPortWindow();
+  ControlFrameSimple cf = addSerialPortControlFrame("Serial Port", 200, 200, 20, 240, color( 100 ) );
 }
 
 void button_mode_machineStoreDialog() {
-	final MachineStoreWindow machineStoreWindow = new MachineStoreWindow();
+  ControlFrameSimple cf = addMachineStoreControlFrame("Machine Store", 450, 250, 20, 240, color( 100 ) );
+//  final MachineStoreWindow machineStoreWindow = new MachineStoreWindow();
 }
 
 void button_mode_machineExecDialog() {
-	final MachineExecWindow machineExecWindow = new MachineExecWindow();
+  ControlFrameSimple cf = addMachineExecControlFrame("Machine Execute", 450, 250, 20, 240, color( 100 ) );
+//  final MachineExecWindow machineExecWindow = new MachineExecWindow();
 }
 
 void button_mode_drawPixelsDialog() {
-	final DrawPixelsWindow drawPixelsWindow = new DrawPixelsWindow();
+  ControlFrameSimple cf = addDrawPixelsControlFrame("Render pixels", 450, 250, 20, 240, color( 100 ) );
+//  final DrawPixelsWindow drawPixelsWindow = new DrawPixelsWindow();
 }
 
 void button_mode_drawWritingDialog() {
-	final DrawWritingWindow drawWritingWindow = new DrawWritingWindow();
+  final DrawWritingWindow drawWritingWindow = new DrawWritingWindow();
 }
 
 ///*------------------------------------------------------------------------
@@ -64,117 +67,118 @@ String textToWrite = "";
 String spriteFilePrefix = "sprite/let";
 String spriteFileSuffix = ".txt";
 public class DrawWritingWindow extends ControlFrame {
-	public DrawWritingWindow() {
-		super(parentPapplet, 450, 250);
-		int xPos = 100;
-		int yPos = 100;
-		String name = DRAW_WRITING_WINDOW_NAME;
+  public DrawWritingWindow() {
+    super(parentPapplet, 450, 250);
+    int xPos = 100;
+    int yPos = 100;
+    String name = DRAW_WRITING_WINDOW_NAME;
 
-		final Frame f = new Frame(name);
-		f.add(this);
-		this.init();
-		f.setTitle(name);
-		f.setSize(super.w, super.h);
-		f.setLocation(xPos, yPos);
-		f.setResizable(false);
-		f.setVisible(true);
+    final Frame f = new Frame(name);
+    f.add(this);
+    this.init();
+    f.setTitle(name);
+    f.setSize(super.w, super.h);
+    f.setLocation(xPos, yPos);
+    f.setResizable(false);
+    f.setVisible(true);
 
-		f.addWindowListener( new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent we) {
-				f.dispose();
-			}
-		});
-		Textfield spriteFileField = cp5().addTextfield("spriteFilePrefixField",20,20,150,20)
-			.setText(getSpriteFilePrefix())
-			.setLabel("File prefix")
-			.plugTo("spriteFilePrefixField");
+    f.addWindowListener( new WindowAdapter() {
+      @Override
+        public void windowClosing(WindowEvent we) {
+        f.dispose();
+      }
+    }
+    );
+    Textfield spriteFileField = cp5().addTextfield("spriteFilePrefixField", 20, 20, 150, 20)
+      .setText(getSpriteFilePrefix())
+      .setLabel("File prefix")
+      .plugTo("spriteFilePrefixField");
 
-		Textfield writingField = cp5().addTextfield("textToWriteField",20,60,400,20)
-			.setText(getTextToWrite())
-			.setLabel("Text to write")
-			.plugTo("textToWriteField");
+    Textfield writingField = cp5().addTextfield("textToWriteField", 20, 60, 400, 20)
+      .setText(getTextToWrite())
+      .setLabel("Text to write")
+      .plugTo("textToWriteField");
 
-		Button importTextButton = cp5().addButton("importTextButton",0,20,100,120,20)
-			.setLabel("Load text from file")
-			.plugTo("importTextButton");
+    Button importTextButton = cp5().addButton("importTextButton", 0, 20, 100, 120, 20)
+      .setLabel("Load text from file")
+      .plugTo("importTextButton");
 
-		RadioButton rPos = cp5().addRadioButton("radio_drawWritingDirection",20,140);
-		//  rPos.add("North-east", DRAW_DIR_NE);
-		rPos.add("South-east", DRAW_DIR_SE);
-		//  rPos.add("South-west", DRAW_DIR_SW);
-		//  rPos.add("North-west", DRAW_DIR_NW);
-		rPos.plugTo("radio_drawWritingDirection");
+    RadioButton rPos = cp5().addRadioButton("radio_drawWritingDirection", 20, 140);
+    //  rPos.add("North-east", DRAW_DIR_NE);
+    rPos.add("South-east", DRAW_DIR_SE);
+    //  rPos.add("South-west", DRAW_DIR_SW);
+    //  rPos.add("North-west", DRAW_DIR_NW);
+    rPos.plugTo("radio_drawWritingDirection");
 
-		Button submitButton = cp5.addButton("submitWritingWindow",0,300,100,120,20)
-			.setLabel("Generate commands")
-			.plugTo("submitWritingWindow");
-	}
+    Button submitButton = cp5.addButton("submitWritingWindow", 0, 300, 100, 120, 20)
+      .setLabel("Generate commands")
+      .plugTo("submitWritingWindow");
+  }
 
-	void spriteFilePrefixField(String value) {
-		spriteFilePrefix = value;
-	}
-	void textToWriteField(String value) {
-		textToWrite = value;
-	}
+  void spriteFilePrefixField(String value) {
+    spriteFilePrefix = value;
+  }
+  void textToWriteField(String value) {
+    textToWrite = value;
+  }
 
-	String getTextToWrite() {
-		return textToWrite;
-	}
-	String getSpriteFilePrefix() {
-		return spriteFilePrefix;
-	}
-	String getSpriteFileSuffix() {
-		return spriteFileSuffix;
-	}
+  String getTextToWrite() {
+    return textToWrite;
+  }
+  String getSpriteFilePrefix() {
+    return spriteFilePrefix;
+  }
+  String getSpriteFileSuffix() {
+    return spriteFileSuffix;
+  }
 
-	void importTextButton() {
-		println("Text!");
-		selectInput("Select the text file to load the text from:", "importTextToWriteFromFile", null, this);
-	}
-	
-	public void importTextToWriteFromFile(File selection) {
-		if (selection != null) {
-			String fp = selection.getAbsolutePath();
-			println("Input file: " + fp);
-			List<String> rows = java.util.Arrays.asList(loadStrings(fp));
-			StringBuilder sb = new StringBuilder(200);
-			for (String row : rows) {
-				sb.append(row);
-			}
-			textToWriteField(sb.toString());
-			println("Completed text import, " + getTextToWrite().length() + " characters found.");
-			
-			println("Text: " + getTextToWrite());
-			
-			Textfield tf = cp5().get(Textfield.class, "textToWriteField");
-			tf.setText(getTextToWrite());
-			tf.submit();
-		}
-	}
+  void importTextButton() {
+    println("Text!");
+    selectInput("Select the text file to load the text from:", "importTextToWriteFromFile", null, this);
+  }
 
-	void submitWritingWindow(int theValue) 
-	{
-		println("Write.");
-		 
-		Textfield tf = cp5().get(Textfield.class, "spriteFilePrefixField");
-		tf.submit();
-		tf.setText(getSpriteFilePrefix());
-		 
-		Textfield wf = cp5.get(Textfield.class, "textToWriteField");
-		wf.submit();
-		wf.setText(getTextToWrite());
-		 
-		println("Start dir: " + renderStartDirection);
-		println("Sprite file prefix: " + spriteFilePrefix);
-		println("Text: " + textToWrite);
+  public void importTextToWriteFromFile(File selection) {
+    if (selection != null) {
+      String fp = selection.getAbsolutePath();
+      println("Input file: " + fp);
+      List<String> rows = java.util.Arrays.asList(loadStrings(fp));
+      StringBuilder sb = new StringBuilder(200);
+      for (String row : rows) {
+        sb.append(row);
+      }
+      textToWriteField(sb.toString());
+      println("Completed text import, " + getTextToWrite().length() + " characters found.");
 
-		for (int i=0; i<getTextToWrite().length(); i++) {
-			String filename = getSpriteFilePrefix() + (int) getTextToWrite().charAt(i) + getSpriteFileSuffix();
-			addToCommandQueue(CMD_DRAW_SPRITE + int(gridSize * pixelScalingOverGridSize) + "," + filename+",END");
-			println(filename);
-		}
-	}
+      println("Text: " + getTextToWrite());
+
+      Textfield tf = cp5().get(Textfield.class, "textToWriteField");
+      tf.setText(getTextToWrite());
+      tf.submit();
+    }
+  }
+
+  void submitWritingWindow(int theValue) 
+  {
+    println("Write.");
+
+    Textfield tf = cp5().get(Textfield.class, "spriteFilePrefixField");
+    tf.submit();
+    tf.setText(getSpriteFilePrefix());
+
+    Textfield wf = cp5.get(Textfield.class, "textToWriteField");
+    wf.submit();
+    wf.setText(getTextToWrite());
+
+    println("Start dir: " + renderStartDirection);
+    println("Sprite file prefix: " + spriteFilePrefix);
+    println("Text: " + textToWrite);
+
+    for (int i=0; i<getTextToWrite ().length(); i++) {
+      String filename = getSpriteFilePrefix() + (int) getTextToWrite().charAt(i) + getSpriteFileSuffix();
+      addToCommandQueue(CMD_DRAW_SPRITE + int(gridSize * pixelScalingOverGridSize) + "," + filename+",END");
+      println(filename);
+    }
+  }
 }
 //
 //void button_mode_drawWritingDialog()

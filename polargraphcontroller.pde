@@ -59,6 +59,9 @@ int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
+Map<String, ControlP5> cp5s = new HashMap<String, ControlP5>();
+
+
 
 boolean drawbotReady = false;
 boolean drawbotConnected = false;

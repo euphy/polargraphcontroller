@@ -43,101 +43,124 @@ void button_mode_serialPortDialog() {
 
 void button_mode_machineStoreDialog() {
   ControlFrameSimple cf = addMachineStoreControlFrame("Machine Store", 450, 250, 20, 240, color( 100 ) );
-//  final MachineStoreWindow machineStoreWindow = new MachineStoreWindow();
 }
 
 void button_mode_machineExecDialog() {
   ControlFrameSimple cf = addMachineExecControlFrame("Machine Execute", 450, 250, 20, 240, color( 100 ) );
-//  final MachineExecWindow machineExecWindow = new MachineExecWindow();
 }
 
 void button_mode_drawPixelsDialog() {
   ControlFrameSimple cf = addDrawPixelsControlFrame("Render pixels", 450, 250, 20, 240, color( 100 ) );
-//  final DrawPixelsWindow drawPixelsWindow = new DrawPixelsWindow();
 }
 
 void button_mode_drawWritingDialog() {
-  final DrawWritingWindow drawWritingWindow = new DrawWritingWindow();
+  ControlFrameSimple cf = addSpriteWritingControlFrame("Sprite Writing", 450, 250, 20, 240, color( 100 ) );
+}
+
+void button_mode_drawNorwegianDialog() {
+  ControlFrameSimple cf = addNorwegianPixelControlFrame("Norwegian Pixel", 450, 250, 20, 240, color( 100 ) );
 }
 
 ///*------------------------------------------------------------------------
 //    Details about the "writing" subwindow
 //------------------------------------------------------------------------*/
-String textToWrite = "";
-String spriteFilePrefix = "sprite/let";
-String spriteFileSuffix = ".txt";
-public class DrawWritingWindow extends ControlFrame {
-  public DrawWritingWindow() {
-    super(parentPapplet, 450, 250);
-    int xPos = 100;
-    int yPos = 100;
-    String name = DRAW_WRITING_WINDOW_NAME;
 
-    final Frame f = new Frame(name);
-    f.add(this);
-    this.init();
-    f.setTitle(name);
-    f.setSize(super.w, super.h);
-    f.setLocation(xPos, yPos);
-    f.setResizable(false);
-    f.setVisible(true);
+String spriteWriting_textToWrite = "";
+String spriteWriting_spriteFilePrefix = "sprite/let";
+String spriteWriting_spriteFileSuffix = ".txt";
 
-    f.addWindowListener( new WindowAdapter() {
-      @Override
-        public void windowClosing(WindowEvent we) {
-        f.dispose();
-      }
+ControlFrameSimple addSpriteWritingControlFrame(String theName, int theWidth, int theHeight, int theX, int theY, int theColor ) {
+  final Frame f = new Frame( theName );
+  final ControlFrameSimple p = new ControlFrameSimple( this, theWidth, theHeight, theColor );
+
+  f.add( p );
+  p.init();
+  f.setTitle(theName);
+  f.setSize( p.w, p.h );
+  f.setLocation( theX, theY );
+  f.addWindowListener( new WindowAdapter() {
+    @Override
+      public void windowClosing(WindowEvent we) {
+      p.dispose();
+      f.dispose();
+      cp5s.remove(DRAW_WRITING_WINDOW_NAME);
     }
-    );
-    Textfield spriteFileField = cp5().addTextfield("spriteFilePrefixField", 20, 20, 150, 20)
-      .setText(getSpriteFilePrefix())
+  }
+  );
+  f.setResizable( true );
+  f.setVisible( true );
+  // sleep a little bit to allow p to call setup.
+  // otherwise a nullpointerexception might be caused.
+  try {
+    Thread.sleep( 100 );
+  } 
+  catch(Exception e) {
+  }
+  
+  cp5s.put(DRAW_WRITING_WINDOW_NAME, p.cp5());
+  println(cp5s);
+  
+  // set up controls
+    Textfield spriteFileField = p.cp5().addTextfield("spriteWriting_spriteFilePrefixField", 20, 20, 150, 20)
+      .setText(spriteWriting_getSpriteFilePrefix())
       .setLabel("File prefix")
-      .plugTo("spriteFilePrefixField");
+      .plugTo(this, "spriteWriting_spriteFilePrefixField");
 
-    Textfield writingField = cp5().addTextfield("textToWriteField", 20, 60, 400, 20)
-      .setText(getTextToWrite())
+    Textfield writingField = p.cp5().addTextfield("spriteWriting_textToWriteField", 20, 60, 400, 20)
+      .setText(spriteWriting_getTextToWrite())
       .setLabel("Text to write")
-      .plugTo("textToWriteField");
+      .plugTo(this, "spriteWriting_textToWriteField");
 
-    Button importTextButton = cp5().addButton("importTextButton", 0, 20, 100, 120, 20)
+    Button importTextButton = p.cp5().addButton("spriteWriting_importTextButton", 0, 20, 100, 120, 20)
       .setLabel("Load text from file")
-      .plugTo("importTextButton");
-
-    RadioButton rPos = cp5().addRadioButton("radio_drawWritingDirection", 20, 140);
-    //  rPos.add("North-east", DRAW_DIR_NE);
+      .addListener( new ControlListener() {
+        public void controlEvent( ControlEvent ev ) {
+          spriteWriting_importTextButton();
+        }
+      });
+      
+    RadioButton rPos = p.cp5().addRadioButton("spriteWriting_radio_drawWritingDirection", 20, 140);
     rPos.add("South-east", DRAW_DIR_SE);
-    //  rPos.add("South-west", DRAW_DIR_SW);
-    //  rPos.add("North-west", DRAW_DIR_NW);
-    rPos.plugTo("radio_drawWritingDirection");
+    rPos.activate("South-east");
+    rPos.plugTo(this, "spriteWriting_radio_drawWritingDirection");
 
-    Button submitButton = cp5.addButton("submitWritingWindow", 0, 300, 100, 120, 20)
+    Button submitButton = p.cp5.addButton("spriteWriting_submitWritingWindow", 0, 300, 100, 120, 20)
       .setLabel("Generate commands")
-      .plugTo("submitWritingWindow");
+      .addListener( new ControlListener() {
+        public void controlEvent( ControlEvent ev ) {
+          spriteWriting_submitWritingWindow(p.cp5());
+        }
+      });
+      
+      
+    return p;
+}
+
+
+
+  void spriteWriting_spriteFilePrefixField(String value) {
+    spriteWriting_spriteFilePrefix = value;
+  }
+  void spriteWriting_textToWriteField(String value) {
+    spriteWriting_textToWrite = value;
+  }
+  String spriteWriting_getTextToWrite() {
+    return spriteWriting_textToWrite;
+  }
+  String spriteWriting_getSpriteFilePrefix() {
+    return spriteWriting_spriteFilePrefix;
+  }
+  String spriteWriting_getSpriteFileSuffix() {
+    return spriteWriting_spriteFileSuffix;
   }
 
-  void spriteFilePrefixField(String value) {
-    spriteFilePrefix = value;
-  }
-  void textToWriteField(String value) {
-    textToWrite = value;
-  }
-
-  String getTextToWrite() {
-    return textToWrite;
-  }
-  String getSpriteFilePrefix() {
-    return spriteFilePrefix;
-  }
-  String getSpriteFileSuffix() {
-    return spriteFileSuffix;
+  void spriteWriting_importTextButton() {
+    println("Text being imported!");
+    selectInput("Select the text file to load the text from:", 
+                "spriteWriting_importTextToWriteFromFile");
   }
 
-  void importTextButton() {
-    println("Text!");
-    selectInput("Select the text file to load the text from:", "importTextToWriteFromFile", null, this);
-  }
-
-  public void importTextToWriteFromFile(File selection) {
+  public void spriteWriting_importTextToWriteFromFile(File selection) {
     if (selection != null) {
       String fp = selection.getAbsolutePath();
       println("Input file: " + fp);
@@ -146,50 +169,47 @@ public class DrawWritingWindow extends ControlFrame {
       for (String row : rows) {
         sb.append(row);
       }
-      textToWriteField(sb.toString());
-      println("Completed text import, " + getTextToWrite().length() + " characters found.");
+      spriteWriting_textToWriteField(sb.toString());
+      println("Completed text import, " + spriteWriting_getTextToWrite().length() + " characters found.");
 
-      println("Text: " + getTextToWrite());
+      println("Text: " + spriteWriting_getTextToWrite());
+      
+      println(cp5s);
 
-      Textfield tf = cp5().get(Textfield.class, "textToWriteField");
-      tf.setText(getTextToWrite());
-      tf.submit();
+      Textfield tf = cp5s.get(DRAW_WRITING_WINDOW_NAME).get(Textfield.class, "spriteWriting_textToWriteField");      
+      if (spriteWriting_getTextToWrite() != null 
+          && !"".equals(spriteWriting_getTextToWrite().trim())) {
+        tf.setText(spriteWriting_getTextToWrite());
+        tf.submit();
+        tf.setText(spriteWriting_getTextToWrite());
+      }
     }
   }
 
-  void submitWritingWindow(int theValue) 
+  void spriteWriting_submitWritingWindow(ControlP5 parent) 
   {
     println("Write.");
 
-    Textfield tf = cp5().get(Textfield.class, "spriteFilePrefixField");
+    Textfield tf = parent.get(Textfield.class, "spriteWriting_spriteFilePrefixField");
     tf.submit();
-    tf.setText(getSpriteFilePrefix());
+    tf.setText(spriteWriting_getSpriteFilePrefix());
 
-    Textfield wf = cp5.get(Textfield.class, "textToWriteField");
+    Textfield wf = parent.get(Textfield.class, "spriteWriting_textToWriteField");
     wf.submit();
-    wf.setText(getTextToWrite());
+    wf.setText(spriteWriting_getTextToWrite());
 
     println("Start dir: " + renderStartDirection);
-    println("Sprite file prefix: " + spriteFilePrefix);
-    println("Text: " + textToWrite);
+    println("Sprite file prefix: " + spriteWriting_spriteFilePrefix);
+    println("Text: " + spriteWriting_textToWrite);
 
-    for (int i=0; i<getTextToWrite ().length(); i++) {
-      String filename = getSpriteFilePrefix() + (int) getTextToWrite().charAt(i) + getSpriteFileSuffix();
+    for (int i=0; i<spriteWriting_getTextToWrite ().length(); i++) {
+      String filename = spriteWriting_getSpriteFilePrefix() + (int) spriteWriting_getTextToWrite().charAt(i) + spriteWriting_getSpriteFileSuffix();
       addToCommandQueue(CMD_DRAW_SPRITE + int(gridSize * pixelScalingOverGridSize) + "," + filename+",END");
       println(filename);
     }
   }
-}
-//
-//void button_mode_drawWritingDialog()
-//{
-//  this.dialogWindow = cp5.addControlWindow("drawWritingWindow",100,100,450,200);
-//  dialogWindow.hideCoordinates();
-//  
-//  dialogWindow.setBackground(getBackgroundColour());
-//
-//
-//
+
+
 ///*------------------------------------------------------------------------
 //    Details about the "sprite" subwindow
 //------------------------------------------------------------------------*/
@@ -277,71 +297,103 @@ public class DrawWritingWindow extends ControlFrame {
 ///*------------------------------------------------------------------------
 //    Details about the "norwegian draw" subwindow
 //------------------------------------------------------------------------*/
-//String norwegianExecFilename = "filename.pbm";
-//int norwegianAmplitude = 20;
-//int norwegianWavelength = 2;
-//
-//void button_mode_drawNorwegianDialog()
-//{
-//  this.dialogWindow = cp5.addControlWindow("chooseNorwegianFilenameWindow",100,100,450,150);
-//  dialogWindow.hideCoordinates();
-//  
-//  dialogWindow.setBackground(getBackgroundColour());
-//
-//  Textfield filenameField = cp5.addTextfield("norwegianExecFilename",20,20,150,20);
-//  filenameField.setText(norwegianExecFilename);
-//  filenameField.setLabel("Filename to execute from");
-//  filenameField.setWindow(dialogWindow);
-//
-//  Numberbox minSizeField = cp5.addNumberbox("norwegianAmplitude",20,60,100,20);
-//  minSizeField.setValue(norwegianAmplitude);
-//  minSizeField.setMin(10);
-//  minSizeField.setMultiplier(0.5);  
-//  minSizeField.setLabel("Amplitude");
-//  minSizeField.setWindow(dialogWindow);
-//
-//  Numberbox maxSizeField = cp5.addNumberbox("norwegianWavelength",20,100,100,20);
-//  maxSizeField.setValue(norwegianWavelength);
-//  maxSizeField.setMin(1);
-//  maxSizeField.setMultiplier(0.5);  
-//  maxSizeField.setLabel("Wavelength");
-//  maxSizeField.setWindow(dialogWindow);
-//
-//  Button outlineButton = cp5.addButton("submitNorwegianExecTraceOutline",0,180,20,80,20);
-//  outlineButton.setLabel("Trace outline");
-//  outlineButton.setWindow(dialogWindow);
-//
-//  Button submitButton = cp5.addButton("submitNorwegianExecFilenameWindow",0,180,100,80,20);
-//  submitButton.setLabel("Submit");
-//  submitButton.setWindow(dialogWindow);
-//
-//  filenameField.setFocus(true);
-//
-//}
-//
-//void submitNorwegianExecTraceOutline(int theValue) 
-//{
-//  Textfield tf = (Textfield) cp5.controller("norwegianExecFilename");
-//  tf.submit();
-//  tf.setText(norwegianExecFilename);
-//  
-//  println("Filename:" + norwegianExecFilename);
-//  
-//  addToCommandQueue(CMD_DRAW_NORWEGIAN_OUTLINE + norwegianExecFilename + ",END");
-//}
-//
-//void submitNorwegianExecFilenameWindow(int theValue) 
-//{
-//  Textfield tf = (Textfield) cp5.controller("norwegianExecFilename");
-//  tf.submit();
-//  tf.setText(norwegianExecFilename);
-//  
-//  println("Filename:" + norwegianExecFilename);
-//  println("Amplitude:" + norwegianAmplitude);
-//  println("Wavelength:" + norwegianWavelength);
-//  
-//  addToCommandQueue(CMD_DRAW_NORWEGIAN + norwegianExecFilename + ","+norwegianAmplitude+","+norwegianWavelength+",END");
-//}
-//
-//
+String norwegian_execFilename = "filename.pbm";
+int norwegian_amplitude = 20;
+int norwegian_wavelength = 2;
+
+ControlFrameSimple addNorwegianPixelControlFrame(String theName, int theWidth, int theHeight, int theX, int theY, int theColor ) {
+  final Frame f = new Frame( theName );
+  final ControlFrameSimple p = new ControlFrameSimple( this, theWidth, theHeight, theColor );
+
+  f.add( p );
+  p.init();
+  f.setTitle(theName);
+  f.setSize( p.w, p.h );
+  f.setLocation( theX, theY );
+  f.addWindowListener( new WindowAdapter() {
+    @Override
+      public void windowClosing(WindowEvent we) {
+      p.dispose();
+      f.dispose();
+      cp5s.remove(DRAW_WRITING_WINDOW_NAME);
+    }
+  }
+  );
+  f.setResizable( true );
+  f.setVisible( true );
+  // sleep a little bit to allow p to call setup.
+  // otherwise a nullpointerexception might be caused.
+  try {
+    Thread.sleep( 100 );
+  } 
+  catch(Exception e) {
+  }
+  
+  cp5s.put(DRAW_WRITING_WINDOW_NAME, p.cp5());
+  println(cp5s);
+  
+  // set up controls
+  Textfield filenameField = p.cp5().addTextfield("norwegian_execFilename",20,20,150,20)
+    .setText(norwegian_execFilename)
+    .setLabel("Filename to execute from")
+    .plugTo(this, "norwegian_execFilename");
+
+  Numberbox minSizeField = p.cp5().addNumberbox("norwegian_amplitude",20,60,100,20)
+    .setValue(norwegian_amplitude)
+    .setMin(10)
+    .setMultiplier(0.5)  
+    .setLabel("Amplitude")
+    .plugTo(this, "norwegian_amplitude");
+
+  Numberbox maxSizeField = p.cp5().addNumberbox("norwegian_wavelength",20,100,100,20)
+  .setValue(norwegian_wavelength)
+  .setMin(1)
+  .setMultiplier(0.5)  
+  .setLabel("Wavelength")
+  .plugTo(this, "norwegian_wavelength");
+
+  Button outlineButton = p.cp5().addButton("norwegian_submitNorwegianExecTraceOutline",0,180,20,80,20)
+  .setLabel("Trace outline")
+  .addListener( new ControlListener() {
+    public void controlEvent( ControlEvent ev ) {
+      norwegian_submitNorwegianExec(p.cp5().get(Textfield.class, "norwegian_execFilename"), true);
+    }
+  });
+
+  Button submitButton = p.cp5().addButton("norwegian_submitNorwegianExecFilenameWindow",0,180,100,80,20)
+  .setLabel("Submit")
+  .addListener( new ControlListener() {
+    public void controlEvent( ControlEvent ev ) {
+      norwegian_submitNorwegianExec(p.cp5().get(Textfield.class, "norwegian_execFilename"), false);
+    }
+  });
+
+  filenameField.setFocus(true);
+      
+      
+  return p;
+}
+
+
+void norwegian_submitNorwegianExec(Textfield tf, boolean outline)
+{
+  tf.submit();
+  tf.setText(norwegian_execFilename);
+  
+  println("Filename:" + norwegian_execFilename);
+  
+  if (outline) {
+    addToCommandQueue(CMD_DRAW_NORWEGIAN_OUTLINE + norwegian_execFilename + ",END");
+  }
+  else {
+    println("Filename:" + norwegian_execFilename);
+    println("Amplitude:" + norwegian_amplitude);
+    println("Wavelength:" + norwegian_wavelength);
+    
+    addToCommandQueue(CMD_DRAW_NORWEGIAN + norwegian_execFilename + ","+norwegian_amplitude+","+norwegian_wavelength+",END");
+  }
+}
+
+
+
 

@@ -1072,10 +1072,10 @@ Set<String> buildControlNames()
   result.add(MODE_SELECT_ROVE_IMAGE_SOURCE);
   result.add(MODE_SEND_START_TEXT);
   result.add(MODE_SHOW_WRITING_DIALOG);
-  result.add(MODE_START_SWIRLING);
-  result.add(MODE_STOP_SWIRLING);
-  result.add(MODE_START_MARKING);
-  result.add(MODE_STOP_MARKING);
+//  result.add(MODE_START_SWIRLING);
+//  result.add(MODE_STOP_SWIRLING);
+//  result.add(MODE_START_MARKING);
+//  result.add(MODE_STOP_MARKING);
   result.add(MODE_START_SPRITE);
   result.add(MODE_START_RANDOM_SPRITES);
   result.add(MODE_STOP_RANDOM_SPRITES);

@@ -1076,9 +1076,9 @@ Set<String> buildControlNames()
 //  result.add(MODE_STOP_SWIRLING);
 //  result.add(MODE_START_MARKING);
 //  result.add(MODE_STOP_MARKING);
-  result.add(MODE_START_SPRITE);
-  result.add(MODE_START_RANDOM_SPRITES);
-  result.add(MODE_STOP_RANDOM_SPRITES);
+//  result.add(MODE_START_SPRITE);
+//  result.add(MODE_START_RANDOM_SPRITES);
+//  result.add(MODE_STOP_RANDOM_SPRITES);
   result.add(MODE_DRAW_NORWEGIAN_DIALOG);
   
   result.add(MODE_LIVE_BLUR_VALUE);

@@ -55,7 +55,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 0;
-int buildNo = 0;
+int buildNo = 3;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -539,7 +539,10 @@ void setup()
   }
   loadFromPropertiesFile();
   
-  size(windowWidth, windowHeight, JAVA2D );
+//  size(400, 400, JAVA2D );
+//  surface.setResizable(true);
+//  surface.setSize(windowWidth, windowHeight);
+  size(windowWidth, windowHeight, JAVA2D);
   this.cp5 = new ControlP5(this);
   initTabs();
 
@@ -589,7 +592,6 @@ void setup()
 
   addEventListeners();
 
-  //gamepad_init();
   frameRate(8);
 }
 void addEventListeners()
@@ -604,7 +606,8 @@ void addEventListeners()
         }
       }
     }
-  ); 
+  );
+  
   addMouseWheelListener(new java.awt.event.MouseWheelListener() 
     { 
       public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) 
@@ -3096,25 +3099,6 @@ void initLogging()
   }
 }
 
-void initImages()
-{
-//  try
-//  {
-//    yButtonImage = loadImage("y.png");
-//    xButtonImage = loadImage("x.png");
-//    aButtonImage = loadImage("a.png");
-//    bButtonImage = loadImage("b.png");
-//    dpadXImage = loadImage("dpadlr.png");
-//    dpadYImage = loadImage("dpadud.png");
-//  }
-//  catch (Exception e)
-//  {
-//    yButtonImage = makeColourImage(64,64,color(180,180,0));
-//    xButtonImage = makeColourImage(64,64,color(0,0,180));
-//    aButtonImage = makeColourImage(64,64,color(0,180,0));
-//    bButtonImage = makeColourImage(64,64,color(180,0,0));
-//  }
-}
 
 PImage makeColourImage(int w, int h, int colour)
 {

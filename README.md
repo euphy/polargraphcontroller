@@ -4,14 +4,9 @@ polargraphcontroller
 Polargraph controller
 Copyright Sandy Noble 2015.
 
-*** THIS VERSION IS UNDER DEVELOPMENT! ***
-==========================================
-
-This branch is being migrated to v2x of Processing, and modern versions of the libraries.
-
 - Requires the excellent ControlP5 GUI library available from https://github.com/sojamo/controlp5.
 - Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.
-- Somewhat running on Processing v2.2.1.
+- Running on Processing v2.2.1.
 
 This is a desktop application for controlling a polargraph machine, communicating using ASCII command language over a serial link.
 

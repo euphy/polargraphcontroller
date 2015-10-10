@@ -524,8 +524,6 @@ void setup()
   initLogging();
   parentPapplet = this;
   
-  initImages();
-  
   RG.init(this);
   RG.setPolygonizer(RG.ADAPTATIVE);
 

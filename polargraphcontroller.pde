@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 0;
-int buildNo = 3;
+int buildNo = 7;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -515,6 +515,8 @@ RShape captureShape = null;
 String shapeSavePath = "../../savedcaptures/";
 String shapeSavePrefix = "shape-";
 String shapeSaveExtension = ".svg";
+
+static Float gcodeZAxisDrawingHeight = 1.0; //-0.125000;
 
 String filePath = null;
 
@@ -1068,7 +1070,7 @@ void loadVectorWithFileChooser()
     public void run() {
       JFileChooser fc = new JFileChooser();
       fc.setFileFilter(new VectorFileFilter());
-      
+
       fc.setDialogTitle("Choose a vector file...");
 
       int returned = fc.showOpenDialog(frame);
@@ -1077,7 +1079,7 @@ void loadVectorWithFileChooser()
         File file = fc.getSelectedFile();
         if (file.exists())
         {
-          RShape shape = RG.loadShape(file.getPath());
+          RShape shape = loadShapeFromFile(file.getPath());
           if (shape != null) 
           {
             setVectorFilename(file.getPath());
@@ -1090,20 +1092,22 @@ void loadVectorWithFileChooser()
         }
       }
     }
-  });
+  }
+  );
 }
+
 class VectorFileFilter extends javax.swing.filechooser.FileFilter 
 {
   public boolean accept(File file) {
-      String filename = file.getName();
-      filename.toLowerCase();
-      if (file.isDirectory() || filename.endsWith(".svg")) 
-        return true;
-      else
-        return false;
+    String filename = file.getName();
+    filename.toLowerCase();
+    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gco") || filename.endsWith(".g"))
+      return true;
+    else
+      return false;
   }
   public String getDescription() {
-      return "Vector graphic files (SVG)";
+    return "Vector graphic files (SVG, GCode)";
   }
 }
 
@@ -1186,6 +1190,200 @@ void saveNewPropertiesFileWithFileChooser()
   });
 }
 
+
+
+RShape loadShapeFromFile(String filename) {
+  RShape sh = null;
+  if (filename.toLowerCase().endsWith(".svg")) {
+    sh = RG.loadShape(filename);
+  }
+  else if (filename.toLowerCase().endsWith(".gco") || filename.toLowerCase().endsWith(".g")) {
+    sh = loadShapeFromGCodeFile(filename);
+  }
+  return sh;
+}
+
+int countLines(String filename) throws IOException {
+    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+    try {
+        byte[] c = new byte[1024];
+        int count = 0;
+        int readChars = 0;
+        boolean empty = true;
+        while ((readChars = is.read(c)) != -1) {
+            empty = false;
+            for (int i = 0; i < readChars; ++i) {
+                if (c[i] == '\n') {
+                    ++count;
+                }
+            }
+        }
+        return (count == 0 && !empty) ? 1 : count;
+    } finally {
+        is.close();
+    }
+}
+
+RShape loadShapeFromGCodeFile(String filename) {
+  noLoop();
+  RShape parent = null;
+  BufferedReader reader = null;
+  long totalPoints = 0;
+  long time = millis();
+
+  try {
+    long countLines = countLines(filename);
+    println("" + countLines + " lines found.");
+    reader = createReader(filename);
+    parent = new RShape();
+    String line;
+    boolean drawLine = false;
+    int gCodeZAxisChanges = 0;
+    
+    long lineNo = 0;
+    float lastPercent = 0.0f;
+    while ((line = reader.readLine ()) != null) {
+      lineNo++;
+      if (line.toUpperCase().startsWith("G")) {
+        if ((millis() - time) > 500) {
+          println(new StringBuilder().append(lineNo).append(" of ").append(countLines).append(": ").append(line).append(". Points: ").append(totalPoints).toString());
+          long free = Runtime.getRuntime().freeMemory();
+          long maximum = Runtime.getRuntime().maxMemory();
+          println(new StringBuilder().append("Free: ").append(free).append(", max: ").append(maximum).toString());
+          time = millis();
+        }
+//        float percent = (lineNo / countLines) * 100;
+//        if (percent != lastPercent) {
+//          println("" + percent + "% of the way through.");
+//          lastPercent = percent;
+//        }
+        
+        Map<String, Float> ins = null;
+        try {
+          ins = unpackGCodeInstruction(line);
+        }
+        catch (Exception e) {
+          println("Exception while unpacking a gcode line " + line);
+          continue;
+        }
+        Integer code = Math.round(ins.get("G"));
+        if (code >= 2) {
+          continue;
+        }
+        
+        
+        Float z = ins.get("Z");
+        if (z != null) {
+          gCodeZAxisChanges++;
+          if (gCodeZAxisChanges == 2) {
+            println("Assume second z axis change is to drop the pen to start drawing " + z);
+            gcodeZAxisDrawingHeight = z;
+            drawLine = true;
+          }
+          else if (gCodeZAxisChanges > 2) {
+            drawLine = isGCodeZAxisForDrawing(z);
+          }
+          else {
+            println("Assume first z axis change is to RAISE the pen " + z);
+            drawLine = false;
+          }
+        }
+        
+        Float x = ins.get("X");
+        Float y = ins.get("Y");
+        if (x != null && y == null) {
+          // move x axis only, use y of last
+          RPoint[][] points = parent.getPointsInPaths();
+          RPoint rp = points[points.length-1][points[points.length-1].length-1];
+          y = rp.y;
+        }
+        else if (x == null && y != null) {
+          // move y axis only, use x of last
+          RPoint[][] points = parent.getPointsInPaths();
+          RPoint rp = points[points.length-1][points[points.length-1].length-1];
+          x = rp.x;
+        }
+        
+        if (x != null && y != null) {
+          // move both x and y axis
+          if (drawLine) {
+            parent.addLineTo(x, y);
+          }
+          else {
+            parent.addMoveTo(x, y);
+          }
+        }
+//        RPoint[][] points = parent.getPointsInPaths();
+//        totalPoints = 0;
+//        if (points != null) {
+//          for (int i = 0; i<points.length; i++) {
+//            if (points[i] != null) {
+//              for (int j = 0; j<points[i].length; j++) {
+//                totalPoints++;
+//              }
+//            }
+//          }
+//        }
+//        points = null;
+//        println("" + totalPoints + " points.");
+      }
+    }
+  }
+  catch (IOException e) {
+    println("Execption reading lines from the gcode file " + filename);
+    e.printStackTrace();
+  } 
+  finally {
+    try {
+      reader.close();
+    } 
+    catch (IOException e) {
+      println("Exception closing the gcode file " + filename);
+      e.printStackTrace();
+    }
+    loop();
+  }
+  
+  RPoint[][] points = parent.getPointsInPaths();
+  totalPoints = 0;
+  if (points != null) {
+    for (int i = 0; i<points.length; i++) {
+      if (points[i] != null) {
+        for (int j = 0; j<points[i].length; j++) {
+          totalPoints++;
+        }
+      }
+    }
+  }
+  println("Total points in shape: " + totalPoints);
+
+  loop();
+  return parent;
+}
+
+Boolean isGCodeZAxisForDrawing(float z) {
+  return gcodeZAxisDrawingHeight.compareTo(z) == 0;
+}
+
+Map<String, Float> unpackGCodeInstruction(String line) throws NumberFormatException {
+  Map<String, Float> instruction = new HashMap<String, Float>(4);
+  try {
+    String[] splitted = line.trim().split(" ");
+    for (int i = 0; i < splitted.length; i++) {
+      String axis = splitted[i].substring(0, 1);
+      Float value = Float.parseFloat(splitted[i].substring(1));
+      if ("X".equalsIgnoreCase(axis) || "Y".equalsIgnoreCase(axis) || "Z".equalsIgnoreCase(axis) || "G".equalsIgnoreCase(axis)) {
+        instruction.put(axis, value);
+      }
+    }
+//    println("instruction: " + instruction);
+  }
+  catch (NumberFormatException e) {
+    println("Exception while reading the lines from a gcode file: " + line);
+    throw e;
+  }
+  return instruction;
+}
 
 
 void setPictureFrameDimensionsToBox()

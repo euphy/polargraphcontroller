@@ -1,6 +1,6 @@
 /**
   Polargraph controller
-  Copyright Sandy Noble 2015.
+  Copyright Sandy Noble 2012.
 
   This file is part of Polargraph Controller.
 
@@ -24,8 +24,7 @@
 
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
-  https://github.com/euphy/polargraphcontroller
-
+  http://code.google.com/p/polargraph/
 */
 class Panel
 {
@@ -121,9 +120,9 @@ class Panel
   
   public void draw()
   {
-//    stroke(outlineColour);
-//    strokeWeight(2);
-//    rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
+    //stroke(outlineColour);
+    //strokeWeight(2);
+    //rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
 
     drawControls();
   }
@@ -132,13 +131,13 @@ class Panel
   {
     for (Controller c : this.getControls())
     {
-      //println("Control: " + c.name());
-      PVector pos = getControlPositions().get(c.name());
+//      println("Control: " + c.getName());
+      PVector pos = getControlPositions().get(c.getName());
       float x = pos.x+getOutline().getLeft();
       float y = pos.y+getOutline().getTop();
       c.setPosition(x, y);
       
-      PVector cSize = getControlSizes().get(c.name());
+      PVector cSize = getControlSizes().get(c.getName());
       c.setSize((int)cSize.x, (int)cSize.y);
 
       boolean locked = false;
@@ -147,32 +146,32 @@ class Panel
       
       // any drawing / extracting controls are disabled if there is no selec
       // box specified.
-      if (getControlsToLockIfBoxNotSpecified().contains(c.name()) && !isBoxSpecified())
+      if (getControlsToLockIfBoxNotSpecified().contains(c.getName()) && !isBoxSpecified())
       {
         locked = true;        
       }
       
       // if there is no vector shape loaded then lock the "draw vector"
       // control.
-      if (c.name().equals(MODE_RENDER_VECTORS) && getVectorShape() == null)
+      if (c.getName().equals(MODE_RENDER_VECTORS) && getVectorShape() == null)
       {
         locked = true;
       }
   
       // if there's no image loaded, then hide resizing/moving
-      if (getControlsToLockIfImageNotLoaded().contains(c.name()) && getDisplayMachine().getImage() == null)
+      if (getControlsToLockIfImageNotLoaded().contains(c.getName()) && getDisplayMachine().getImage() == null)
       {
         locked = true;        
       }
       
-      if (c.name().equals(MODE_LOAD_VECTOR_FILE))
+      if (c.getName().equals(MODE_LOAD_VECTOR_FILE))
       {
         if (getVectorShape() != null)
           c.setLabel("Clear vector");
         else
           c.setLabel("Load vector");
       }
-      else if (c.name().equals(MODE_LOAD_IMAGE))
+      else if (c.getName().equals(MODE_LOAD_IMAGE))
       {
         if (getDisplayMachine().getImage() != null)
           c.setLabel("Clear image");
@@ -232,6 +231,4 @@ class Panel
       this.getOutline().setWidth(right);
     }
   }
-  
-  
 }

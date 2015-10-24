@@ -25,7 +25,6 @@
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
   https://github.com/euphy/polargraphcontroller
-
 */
 class Rectangle
 {
@@ -121,6 +120,10 @@ class Rectangle
       return true;
     else
       return false;
+  }
+  
+  public String toString() {
+	return new StringBuffer().append("Rectangle pos: ").append(this.getPosition()).append(", size: ").append(this.getSize()).append(".").toString();
   }
   
 }

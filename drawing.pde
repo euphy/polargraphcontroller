@@ -25,7 +25,6 @@
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
   https://github.com/euphy/polargraphcontroller
-
 */
 static final String CMD_CHANGELENGTH = "C01,";
 static final String CMD_CHANGEPENWIDTH = "C02,";
@@ -945,7 +944,7 @@ void sendMachineStoreMode()
 }
 void sendMachineLiveMode()
 {
-  addToRealtimeCommandQueue(CMD_MACHINE_MODE_LIVE+"END");
+  addToCommandQueue(CMD_MACHINE_MODE_LIVE+"END");
 }
 void sendMachineExecMode()
 {

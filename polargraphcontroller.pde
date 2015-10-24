@@ -28,6 +28,7 @@
  https://github.com/euphy/polargraphcontroller
  
  */
+
 //import processing.video.*;
 import diewald_CV_kit.libraryinfo.*;
 import diewald_CV_kit.utility.*;
@@ -50,13 +51,20 @@ import processing.serial.*;
 import controlP5.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.*;
+import java.awt.Frame;
+import java.awt.BorderLayout;
 
-int majorVersionNo = 1;
-int minorVersionNo = 2;
-int buildNo = 2;
+import java.lang.reflect.Method;
+
+int majorVersionNo = 2;
+int minorVersionNo = 0;
+int buildNo = 3;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
+Map<String, ControlP5> cp5s = new HashMap<String, ControlP5>();
+
+
 
 boolean drawbotReady = false;
 boolean drawbotConnected = false;
@@ -388,11 +396,11 @@ static final char BITMAP_BACKGROUND_COLOUR = 0x0F;
 
 PVector homePointCartesian = null;
 
-public color chromaKeyColour = color(0, 255, 0);
+public color chromaKeyColour = color(0,255,0);
 
 // used in the preview page
 public color pageColour = color(220);
-public color frameColour = color(200, 0, 0);
+public color frameColour = color(200,0,0);
 public color machineColour = color(150);
 public color guideColour = color(255);
 public color backgroundColour = color(100);
@@ -438,7 +446,7 @@ public static final String PANEL_NAME_TRACE = "panel_trace";
 public static final String PANEL_NAME_GENERAL = "panel_general";
 
 public final PVector DEFAULT_CONTROL_SIZE = new PVector(100.0, 20.0);
-public final PVector CONTROL_SPACING = new PVector(2.0, 2.0);
+public final PVector CONTROL_SPACING = new PVector(4.0, 4.0);
 public PVector mainPanelPosition = new PVector(10.0, 85.0);
 
 public final Integer PANEL_MIN_HEIGHT = 400;
@@ -459,13 +467,13 @@ public Map<String, Panel> panels = null;
 // machine moving
 PVector machineDragOffset = new PVector (0.0, 0.0);
 PVector lastMachineDragPosition = new PVector (0.0, 0.0);
-public final float MIN_SCALING = 0.1;
-public final float MAX_SCALING = 15.0;
+public final float MIN_SCALING = 0.01;
+public final float MAX_SCALING = 30.0;
 
 RShape vectorShape = null;
 String vectorFilename = null;
 float vectorScaling = 100;
-PVector vectorPosition = new PVector(0.0, 0.0);
+PVector vectorPosition = new PVector(0.0,0.0);
 int minimumVectorLineLength = 0;
 public static final int VECTOR_FILTER_LOW_PASS = 0;
 
@@ -494,8 +502,6 @@ static int pathLengthHighPassCutoff = 0;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MAX = 10000;
 static final Integer PATH_LENGTH_HIGHPASS_CUTOFF_MIN = 0;
 
-//Capture liveCamera;
-//JMyron liveCamera;
 BlobDetector blob_detector;
 int liveSimplification = 5;
 int blurValue = 1;
@@ -510,29 +516,34 @@ String shapeSavePath = "../../savedcaptures/";
 String shapeSavePrefix = "shape-";
 String shapeSaveExtension = ".svg";
 
-static Float gcodeZAxisDrawingHeight = 1.0; //-0.125000;
+String filePath = null;
+
+static PApplet parentPapplet = null;
 
 void setup()
 {
   println("Running polargraph controller");
   frame.setResizable(true);
   initLogging();
-
-  initImages();
-
+  parentPapplet = this;
+  
   RG.init(this);
   RG.setPolygonizer(RG.ADAPTATIVE);
 
   try 
   { 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
   } 
   catch (Exception e) 
   { 
-    e.printStackTrace();
+    e.printStackTrace();   
   }
   loadFromPropertiesFile();
-
+  
+//  size(400, 400, JAVA2D );
+//  surface.setResizable(true);
+//  surface.setSize(windowWidth, windowHeight);
+  size(windowWidth, windowHeight, JAVA2D);
   this.cp5 = new ControlP5(this);
   initTabs();
 
@@ -540,7 +551,7 @@ void setup()
   println("Serial ports available on your machine:");
   println(serialPorts);
 
-  //  println("getSerialPortNumber()"+getSerialPortNumber());
+//  println("getSerialPortNumber()"+getSerialPortNumber());
   if (getSerialPortNumber() >= 0)
   {
     println("About to connect to serial port in slot " + getSerialPortNumber());
@@ -561,8 +572,8 @@ void setup()
       catch (Exception e)
       {
         println("Attempting to connect to serial port " 
-          + portName + " in slot " + getSerialPortNumber() 
-          + " caused an exception: " + e.getMessage());
+        + portName + " in slot " + getSerialPortNumber() 
+        + " caused an exception: " + e.getMessage());
       }
     }
     else
@@ -578,34 +589,34 @@ void setup()
 
   currentMode = MODE_BEGIN;
   preLoadCommandQueue();
-  size(windowWidth, windowHeight, JAVA2D );
   changeTab(TAB_NAME_INPUT, TAB_NAME_INPUT);
 
   addEventListeners();
 
-  //gamepad_init();
+  frameRate(8);
 }
 void addEventListeners()
 {
   frame.addComponentListener(new ComponentAdapter() 
-  {
-    public void componentResized(ComponentEvent event) 
     {
-      if (event.getSource()==frame) 
+      public void componentResized(ComponentEvent event) 
       {
-        windowResized();
+        if (event.getSource()==frame) 
+        {
+  	  windowResized();
+        }
       }
     }
-  }
-  ); 
-  addMouseWheelListener(new java.awt.event.MouseWheelListener() 
-  { 
-    public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) 
-    { 
-      mouseWheel(evt.getWheelRotation());
-    }
-  }
   );
+  
+  addMouseWheelListener(new java.awt.event.MouseWheelListener() 
+    { 
+      public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) 
+      { 
+        mouseWheel(evt.getWheelRotation());
+      }
+    }
+  ); 
 }  
 
 
@@ -625,6 +636,7 @@ void windowResized()
     Panel p = getPanels().get(key);
     p.setHeight(frame.getHeight() - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
   }
+  
 }
 void draw()
 {
@@ -667,6 +679,7 @@ void draw()
   {
     dispatchCommandQueue();
   }
+  
 }
 
 String getCurrentTab()
@@ -687,6 +700,7 @@ boolean isShowingDialogBox()
 }
 void drawDialogBox()
 {
+  
 }
 String getVectorFilename()
 {
@@ -744,12 +758,12 @@ void drawImagePage()
   getDisplayMachine().draw();
   drawMoveImageOutline();
   stroke(255, 0, 0);
-
+ 
   for (Panel panel : getPanelsForTab(TAB_NAME_INPUT))
   {
     panel.draw();
   }
-  stroke(200, 200);
+  stroke(200,200);
   text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
 
   showGroupBox();
@@ -757,7 +771,7 @@ void drawImagePage()
   if (displayingQueuePreview)
     previewQueue();
   if (displayingInfoTextOnInputPage)
-    showText(250, 45);
+    showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
@@ -765,7 +779,7 @@ void drawImagePage()
 
 void drawMachineOutline()
 {
-  rect(machinePosition.x, machinePosition.y, machinePosition.x+getDisplayMachine().getWidth(), machinePosition.y+getDisplayMachine().getHeight());
+  rect(machinePosition.x,machinePosition.y, machinePosition.x+getDisplayMachine().getWidth(), machinePosition.y+getDisplayMachine().getHeight());
 }
 void drawDetailsPage()
 {
@@ -778,16 +792,16 @@ void drawDetailsPage()
   noFill();
   getDisplayMachine().drawForSetup();
   stroke(255, 0, 0);
-
+ 
   for (Panel panel : getPanelsForTab(TAB_NAME_DETAILS))
   {
     panel.draw();
   }
   text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
 
-  //  showCurrentMachinePosition();
+//  showCurrentMachinePosition();
   if (displayingInfoTextOnInputPage)
-    showText(250, 45);
+    showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
@@ -804,18 +818,18 @@ void drawRovingPage()
   noFill();
   getDisplayMachine().drawForSetup();
   stroke(255, 0, 0);
-
+ 
   for (Panel panel : getPanelsForTab(TAB_NAME_ROVING))
   {
     panel.draw();
   }
   text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
 
-  //  showCurrentMachinePosition();
+//  showCurrentMachinePosition();
   showGroupBox();
   showCurrentMachinePosition();
   if (displayingInfoTextOnInputPage)
-    showText(250, 45);
+    showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
@@ -840,7 +854,7 @@ void drawTracePage()
   }
 
   stroke(255, 0, 0);
-
+ 
   for (Panel panel : getPanelsForTab(TAB_NAME_TRACE))
   {
     panel.draw();
@@ -849,15 +863,15 @@ void drawTracePage()
 
 
   if (displayingInfoTextOnInputPage)
-    showText(250, 45);
+    showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
   showCommandQueue((int) width-200, 20);
 
 
-  //  processGamepadInput();
-  //
-  //  if (displayGamepadOverlay)
-  //    displayGamepadOverlay();
+//  processGamepadInput();
+//
+//  if (displayGamepadOverlay)
+//    displayGamepadOverlay();
 }
 
 
@@ -870,9 +884,9 @@ void drawCommandQueuePage()
   fill(100);
   drawMachineOutline();
   showingSummaryOverlay = false;
+  
 
-
-
+  
   int right = 0;
   for (Panel panel : getPanelsForTab(TAB_NAME_QUEUE))
   {
@@ -883,8 +897,9 @@ void drawCommandQueuePage()
   }
   text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
   showCommandQueue(right, (int)mainPanelPosition.y);
-
+  
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
+  
 }
 
 void drawImageLoadPage()
@@ -903,15 +918,15 @@ void drawMoveImageOutline()
     PVector imageSizeOnScreen = getDisplayMachine().scaleToScreen(imageSize);
     imageSizeOnScreen.sub(getDisplayMachine().getOutline().getTopLeft());
     PVector offset = new PVector(imageSizeOnScreen.x/2.0, imageSizeOnScreen.y/2.0);
-
+    
     PVector mVect = getMouseVector();
     PVector imagePos = new PVector(mVect.x-offset.x, mVect.y-offset.y);
 
-    fill(80, 50);
+    fill(80,50);
     noStroke();
     rect(imagePos.x+imageSizeOnScreen.x, imagePos.y+4, 4, imageSizeOnScreen.y);
     rect(imagePos.x+4, imageSizeOnScreen.y+imagePos.y, imageSizeOnScreen.x-4, 4);
-    tint(255, 180);
+    tint(255,180);
     image(getDisplayMachine().getImage(), imagePos.x, imagePos.y, imageSizeOnScreen.x, imageSizeOnScreen.y);
     noTint();
     // decorate image
@@ -953,12 +968,12 @@ void drawMoveImageOutline()
 void showCurrentMachinePosition()
 {
   noStroke();
-  fill(255, 0, 255, 150);
+  fill(255,0,255,150);
   PVector pgCoord = getDisplayMachine().scaleToScreen(currentMachinePos);
   ellipse(pgCoord.x, pgCoord.y, 20, 20);
 
   // also show cartesian position if reported
-  fill(255, 255, 0, 150);
+  fill(255,255,0,150);
   ellipse(currentCartesianMachinePos.x, currentCartesianMachinePos.y, 15, 15);
 
   noFill();
@@ -982,14 +997,14 @@ void showGroupBox()
       noFill();
       stroke(getFrameColour());
       strokeWeight(1);
-
+  
       if (getBoxVector1() != null)
       {
         PVector topLeft = getDisplayMachine().scaleToScreen(boxVector1);
         line(topLeft.x, topLeft.y, topLeft.x-10, topLeft.y);
         line(topLeft.x, topLeft.y, topLeft.x, topLeft.y-10);
       }
-
+  
       if (getBoxVector2() != null)
       {
         PVector botRight = getDisplayMachine().scaleToScreen(boxVector2);
@@ -998,6 +1013,7 @@ void showGroupBox()
       }
     }
   }
+  
 }
 
 void loadImageWithFileChooser()
@@ -1007,7 +1023,7 @@ void loadImageWithFileChooser()
     public void run() {
       JFileChooser fc = new JFileChooser();
       fc.setFileFilter(new ImageFileFilter());
-
+      
       fc.setDialogTitle("Choose an image file...");
 
       int returned = fc.showOpenDialog(frame);
@@ -1027,22 +1043,21 @@ void loadImageWithFileChooser()
         }
       }
     }
-  }
-  );
+  });
 }
 
 class ImageFileFilter extends javax.swing.filechooser.FileFilter 
 {
   public boolean accept(File file) {
-    String filename = file.getName();
-    filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg")) 
-      return true;
-    else
-      return false;
+      String filename = file.getName();
+      filename.toLowerCase();
+      if (file.isDirectory() || filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg")) 
+        return true;
+      else
+        return false;
   }
   public String getDescription() {
-    return "Image files (PNG or JPG)";
+      return "Image files (PNG or JPG)";
   }
 }
 
@@ -1053,7 +1068,7 @@ void loadVectorWithFileChooser()
     public void run() {
       JFileChooser fc = new JFileChooser();
       fc.setFileFilter(new VectorFileFilter());
-
+      
       fc.setDialogTitle("Choose a vector file...");
 
       int returned = fc.showOpenDialog(frame);
@@ -1062,7 +1077,7 @@ void loadVectorWithFileChooser()
         File file = fc.getSelectedFile();
         if (file.exists())
         {
-          RShape shape = loadShapeFromFile(file.getPath());
+          RShape shape = RG.loadShape(file.getPath());
           if (shape != null) 
           {
             setVectorFilename(file.getPath());
@@ -1075,24 +1090,22 @@ void loadVectorWithFileChooser()
         }
       }
     }
-  }
-  );
+  });
 }
 class VectorFileFilter extends javax.swing.filechooser.FileFilter 
 {
   public boolean accept(File file) {
-    String filename = file.getName();
-    filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gco") || filename.endsWith(".g"))
-      return true;
-    else
-      return false;
+      String filename = file.getName();
+      filename.toLowerCase();
+      if (file.isDirectory() || filename.endsWith(".svg")) 
+        return true;
+      else
+        return false;
   }
   public String getDescription() {
-    return "Vector graphic files (SVG, GCode)";
+      return "Vector graphic files (SVG)";
   }
 }
-
 
 void loadNewPropertiesFilenameWithFileChooser()
 {
@@ -1102,7 +1115,7 @@ void loadNewPropertiesFilenameWithFileChooser()
     {
       JFileChooser fc = new JFileChooser();
       fc.setFileFilter(new PropertiesFileFilter());
-
+      
       fc.setDialogTitle("Choose a config file...");
 
       int returned = fc.showOpenDialog(frame);
@@ -1118,28 +1131,27 @@ void loadNewPropertiesFilenameWithFileChooser()
           // clear old properties.
           props = null;
           loadFromPropertiesFile();
-
+          
           // set values of number spinners etc
           updateNumberboxValues();
-        }
+        }   
       }
     }
-  }
-  );
+  });
 }
 
 class PropertiesFileFilter extends javax.swing.filechooser.FileFilter 
 {
   public boolean accept(File file) {
-    String filename = file.getName();
-    filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".properties.txt")) 
-      return true;
-    else
-      return false;
+      String filename = file.getName();
+      filename.toLowerCase();
+      if (file.isDirectory() || filename.endsWith(".properties.txt")) 
+        return true;
+      else
+        return false;
   }
   public String getDescription() {
-    return "Properties files (*.properties.txt)";
+      return "Properties files (*.properties.txt)";
   }
 }
 
@@ -1151,7 +1163,7 @@ void saveNewPropertiesFileWithFileChooser()
     {
       JFileChooser fc = new JFileChooser();
       fc.setFileFilter(new PropertiesFileFilter());
-
+      
       fc.setDialogTitle("Enter a config file name...");
 
       int returned = fc.showSaveDialog(frame);
@@ -1162,7 +1174,7 @@ void saveNewPropertiesFileWithFileChooser()
         newPropertiesFilename.toLowerCase();
         if (!newPropertiesFilename.endsWith(".properties.txt"))
           newPropertiesFilename+=".properties.txt";
-
+          
         println("new propertiesFilename: "+  newPropertiesFilename);
         propertiesFilename = newPropertiesFilename;
         savePropertiesFile();
@@ -1171,211 +1183,18 @@ void saveNewPropertiesFileWithFileChooser()
         loadFromPropertiesFile();
       }
     }
-  }
-  );
+  });
 }
 
-RShape loadShapeFromFile(String filename) {
-  RShape sh = null;
-  if (filename.toLowerCase().endsWith(".svg")) {
-    sh = RG.loadShape(filename);
-  }
-  else if (filename.toLowerCase().endsWith(".gco") || filename.toLowerCase().endsWith(".g")) {
-    sh = loadShapeFromGCodeFile(filename);
-  }
-  return sh;
-}
-
-int countLines(String filename) throws IOException {
-    InputStream is = new BufferedInputStream(new FileInputStream(filename));
-    try {
-        byte[] c = new byte[1024];
-        int count = 0;
-        int readChars = 0;
-        boolean empty = true;
-        while ((readChars = is.read(c)) != -1) {
-            empty = false;
-            for (int i = 0; i < readChars; ++i) {
-                if (c[i] == '\n') {
-                    ++count;
-                }
-            }
-        }
-        return (count == 0 && !empty) ? 1 : count;
-    } finally {
-        is.close();
-    }
-}
-
-RShape loadShapeFromGCodeFile(String filename) {
-  noLoop();
-  RShape parent = null;
-  BufferedReader reader = null;
-  long totalPoints = 0;
-  long time = millis();
-
-  try {
-    long countLines = countLines(filename);
-    println("" + countLines + " lines found.");
-    reader = createReader(filename);
-    parent = new RShape();
-    String line;
-    boolean drawLine = false;
-    int gCodeZAxisChanges = 0;
-    
-    long lineNo = 0;
-    float lastPercent = 0.0f;
-    while ((line = reader.readLine ()) != null) {
-      lineNo++;
-      if (line.toUpperCase().startsWith("G")) {
-        if ((millis() - time) > 500) {
-          println(new StringBuilder().append(lineNo).append(" of ").append(countLines).append(": ").append(line).append(". Points: ").append(totalPoints).toString());
-          long free = Runtime.getRuntime().freeMemory();
-          long maximum = Runtime.getRuntime().maxMemory();
-          println(new StringBuilder().append("Free: ").append(free).append(", max: ").append(maximum).toString());
-          time = millis();
-        }
-//        float percent = (lineNo / countLines) * 100;
-//        if (percent != lastPercent) {
-//          println("" + percent + "% of the way through.");
-//          lastPercent = percent;
-//        }
-        
-        Map<String, Float> ins = null;
-        try {
-          ins = unpackGCodeInstruction(line);
-        }
-        catch (Exception e) {
-          println("Exception while unpacking a gcode line " + line);
-          continue;
-        }
-        Integer code = Math.round(ins.get("G"));
-        if (code >= 2) {
-          continue;
-        }
-        
-        
-        Float z = ins.get("Z");
-        if (z != null) {
-          gCodeZAxisChanges++;
-          if (gCodeZAxisChanges == 2) {
-            println("Assume second z axis change is to drop the pen to start drawing " + z);
-            gcodeZAxisDrawingHeight = z;
-            drawLine = true;
-          }
-          else if (gCodeZAxisChanges > 2) {
-            drawLine = isGCodeZAxisForDrawing(z);
-          }
-          else {
-            println("Assume first z axis change is to RAISE the pen " + z);
-            drawLine = false;
-          }
-        }
-        
-        Float x = ins.get("X");
-        Float y = ins.get("Y");
-        if (x != null && y == null) {
-          // move x axis only, use y of last
-          RPoint[][] points = parent.getPointsInPaths();
-          RPoint rp = points[points.length-1][points[points.length-1].length-1];
-          y = rp.y;
-        }
-        else if (x == null && y != null) {
-          // move y axis only, use x of last
-          RPoint[][] points = parent.getPointsInPaths();
-          RPoint rp = points[points.length-1][points[points.length-1].length-1];
-          x = rp.x;
-        }
-        
-        if (x != null && y != null) {
-          // move both x and y axis
-          if (drawLine) {
-            parent.addLineTo(x, y);
-          }
-          else {
-            parent.addMoveTo(x, y);
-          }
-        }
-//        RPoint[][] points = parent.getPointsInPaths();
-//        totalPoints = 0;
-//        if (points != null) {
-//          for (int i = 0; i<points.length; i++) {
-//            if (points[i] != null) {
-//              for (int j = 0; j<points[i].length; j++) {
-//                totalPoints++;
-//              }
-//            }
-//          }
-//        }
-//        points = null;
-//        println("" + totalPoints + " points.");
-      }
-    }
-  }
-  catch (IOException e) {
-    println("Execption reading lines from the gcode file " + filename);
-    e.printStackTrace();
-  } 
-  finally {
-    try {
-      reader.close();
-    } 
-    catch (IOException e) {
-      println("Exception closing the gcode file " + filename);
-      e.printStackTrace();
-    }
-    loop();
-  }
-  
-  RPoint[][] points = parent.getPointsInPaths();
-  totalPoints = 0;
-  if (points != null) {
-    for (int i = 0; i<points.length; i++) {
-      if (points[i] != null) {
-        for (int j = 0; j<points[i].length; j++) {
-          totalPoints++;
-        }
-      }
-    }
-  }
-  println("Total points in shape: " + totalPoints);
-
-  loop();
-  return parent;
-}
-
-Boolean isGCodeZAxisForDrawing(float z) {
-  return gcodeZAxisDrawingHeight.compareTo(z) == 0;
-}
-
-Map<String, Float> unpackGCodeInstruction(String line) throws NumberFormatException {
-  Map<String, Float> instruction = new HashMap<String, Float>(4);
-  try {
-    String[] splitted = line.trim().split(" ");
-    for (int i = 0; i < splitted.length; i++) {
-      String axis = splitted[i].substring(0, 1);
-      Float value = Float.parseFloat(splitted[i].substring(1));
-      if ("X".equalsIgnoreCase(axis) || "Y".equalsIgnoreCase(axis) || "Z".equalsIgnoreCase(axis) || "G".equalsIgnoreCase(axis)) {
-        instruction.put(axis, value);
-      }
-    }
-//    println("instruction: " + instruction);
-  }
-  catch (NumberFormatException e) {
-    println("Exception while reading the lines from a gcode file: " + line);
-    throw e;
-  }
-  return instruction;
-}
 
 
 void setPictureFrameDimensionsToBox()
 {
-  //  if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
-  //  {
-  Rectangle r = new Rectangle(getDisplayMachine().inSteps(getBoxVector1()), getDisplayMachine().inSteps(getBoxVectorSize()));
-  getDisplayMachine().setPictureFrame(r);
-  //  }
+//  if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
+//  {
+    Rectangle r = new Rectangle(getDisplayMachine().inSteps(getBoxVector1()), getDisplayMachine().inSteps(getBoxVectorSize()));
+    getDisplayMachine().setPictureFrame(r);
+//  }
 }
 void setBoxToPictureframeDimensions()
 {
@@ -1391,6 +1210,7 @@ void setBoxToPictureframeDimensions()
     t = (Toggle) getAllControls().get(MODE_SHOW_DENSITY_PREVIEW);
     t.setValue(1);
     t.update();
+    
   }
 }
 
@@ -1413,33 +1233,32 @@ void controlEvent(ControlEvent controlEvent)
 {
   if (controlEvent.isTab()) 
   {
-    if (controlEvent.tab().name() == getCurrentTab())
+    if (controlEvent.tab().getName() == getCurrentTab())
     {
       // already here.
       println("Already here.");
     }
     else
     {
-      changeTab(currentTab, controlEvent.tab().name());
+      changeTab(currentTab, controlEvent.tab().getName());
     }
   }
-  else if (controlEvent.isGroup()) 
+  else if(controlEvent.isGroup()) 
   {
-    print("got an event from "+controlEvent.group().name()+"\t");
+    print("got an event from "+controlEvent.group().getName()+"\t");
 
     // checkbox uses arrayValue to store the state of 
     // individual checkbox-items. usage:
-    for (int i=0; i<controlEvent.group().arrayValue().length; i++) 
+    for (int i=0; i<controlEvent.group().getArrayValue().length; i++) 
     {
-      int n = (int)controlEvent.group().arrayValue()[i];
+      int n = (int)controlEvent.group().getArrayValue()[i];
     }
     println();
-  }
+  } 
 }
 
 void changeTab(String from, String to)
 {
-
   // hide old panels
   currentTab = to;
   for (Panel panel : getPanelsForTab(currentTab))
@@ -1521,8 +1340,12 @@ boolean mouseOverPanel()
   boolean result = false;
   for (Panel panel : getPanelsForTab(currentTab))
   {
-    if (panel.getOutline().surrounds(getMouseVector()))
+    if (panel.getOutline().surrounds(getMouseVector())) {
+      println("Outline: " + panel.getOutline().toString());
+      println("OVER PANEL!" + panel.getName());
       result = true;
+	  break;
+    }
   }
   return result;
 }
@@ -1557,14 +1380,14 @@ void changeMachineScaling(int delta)
 boolean checkKey(int k)
 {
   if (keys.length >= k) {
-    return keys[k];
+    return keys[k];  
   }
   return false;
 }
 
 void keyReleased()
 { 
-  keys[keyCode] = false;
+  keys[keyCode] = false; 
 }
 
 void keyPressed()
@@ -1574,7 +1397,7 @@ void keyPressed()
   //println("key: " + KeyEvent.getKeyText(keyCode));
   //println("Keys: " + keys);
   //println("Keycode: " + keyCode);
-
+  
   if (checkKey(CONTROL) && checkKey(KeyEvent.VK_PAGE_UP)) 
     changeMachineScaling(1);
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_PAGE_DOWN)) 
@@ -1590,8 +1413,8 @@ void keyPressed()
   else if (checkKey(KeyEvent.VK_ESCAPE))
     key = 0;
 
-  //  if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G)) 
-  //    println("CTRL+G");
+//  if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G)) 
+//    println("CTRL+G");
 
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G))
   {
@@ -1614,7 +1437,7 @@ void keyPressed()
       setUseWindowedConsole(false);
     else
       setUseWindowedConsole(true);
-
+      
     initLogging();
   }
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_S))
@@ -1626,60 +1449,60 @@ void keyPressed()
   {
     displayingInfoTextOnInputPage = (displayingInfoTextOnInputPage) ? false : true;
   }
-  //  else if (key == '+')
-  //  {
-  //    currentMachineMaxSpeed = currentMachineMaxSpeed+MACHINE_MAXSPEED_INCREMENT;
-  //    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
-  //    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-  //    DecimalFormat df = (DecimalFormat)nf;  
-  //    df.applyPattern("###.##");
-  //    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
-  //  }
-  //  else if (key == '-')
-  //  {
-  //    currentMachineMaxSpeed = currentMachineMaxSpeed+(0.0 - MACHINE_MAXSPEED_INCREMENT);
-  //    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
-  //    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-  //    DecimalFormat df = (DecimalFormat)nf;  
-  //    df.applyPattern("###.##");
-  //    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
-  //  }
-  //  else if (key == '*')
-  //  {
-  //    currentMachineAccel = currentMachineAccel+MACHINE_ACCEL_INCREMENT;
-  //    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
-  //    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-  //    DecimalFormat df = (DecimalFormat)nf;  
-  //    df.applyPattern("###.##");
-  //    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
-  //  }
-  //  else if (key == '/')
-  //  {
-  //    currentMachineAccel = currentMachineAccel+(0.0 - MACHINE_ACCEL_INCREMENT);
-  //    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
-  //    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-  //    DecimalFormat df = (DecimalFormat)nf;  
-  //    df.applyPattern("###.##");
-  //    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
-  //  }
-  //  else if (key == ']')
-  //  {
-  //    currentPenWidth = currentPenWidth+penIncrement;
-  //    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
-  //    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-  //    DecimalFormat df = (DecimalFormat)nf;  
-  //    df.applyPattern("###.##");
-  //    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
-  //  }
-  //  else if (key == '[')
-  //  {
-  //    currentPenWidth = currentPenWidth-penIncrement;
-  //    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
-  //    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-  //    DecimalFormat df = (DecimalFormat)nf;  
-  //    df.applyPattern("###.##");
-  //    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
-  //  }
+//  else if (key == '+')
+//  {
+//    currentMachineMaxSpeed = currentMachineMaxSpeed+MACHINE_MAXSPEED_INCREMENT;
+//    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
+//  }
+//  else if (key == '-')
+//  {
+//    currentMachineMaxSpeed = currentMachineMaxSpeed+(0.0 - MACHINE_MAXSPEED_INCREMENT);
+//    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
+//  }
+//  else if (key == '*')
+//  {
+//    currentMachineAccel = currentMachineAccel+MACHINE_ACCEL_INCREMENT;
+//    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
+//  }
+//  else if (key == '/')
+//  {
+//    currentMachineAccel = currentMachineAccel+(0.0 - MACHINE_ACCEL_INCREMENT);
+//    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
+//  }
+//  else if (key == ']')
+//  {
+//    currentPenWidth = currentPenWidth+penIncrement;
+//    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
+//  }
+//  else if (key == '[')
+//  {
+//    currentPenWidth = currentPenWidth-penIncrement;
+//    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
+//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
+//    DecimalFormat df = (DecimalFormat)nf;  
+//    df.applyPattern("###.##");
+//    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
+//  }
   else if (key == '#' )
   {
     addToRealtimeCommandQueue(CMD_PENUP+"END");
@@ -1697,15 +1520,15 @@ void keyPressed()
   {
     this.maxSegmentLength++;
   }
-  //  else if (key == ',')
-  //  {
-  //    if (this.minimumVectorLineLength > 0)
-  //      this.minimumVectorLineLength--;
-  //  }
-  //  else if (key == '.')
-  //  {
-  //    this.minimumVectorLineLength++;
-  //  }
+//  else if (key == ',')
+//  {
+//    if (this.minimumVectorLineLength > 0)
+//      this.minimumVectorLineLength--;
+//  }
+//  else if (key == '.')
+//  {
+//    this.minimumVectorLineLength++;
+//  }
 }
 void mouseDragged()
 {
@@ -1726,12 +1549,12 @@ void mouseDragged()
     }
   }
 }
-
+  
 void mouseClicked()
 {
   if (mouseOverPanel())
   { // changing mode
-    //    panelClicked();
+//    panelClicked();
   }
   else
   {
@@ -1741,10 +1564,10 @@ void mouseClicked()
       PVector mVect = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
       PVector offset = new PVector(imageSize.x/2.0, imageSize.y/2.0);
       PVector imagePos = new PVector(mVect.x-offset.x, mVect.y-offset.y);
-
+  
       imagePos = getDisplayMachine().inSteps(imagePos);
       getDisplayMachine().getImageFrame().setPosition(imagePos.x, imagePos.y);
-
+  
       if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
         getDisplayMachine().extractPixelsFromArea(getBoxVector1(), getBoxVectorSize(), getGridSize(), sampleArea);
     }
@@ -1791,9 +1614,9 @@ void machineClicked()
 }
 void mousePressed()
 {
-  //  println("mouse pressed");
-  //  println("mouse button: "+mouseButton);
-  //  println("Current mode: " +currentMode);
+//  println("mouse pressed");
+//  println("mouse button: "+mouseButton);
+//  println("Current mode: " +currentMode);
   if (mouseButton == CENTER)
   {
     middleButtonMachinePress();
@@ -1810,13 +1633,13 @@ void mousePressed()
       if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
       {
         getDisplayMachine().extractPixelsFromArea(getBoxVector1(), getBoxVectorSize(), getGridSize(), sampleArea);
-        //        minitoggle_mode_showImage(false);
-        //        minitoggle_mode_showDensityPreview(true);
+//        minitoggle_mode_showImage(false);
+//        minitoggle_mode_showDensityPreview(true);
       }
     }
     else
     {
-      //      println("Do nothing.");
+//      println("Do nothing.");
     }
   }
 }
@@ -1876,6 +1699,7 @@ void leftButtonMachineClick()
     setChromaKey(getMouseVector());
   else if (currentMode.equals(MODE_SEND_START_TEXT))
     sendStartTextAtPoint();
+  
 }
 
 void mouseWheel(int delta) 
@@ -1908,14 +1732,17 @@ boolean isPreviewable(String command)
 }
 
 /**
- This will comb the command queue and attempt to draw a picture of what it contains.
- Coordinates here are in pixels.
- */
-void previewQueue()
+  This will comb the command queue and attempt to draw a picture of what it contains.
+  Coordinates here are in pixels.
+*/
+void previewQueue() {
+  previewQueue(false);
+}
+
+void previewQueue(boolean forceRebuild)
 {
   PVector startPoint = null;
-
-  if (commandQueue.hashCode() != lastCommandQueueHash)
+  if (forceRebuild || (commandQueue.hashCode() != lastCommandQueueHash))
   {
     println("regenerating preview queue.");
     previewCommandList.clear();
@@ -1930,27 +1757,27 @@ void previewQueue()
 
         String aLenStr = splitted[1];
         String bLenStr = splitted[2];
-
+        
         PVector endPoint = new PVector(Integer.parseInt(aLenStr)+previewCordOffset, Integer.parseInt(bLenStr)+previewCordOffset);
         endPoint = getDisplayMachine().asCartesianCoords(endPoint);
         endPoint = getDisplayMachine().inMM(endPoint);
-
+        
         pv.x = endPoint.x;
         pv.y = endPoint.y;
         pv.z = -1.0;
-
+        
         if (command.startsWith(CMD_DRAWPIXEL))
         {
           String densStr = splitted[4];
           pv.z = Integer.parseInt(densStr);
         }
-
+        
         previewCommandList.add(pv);
       }
     }
     lastCommandQueueHash = commandQueue.hashCode();
   }
-
+  
   for (PreviewVector pv : previewCommandList)
   {
     PVector p = (PVector) pv;
@@ -1959,35 +1786,37 @@ void previewQueue()
     if (startPoint == null)
     {
       noStroke();
-      fill(255, 0, 255, 150);
+      fill(255,0,255,150);
       startPoint = getDisplayMachine().scaleToScreen(currentMachinePos);
       ellipse(p.x, p.y, 20, 20);
       noFill();
     }
-
+    
     if (pv.command.equals(CMD_CHANGELENGTHDIRECT))
       stroke(0);
     else 
-      stroke(200, 0, 0);
+      stroke(200,0,0);
     line(startPoint.x, startPoint.y, p.x, p.y);
     startPoint = p;
 
     if (pv.z >= 0.0)
     {
       noStroke();
-      fill(255, pv.z, pv.z);
-      ellipse(p.x, p.y, 5, 5);
+      fill(255,pv.z,pv.z);
+      ellipse(p.x, p.y, 5,5);
       noFill();
     }
+
   }
 
   if (startPoint != null)
   {
     noStroke();
-    fill(200, 0, 0, 128);
-    ellipse(startPoint.x, startPoint.y, 15, 15);
+    fill(200,0,0,128);
+    ellipse(startPoint.x, startPoint.y, 15,15);
     noFill();
   }
+  
 }
 
 boolean isHiddenPixel(PVector p)
@@ -1998,88 +1827,60 @@ boolean isHiddenPixel(PVector p)
     return false;
 }
 
-
-
-void sizeImageToFitBox()
-{
-  //  PVector mmBoxSize = getDisplayMachine().inSteps(getBoxSize());
-  //  PVector mmBoxPos = getDisplayMachine().inSteps(getBoxVector1());
-  //  println("mm box: " + mmBoxSize);
-
+void sizeImageToFitBox() {
   PVector boxSize = getDisplayMachine().inSteps(getBoxSize());
   PVector boxPos = getDisplayMachine().inSteps(getBoxVector1());
   println("image: " + boxSize);
-
+  
   Rectangle r = new Rectangle(boxPos, boxSize);
   getDisplayMachine().setImageFrame(r);
 }
 
-void exportQueueToFile()
-{
-  if (!commandQueue.isEmpty() || !realtimeCommandQueue.isEmpty())
-  {
-    String savePath = selectOutput();  // Opens file chooser
-    if (savePath == null) 
-    {
-      // If a file was not selected
-      println("No output file was selected...");
-    } 
-    else 
-    {
-      // If a file was selected, print path to folder
-      println("Output file: " + savePath);
-      List<String> allCommands = new ArrayList<String>(realtimeCommandQueue);
-      allCommands.addAll(commandQueue);
-
-      String[] list = (String[]) allCommands.toArray(new String[0]);
-      saveStrings(savePath, list);
-      println("Completed queue export, " + list.length + " commands exported.");
-    }
-  }
-}
-void importQueueFromFile()
-{
-  commandQueue.clear();
-  String loadPath = selectInput();
-  if (loadPath == null)
-  {
-    // nothing selected
-    println("No input file was selected.");
-  }
-  else
-  {
-    println("Input file: " + loadPath);
-    String commands[] = loadStrings(loadPath);
-    //    List<String> list = Arrays
-    commandQueue.addAll(Arrays.asList(commands));
-    println("Completed queue import, " + commandQueue.size() + " commands found.");
-  }
+void exportQueueToFile() {
+	if (!commandQueue.isEmpty() || !realtimeCommandQueue.isEmpty()) {
+		selectOutput("Enter a filename to save to:", "exportQueueToFile");  // Opens file chooser
+	}
 }
 
-String importTextToWriteFromFile()
-{
-  String loadPath = selectInput();
-  String result = "";
-  if (loadPath == null)
-  {
-    // nothing selected
-    println("No input file was selected.");
-  }
-  else
-  {
-    println("Input file: " + loadPath);
-    List<String> rows = java.util.Arrays.asList(loadStrings(loadPath));
-    StringBuilder sb = new StringBuilder(200);
-    for (String row : rows) 
-    {
-      sb.append(row);
-    }
-    result = sb.toString();
-
-    println("Completed text import, " + result.length() + " characters found.");
-  }
-  return result;
+void exportQueueToFile(File selection) {
+	if (selection != null) {
+		filePath = selection.getAbsolutePath();
+		println("User selected " + filePath);
+		// If a file was selected, print path to folder
+		println("Output file: " + filePath);
+		List<String> allCommands = new ArrayList<String>(realtimeCommandQueue);
+		allCommands.addAll(commandQueue);
+  
+		String[] list = (String[]) allCommands.toArray(new String[0]);
+		saveStrings(filePath, list);
+		println("Completed queue export, " + list.length + " commands exported.");
+	}  
 }
+
+void fileSelected(File selection) {
+	if (selection == null) {
+		println("Window was closed or the user hit cancel.");
+		filePath = null;
+	} else {
+		filePath = selection.getAbsolutePath();
+		println("User selected " + filePath);
+	}
+}
+
+void importQueueFromFile() {
+	commandQueue.clear();
+	selectInput("Select file to import queue from", "fileSelected");
+	if (filePath == null) {
+		// nothing selected
+		println("No input file was selected.");
+	} else {
+		println("Input file: " + filePath);
+		String commands[] = loadStrings(filePath);
+		commandQueue.addAll(Arrays.asList(commands));
+		println("Completed queue import, " + commandQueue.size() + " commands found.");
+	}
+}
+
 
 
 
@@ -2088,7 +1889,7 @@ void queueClicked()
   int relativeCoord = (mouseY-topEdgeOfQueue);
   int rowClicked = relativeCoord / queueRowHeight;
   int totalCommands = commandQueue.size()+realtimeCommandQueue.size();
-
+  
   if (rowClicked < 1) // its the header - start or stop queue
   {
     if (commandQueueRunning)
@@ -2114,7 +1915,7 @@ void queueClicked()
         {
           cmdNumber-=(realtimeCommandQueue.size()+1);
           commandQueue.remove(cmdNumber);
-        }
+        }        
       }
       else
       {
@@ -2161,7 +1962,7 @@ PVector getBoxVector2()
 }
 PVector getBoxVectorSize()
 {
-  return PVector.sub(getBoxVector2(), getBoxVector1());
+  return PVector.sub(getBoxVector2(),getBoxVector1());
 }
 
 float getSampleArea()
@@ -2182,32 +1983,32 @@ void showText(int xPosOrigin, int yPosOrigin)
   noStroke();
   fill(0, 0, 0, 80);
   rect(xPosOrigin, yPosOrigin, 220, 550);
-
-
+  
+  
   textSize(12);
   fill(255);
   int tRow = 15;
   int textPositionX = xPosOrigin+4;
   int textPositionY = yPosOrigin+4;
-
+  
   int tRowNo = 1;
   PVector screenCoordsCart = getMouseVector();
-
+ 
   text(programTitle, textPositionX, textPositionY+(tRow*tRowNo++));
   tRowNo++;
   text("Cursor position: " + mouseX + ", " + mouseY, textPositionX, textPositionY+(tRow*tRowNo++));
-
+  
   text("MM Per Step: " + getDisplayMachine().getMMPerStep(), textPositionX, textPositionY+(tRow*tRowNo++));
-  text("Steps Per MM: " + getDisplayMachine().getStepsPerMM(), textPositionX, textPositionY+(tRow*tRowNo++));
+  text("Steps Per MM: " + getDisplayMachine().getStepsPerMM() ,textPositionX, textPositionY+(tRow*tRowNo++));
 
   if (getDisplayMachine().getOutline().surrounds(screenCoordsCart))
   {
     PVector posOnMachineCartesianInMM = getDisplayMachine().scaleToDisplayMachine(screenCoordsCart);
     text("Machine x/y mm: " + posOnMachineCartesianInMM.x+","+posOnMachineCartesianInMM.y, textPositionX, textPositionY+(tRow*tRowNo++));
-
+    
     PVector posOnMachineNativeInMM = getDisplayMachine().convertToNative(posOnMachineCartesianInMM);
     text("Machine a/b mm: " + posOnMachineNativeInMM.x+","+posOnMachineNativeInMM.y, textPositionX, textPositionY+(tRow*tRowNo++));
-
+  
     PVector posOnMachineNativeInSteps = getDisplayMachine().inSteps(posOnMachineNativeInMM);
     text("Machine a/b steps: " + posOnMachineNativeInSteps.x+","+posOnMachineNativeInSteps.y, textPositionX, textPositionY+(tRow*tRowNo++));
   }
@@ -2217,24 +2018,24 @@ void showText(int xPosOrigin, int yPosOrigin)
     text("Machine a/b mm: --,--", textPositionX, textPositionY+(tRow*tRowNo++));
     text("Machine a/b steps: --,--", textPositionX, textPositionY+(tRow*tRowNo++));
   }
-
+  
 
 
   drawStatusText(textPositionX, textPositionY+(tRow*tRowNo++));  
-
+    
   text(commandStatus, textPositionX, textPositionY+(tRow*tRowNo++));
-
+  
   text("Mode: " + currentMode, textPositionX, textPositionY+(tRow*tRowNo++));
 
   // middle side
   text("Grid size: " + getGridSize(), textPositionX, textPositionY+(tRow*tRowNo++));
-
+  
   text("Box width: " + getBoxWidth(), textPositionX, textPositionY+(tRow*tRowNo++));
   text("Box height: " + getBoxHeight(), textPositionX, textPositionY+(tRow*tRowNo++));
 
   text("Box offset left: " + getBoxPosition().x, textPositionX, textPositionY+(tRow*tRowNo++));
   text("Box offset top: " + getBoxPosition().y, textPositionX, textPositionY+(tRow*tRowNo++));
-
+  
   text("Available memory: " + machineAvailMem + " (min: " + machineMinAvailMem +", used: "+ machineUsedMem+")", textPositionX, textPositionY+(tRow*tRowNo++));
 
   text("Time cmd: " + getCurrentPixelTime() + ", total: " + getTimeSoFar(), textPositionX, textPositionY+(tRow*tRowNo++));
@@ -2266,13 +2067,13 @@ void showText(int xPosOrigin, int yPosOrigin)
   noFill();
   noStroke();
   tRowNo++;
-  
+
 }
 
 void drawStatusText(int x, int y)
 {
   String drawbotStatus = null;
-
+  
   if (useSerialPortConnection)
   {
     if (isDrawbotConnected())
@@ -2280,12 +2081,12 @@ void drawStatusText(int x, int y)
       if (drawbotReady)
       {
         fill(0, 200, 0);
-        if (currentHardware >= HARDWARE_VER_POLARPRO)
-          drawbotStatus = "Polargraph READY! (PRO)";        
-        else if (currentHardware >= HARDWARE_VER_MEGA_POLARSHIELD)
+        if (currentHardware >= HARDWARE_VER_MEGA_POLARSHIELD)
           drawbotStatus = "Polargraph READY! (PolargraphSD)";
         else if (currentHardware >= HARDWARE_VER_MEGA)
           drawbotStatus = "Polargraph READY! (Mega)";
+        else if (currentHardware >= HARDWARE_VER_POLARPRO)
+          drawbotStatus = "Polargraph READY! (PRO)";
         else
           drawbotStatus = "Polargraph READY! (Uno)";
       }
@@ -2296,20 +2097,20 @@ void drawStatusText(int x, int y)
         if ("".equals(busyDoing))
           busyDoing = commandHistory.get(commandHistory.size()-1);
         drawbotStatus = "BUSY: " + busyDoing;
-      }
+      }  
     }
     else
     {
       fill(255, 0, 0);
       drawbotStatus = "Polargraph is not connected.";
-    }
+    }  
   }
   else
   {
     fill(255, 0, 0);
     drawbotStatus = "No serial connection.";
   }
-
+  
   text(drawbotStatus, x, y);
   fill(255);
 }
@@ -2333,29 +2134,29 @@ void showCommandQueue(int xPos, int yPos)
   leftEdgeOfQueue = textPositionX;
   rightEdgeOfQueue = textPositionX+300;
   bottomEdgeOfQueue = height;
-
+  
   drawCommandQueueStatus(textPositionX, commandQueuePos, 14);
   commandQueuePos+=queueRowHeight;
   text("Last command: " + ((commandHistory.isEmpty()) ? "-" : commandHistory.get(commandHistory.size()-1)), textPositionX, commandQueuePos);
   commandQueuePos+=queueRowHeight;
   text("Current command: " + lastCommand, textPositionX, commandQueuePos);
   commandQueuePos+=queueRowHeight;
-
-  fill(128, 255, 255);
+  
+  fill(128,255,255);
   int queueNumber = commandQueue.size()+realtimeCommandQueue.size();
   for (String s : realtimeCommandQueue)
   {
     text((queueNumber--)+". "+ s, textPositionX, commandQueuePos);
     commandQueuePos+=queueRowHeight;
   }
-
+  
   fill(255);
   try
   {
     // Write out the commands into the window, stop when you fall off the bottom of the window
     // Or run out of commands
     int commandNo = 0;
-    while (commandQueuePos <= height && commandNo < commandQueue.size ())
+    while (commandQueuePos <= height && commandNo < commandQueue.size())
     {
       String s = commandQueue.get(commandNo);
       text((queueNumber--)+". "+ s, textPositionX, commandQueuePos);
@@ -2369,6 +2170,7 @@ void showCommandQueue(int xPos, int yPos)
     println("Caught the pesky ConcurrentModificationException: " + cme.getMessage());
   }
   showmachineMessageLog(rightEdgeOfQueue, 20);
+  
 }
 
 void drawCommandQueueStatus(int x, int y, int tSize)
@@ -2400,7 +2202,7 @@ void showmachineMessageLog(int xPos, int yPos)
 
   int pos = textPositionY+(tRow*tRowNo++);
   pos+=queueRowHeight;
-
+  
   fill(255);
   // Write out the commands into the window, stop when you fall off the bottom of the window
   // Or run out of commands
@@ -2408,9 +2210,9 @@ void showmachineMessageLog(int xPos, int yPos)
   while (pos <= height && entryNo >= 0)
   {
     String s = machineMessageLog.get(entryNo);
-    String type = s.substring(0, 1);
-    if ("E".equals(type)) fill(255, 128, 128);
-    else if ("D".equals(type)) fill(50, 50, 50);
+    String type = s.substring(0,1);
+    if ("E".equals(type)) fill(255,128,128);
+    else if ("D".equals(type)) fill(50,50,50);
     else if ("I".equals(type)) fill(255);
     text(s, textPositionX, pos);
     pos+=queueRowHeight;
@@ -2552,7 +2354,7 @@ public DisplayMachine getDisplayMachine()
 {
   if (displayMachine == null)
     displayMachine = new DisplayMachine(new Machine(5000, 5000, 800.0, 95.0), machinePosition, machineScaling);
-
+    
   displayMachine.setOffset(machinePosition);
   displayMachine.setScale(machineScaling);
   return displayMachine;
@@ -2577,12 +2379,12 @@ void changeHardwareVersionTo(int newVer)
 
   switch (newVer)
   {
-  case HARDWARE_VER_MEGA :
-    currentSram = HARDWARE_ATMEGA1280_SRAM;
-  default   :  
-    currentSram = HARDWARE_ATMEGA328_SRAM;
+    case HARDWARE_VER_MEGA :
+      currentSram = HARDWARE_ATMEGA1280_SRAM;
+    default   :  
+      currentSram = HARDWARE_ATMEGA328_SRAM;
   }
-  //  windowResized();
+//  windowResized();
 }
 
 void setHardwareVersionFromIncoming(String readyString)
@@ -2605,15 +2407,14 @@ void setHardwareVersionFromIncoming(String readyString)
       println("Bad format for hardware version - defaulting to ATMEGA328 (Uno)");
       verInt = HARDWARE_VER_UNO;
     }
-
+    
     if (HARDWARE_VER_MEGA == verInt 
-    || HARDWARE_VER_MEGA_POLARSHIELD == verInt
-    || HARDWARE_VER_POLARPRO == verInt)
+    || HARDWARE_VER_MEGA_POLARSHIELD == verInt)
       newHardwareVersion = verInt;
     else
       newHardwareVersion = HARDWARE_VER_UNO;
   }
-
+  
   // now see if it's different to last time.
   if (newHardwareVersion != currentHardware)
   {
@@ -2630,7 +2431,7 @@ void serialEvent(Serial myPort)
   // if you got any bytes other than the linefeed:
   incoming = trim(incoming);
   println("incoming: " + incoming);
-
+  
   if (incoming.startsWith("READY"))
   {
     drawbotReady = true;
@@ -2656,14 +2457,14 @@ void serialEvent(Serial myPort)
     readPenLiftRange(incoming);
   else if (incoming.startsWith("PGSPEED"))
     readMachineSpeed(incoming);
-
+    
   else if ("RESEND".equals(incoming))
     resendLastCommand();
   else if ("DRAWING".equals(incoming))
     drawbotReady = false;
   else if (incoming.startsWith("MEMORY"))
     extractMemoryUsage(incoming);
-
+    
   else if (incoming.startsWith("BUTTON"))
     handleMachineButton(incoming);
 
@@ -2691,10 +2492,10 @@ void extractMemoryUsage(String mem)
 void readMachineMessage(String msg)
 {
   msg = msg.substring(4, msg.length());
-  String type = msg.substring(0, 1);
+  String type = msg.substring(0,1);
   msg = msg.substring(2, msg.length());
   String timestamp = new SimpleDateFormat("HH:mm:ss").format(new Date());
-
+  
   msg = type + timestamp + " " + msg;
   machineMessageLog.add(msg);
   if (machineMessageLog.size() > 200) 
@@ -2727,7 +2528,7 @@ void readCartesianMachinePosition(String sync)
     Float a = Float.valueOf(currentAPos).floatValue();
     Float b = Float.valueOf(currentBPos).floatValue();
     currentCartesianMachinePos.x = a;
-    currentCartesianMachinePos.y = b;
+    currentCartesianMachinePos.y = b;  
   }
 }
 
@@ -2737,7 +2538,7 @@ void readMmPerRev(String in)
   if (splitted.length == 3)
   {
     String mmStr = splitted[1];
-
+    
     float mmPerRev = Float.parseFloat(mmStr);
     getDisplayMachine().setMMPerRev(mmPerRev);
     updateNumberboxValues();
@@ -2750,7 +2551,7 @@ void readStepsPerRev(String in)
   if (splitted.length == 3)
   {
     String stepsStr = splitted[1];
-
+    
     Float stepsPerRev = Float.parseFloat(stepsStr);
     getDisplayMachine().setStepsPerRev(stepsPerRev);
     updateNumberboxValues();
@@ -2763,7 +2564,7 @@ void readStepMultiplier(String in)
   if (splitted.length == 3)
   {
     String stepsStr = splitted[1];
-
+    
     machineStepMultiplier = Integer.parseInt(stepsStr);
     updateNumberboxValues();
   }
@@ -2777,13 +2578,13 @@ void readMachineSize(String in)
   {
     String mWidth = splitted[1];
     String mHeight = splitted[2];
-
+    
     Integer intWidth = Integer.parseInt(mWidth);
     Integer intHeight = Integer.parseInt(mHeight);
-
+    
     float fWidth = getDisplayMachine().inSteps(intWidth);
     float fHeight = getDisplayMachine().inSteps(intHeight);
-
+    
     getDisplayMachine().setSize(int(fWidth+0.5), int(fHeight+0.5));
     updateNumberboxValues();
   }
@@ -2795,6 +2596,7 @@ void readMachineName(String sync)
   if (splitted.length == 3)
   {
     String name = splitted[1];
+    
   }
 }
 
@@ -2805,10 +2607,10 @@ void readMachineSpeed(String in)
   {
     String speed = splitted[1];
     String accel = splitted[2];
-
+    
     currentMachineMaxSpeed = Float.parseFloat(speed);
     currentMachineAccel = Float.parseFloat(accel);
-
+    
     updateNumberboxValues();
   }
 }
@@ -2820,7 +2622,7 @@ void readPenLiftRange(String in)
   {
     String downPos = splitted[1];
     String upPos = splitted[2];
-
+    
     penLiftDownPosition = Integer.parseInt(downPos);
     penLiftUpPosition = Integer.parseInt(upPos);
 
@@ -2861,11 +2663,9 @@ void dispatchCommandQueue()
       commandQueue.remove(0);
       println("Dispatching command: " + command);
     }
-    if (useChecksum()) {
-      Checksum crc = new CRC32();
-      crc.update(lastCommand.getBytes(), 0, lastCommand.length());
-      lastCommand = lastCommand+":"+crc.getValue();
-    }
+//    Checksum crc = new CRC32();
+//    crc.update(lastCommand.getBytes(), 0, lastCommand.length());
+//    lastCommand = lastCommand+":"+crc.getValue();
     println("Last command:" + lastCommand);
     myPort.write(lastCommand);
     myPort.write(10); // OH *$%! of COURSE you should terminate it.
@@ -2874,11 +2674,7 @@ void dispatchCommandQueue()
   else if (commandQueue.isEmpty())
   {
     stopPixelTimer();
-  }
-}
-
-boolean useChecksum() {
-  return currentHardware == 200;
+  }  
 }
 
 void addToCommandQueue(String command)
@@ -2925,7 +2721,7 @@ Properties getProperties()
     {
       props = new Properties();
       String fileToLoad = sketchPath(propertiesFilename);
-
+      
       File propertiesFile = new File(fileToLoad);
       if (!propertiesFile.exists())
       {
@@ -2933,7 +2729,7 @@ Properties getProperties()
         savePropertiesFile();
         println("saved.");
       }
-
+      
       propertiesFileStream = new FileInputStream(propertiesFile);
       props.load(propertiesFileStream);
       println("Successfully loaded properties file " + fileToLoad);
@@ -2962,12 +2758,12 @@ void loadFromPropertiesFile()
 {
   getDisplayMachine().loadDefinitionFromProperties(getProperties());
   this.pageColour = getColourProperty("controller.page.colour", color(220));
-  this.frameColour = getColourProperty("controller.frame.colour", color(200, 0, 0));
+  this.frameColour = getColourProperty("controller.frame.colour", color(200,0,0));
   this.machineColour = getColourProperty("controller.machine.colour", color(150));
   this.guideColour = getColourProperty("controller.guide.colour", color(255));
   this.backgroundColour = getColourProperty("controller.background.colour", color(100));
   this.densityPreviewColour = getColourProperty("controller.densitypreview.colour", color(0));
-  this.chromaKeyColour = getColourProperty("controller.pixel.mask.color", color(0, 255, 0));
+  this.chromaKeyColour = getColourProperty("controller.pixel.mask.color", color(0,255,0));
 
   // pen size
   this.currentPenWidth = getFloatProperty("machine.pen.size", 0.8);
@@ -2976,7 +2772,7 @@ void loadFromPropertiesFile()
   this.currentMachineMaxSpeed = getFloatProperty("machine.motors.maxSpeed", 600.0);
   this.currentMachineAccel = getFloatProperty("machine.motors.accel", 400.0);
   this.machineStepMultiplier = getIntProperty("machine.step.multiplier", 1);
-
+  
   // serial port
   this.serialPortNumber = getIntProperty("controller.machine.serialport", 0);
   this.baudRate = getIntProperty("controller.machine.baudrate", 57600);
@@ -2985,49 +2781,49 @@ void loadFromPropertiesFile()
   this.gridSize = getFloatProperty("controller.grid.size", 100.0);
   this.sampleArea = getIntProperty("controller.pixel.samplearea", 2);
   this.pixelScalingOverGridSize = getFloatProperty("controller.pixel.scaling", 1.0);
-
+  
   // pixel renderer
   this.densityPreviewStyle = getIntProperty("controller.density.preview.style", 1);
-
+  
   // initial screen size
   this.windowWidth = getIntProperty("controller.window.width", 650);
   this.windowHeight = getIntProperty("controller.window.height", 400);
-
+  
   println("windowHeight:" + this.windowHeight);
 
   this.testPenWidthStartSize = getFloatProperty("controller.testPenWidth.startSize", 0.5);
   this.testPenWidthEndSize = getFloatProperty("controller.testPenWidth.endSize", 2.0);
   this.testPenWidthIncrementSize = getFloatProperty("controller.testPenWidth.incrementSize", 0.5);
-
+  
   this.maxSegmentLength = getIntProperty("controller.maxSegmentLength", 2);
-
+  
   float homePointX = getFloatProperty("controller.homepoint.x", 0.0);
   float homePointY = getFloatProperty("controller.homepoint.y", 0.0);
-
+  
   if (homePointX == 0.0)
   {
     float defaultX = getDisplayMachine().getWidth() / 2.0;    // in steps
     float defaultY = getDisplayMachine().getPage().getTop();  // in steps
-    //    homePointX = getDisplayMachine().inMM(defaultX);
-    //    homePointY = getDisplayMachine().inMM(defaultY);
+//    homePointX = getDisplayMachine().inMM(defaultX);
+//    homePointY = getDisplayMachine().inMM(defaultY);
     println("Loading default homepoint.");
   }
   this.homePointCartesian = new PVector(getDisplayMachine().inSteps(homePointX), getDisplayMachine().inSteps(homePointY));
-  //  println("home point loaded: " + homePointCartesian + ", " + getHomePoint());
-
+//  println("home point loaded: " + homePointCartesian + ", " + getHomePoint());
+  
   setVectorFilename(getStringProperty("controller.vector.filename", null));
   if (getVectorFilename() != null)
   {
     RShape shape = null;
     try
     {
-      shape =loadShapeFromFile(getVectorFilename());
+      shape = RG.loadShape(getVectorFilename());
     }
     catch (Exception e)
     {
       shape = null;
     }
-
+    
     if (shape != null) 
     {
       setVectorShape(shape);
@@ -3042,27 +2838,29 @@ void loadFromPropertiesFile()
   getVectorPosition().y = getFloatProperty("controller.vector.position.y", 0.0);
   this.minimumVectorLineLength = getIntProperty("controller.vector.minLineLength", 0);
 
+
+  
   println("Finished loading configuration from properties file.");
 }
 
 void savePropertiesFile()
 {
   Properties props = new Properties();
-
+  
   props = getDisplayMachine().loadDefinitionIntoProperties(props);
 
   NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
   DecimalFormat df = (DecimalFormat)nf;  
   df.applyPattern("###.##");
-
+  
   props.setProperty("controller.page.colour", hex(this.pageColour, 6));
-  props.setProperty("controller.frame.colour", hex(this.frameColour, 6));
-  props.setProperty("controller.machine.colour", hex(this.machineColour, 6));
-  props.setProperty("controller.guide.colour", hex(this.guideColour, 6));
-  props.setProperty("controller.background.colour", hex(this.backgroundColour, 6));
-  props.setProperty("controller.densitypreview.colour", hex(this.densityPreviewColour, 6));
+  props.setProperty("controller.frame.colour", hex(this.frameColour,6));
+  props.setProperty("controller.machine.colour", hex(this.machineColour,6));
+  props.setProperty("controller.guide.colour", hex(this.guideColour,6));
+  props.setProperty("controller.background.colour", hex(this.backgroundColour,6));
+  props.setProperty("controller.densitypreview.colour", hex(this.densityPreviewColour,6));
 
-
+  
   // pen size
   props.setProperty("machine.pen.size", df.format(currentPenWidth));
   // serial port
@@ -3084,15 +2882,15 @@ void savePropertiesFile()
   props.setProperty("controller.testPenWidth.startSize", df.format(testPenWidthStartSize));
   props.setProperty("controller.testPenWidth.endSize", df.format(testPenWidthEndSize));
   props.setProperty("controller.testPenWidth.incrementSize", df.format(testPenWidthIncrementSize));
-
+  
   props.setProperty("controller.maxSegmentLength", new Integer(getMaxSegmentLength()).toString());
-
+  
   props.setProperty("machine.motors.maxSpeed", df.format(currentMachineMaxSpeed));
   props.setProperty("machine.motors.accel", df.format(currentMachineAccel));
   props.setProperty("machine.step.multiplier", new Integer(machineStepMultiplier).toString());
-
+  
   props.setProperty("controller.pixel.mask.color", hex(this.chromaKeyColour, 6));
-
+  
   PVector hp = null;  
   if (getHomePoint() != null)
   {
@@ -3100,20 +2898,21 @@ void savePropertiesFile()
   }
   else
     hp = new PVector(2000.0, 1000.0);
-
+    
   hp = getDisplayMachine().inMM(hp);
-
+  
   props.setProperty("controller.homepoint.x", df.format(hp.x));
   props.setProperty("controller.homepoint.y", df.format(hp.y));
-
+  
   if (getVectorFilename() != null)
     props.setProperty("controller.vector.filename", getVectorFilename());
-
+    
   props.setProperty("controller.vector.scaling", df.format(vectorScaling));
   props.setProperty("controller.vector.position.x", df.format(getVectorPosition().x));
   props.setProperty("controller.vector.position.y", df.format(getVectorPosition().y));
   props.setProperty("controller.vector.minLineLength", new Integer(this.minimumVectorLineLength).toString());
 
+ 
   FileOutputStream propertiesOutput = null;
 
   try
@@ -3127,14 +2926,14 @@ void savePropertiesFile()
       FileInputStream propertiesFileStream = new FileInputStream(propertiesFile);
       oldProps.load(propertiesFileStream);
       oldProps.putAll(props);
-      oldProps.store(propertiesOutput, "   ***  Polargraph properties file   ***  ");
+      oldProps.store(propertiesOutput,"   ***  Polargraph properties file   ***  ");
       println("Saved settings.");
     }
     else
     { // create it
       propertiesFile.createNewFile();
       propertiesOutput = new FileOutputStream(propertiesFile);
-      props.store(propertiesOutput, "   ***  Polargraph properties file   ***  ");
+      props.store(propertiesOutput,"   ***  Polargraph properties file   ***  ");
       println("Created file.");
     }
   }
@@ -3150,26 +2949,24 @@ void savePropertiesFile()
       {
         propertiesOutput.close();
       }
-      catch (Exception e2) {
-        println("what now!"+e2.getMessage());
-      }
+      catch (Exception e2) {println("what now!"+e2.getMessage());}
     }
   }
 }
 
 boolean getBooleanProperty(String id, boolean defState) 
 {
-  return boolean(getProperties().getProperty(id, ""+defState));
+  return boolean(getProperties().getProperty(id,""+defState));
 }
-
+ 
 int getIntProperty(String id, int defVal) 
 {
-  return int(getProperties().getProperty(id, ""+defVal));
+  return int(getProperties().getProperty(id,""+defVal)); 
 }
-
+ 
 float getFloatProperty(String id, float defVal) 
 {
-  return float(getProperties().getProperty(id, ""+defVal));
+  return float(getProperties().getProperty(id,""+defVal)); 
 }
 String getStringProperty(String id, String defVal)
 {
@@ -3183,7 +2980,7 @@ color getColourProperty(String id, color defVal)
   {
     col = defVal;
   }
-
+  
   if (colStr.length() == 1)
   {
     // single value grey
@@ -3193,25 +2990,25 @@ color getColourProperty(String id, color defVal)
   else if (colStr.length() == 3)
   {
     // 3 digit rgb
-    String d1 = colStr.substring(0, 1);
-    String d2 = colStr.substring(1, 2);
-    String d3 = colStr.substring(2, 3);
+    String d1 = colStr.substring(0,1);
+    String d2 = colStr.substring(1,2);
+    String d3 = colStr.substring(2,3);
     d1 = d1+d1;
     d2 = d2+d2;
     d3 = d3+d3;
-
+    
     col = color(unhex(d1), unhex(d2), unhex(d3));
   }
   else if  (colStr.length() == 6)
   {
     // 6 digit rgb
-    String d1 = colStr.substring(0, 2);
-    String d2 = colStr.substring(2, 4);
-    String d3 = colStr.substring(4, 6);
-
+    String d1 = colStr.substring(0,2);
+    String d2 = colStr.substring(2,4);
+    String d3 = colStr.substring(4,6);
+    
     col = color(unhex(d1), unhex(d2), unhex(d3));
   }
-
+  
   return col;
 }
 
@@ -3236,7 +3033,7 @@ void setOverwriteExistingStoreFile(boolean over)
 {
   this.overwriteExistingStoreFile = over;
 }
-
+  
 void initProperties()
 {
   getProperties();
@@ -3251,10 +3048,12 @@ float getPixelScalingOverGridSize()
 {
   return pixelScalingOverGridSize;
 }
+
 void setPixelScalingOverGridSize(float scaling)
 {
   pixelScalingOverGridSize = scaling;
 }
+
 int getDensityPreviewStyle()
 {
   return densityPreviewStyle;
@@ -3264,65 +3063,49 @@ Integer getBaudRate()
 {
   return baudRate;
 }
+
 boolean isUseWindowedConsole()
 {
   return this.useWindowedConsole;
 }
+
 void setUseWindowedConsole(boolean use)
 {
   this.useWindowedConsole = use;
 }
+
 void initLogging()
 {
   try
   {
-    //    logger = Logger.getLogger("uk.co.polargraph.controller");
-    //    FileHandler fileHandler = new FileHandler("mylog.txt");
-    //    fileHandler.setFormatter(new SimpleFormatter());
-    //    logger.addHandler(fileHandler);
-    //    logger.setLevel(Level.INFO);
-    //    logger.info("Hello");
-    if (isUseWindowedConsole())
-    {
-      console = new Console();
-    }
-    else
-    {
-      console.close();
-      console = null;
-    }
+//    logger = Logger.getLogger("uk.co.polargraph.controller");
+//    FileHandler fileHandler = new FileHandler("mylog.txt");
+//    fileHandler.setFormatter(new SimpleFormatter());
+//    logger.addHandler(fileHandler);
+//    logger.setLevel(Level.INFO);
+//    logger.info("Hello");
+//    if (isUseWindowedConsole())
+//    {
+//      console = new Console();
+//    }
+//    else
+//    {
+//      console.close();
+//      console = null;
+//    }
   }
   catch(Exception e)
   {
     println("Exception setting up logger: " + e.getMessage());
   }
 }
-void initImages()
-{
-  //  try
-  //  {
-  //    yButtonImage = loadImage("y.png");
-  //    xButtonImage = loadImage("x.png");
-  //    aButtonImage = loadImage("a.png");
-  //    bButtonImage = loadImage("b.png");
-  //    dpadXImage = loadImage("dpadlr.png");
-  //    dpadYImage = loadImage("dpadud.png");
-  //  }
-  //  catch (Exception e)
-  //  {
-  //    yButtonImage = makeColourImage(64,64,color(180,180,0));
-  //    xButtonImage = makeColourImage(64,64,color(0,0,180));
-  //    aButtonImage = makeColourImage(64,64,color(0,180,0));
-  //    bButtonImage = makeColourImage(64,64,color(180,0,0));
-  //  }
-}
+
 
 PImage makeColourImage(int w, int h, int colour)
 {
-  PImage img = createImage(w, h, RGB);
-  for (int i=0; i < img.pixels.length; i++) {
-    img.pixels[i] = colour;
+  PImage img = createImage(w,h,RGB);
+  for(int i=0; i < img.pixels.length; i++) {
+    img.pixels[i] = colour; 
   }
   return img;
 }
-

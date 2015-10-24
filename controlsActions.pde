@@ -25,7 +25,6 @@
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
   https://github.com/euphy/polargraphcontroller
-
 */
 void button_mode_begin()
 {
@@ -723,7 +722,7 @@ void button_mode_sendButtonDeactivate()
 void numberbox_mode_previewCordOffsetValue(int value)
 {
   previewCordOffset = value;
-  lastCommandQueueHash = 0;
+  previewQueue(true);
 }
 
 

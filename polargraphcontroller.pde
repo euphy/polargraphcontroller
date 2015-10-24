@@ -57,8 +57,8 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 0;
-int buildNo = 7;
+int minorVersionNo = 1;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;

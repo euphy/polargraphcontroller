@@ -1101,7 +1101,7 @@ class VectorFileFilter extends javax.swing.filechooser.FileFilter
   public boolean accept(File file) {
     String filename = file.getName();
     filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gco") || filename.endsWith(".g"))
+    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gco") || filename.endsWith(".g") || filename.endsWith(".txt"))
       return true;
     else
       return false;
@@ -1197,7 +1197,7 @@ RShape loadShapeFromFile(String filename) {
   if (filename.toLowerCase().endsWith(".svg")) {
     sh = RG.loadShape(filename);
   }
-  else if (filename.toLowerCase().endsWith(".gco") || filename.toLowerCase().endsWith(".g")) {
+  else if (filename.toLowerCase().endsWith(".gco") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".txt")) {
     sh = loadShapeFromGCodeFile(filename);
   }
   return sh;

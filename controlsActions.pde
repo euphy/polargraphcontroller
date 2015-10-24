@@ -725,4 +725,14 @@ void numberbox_mode_previewCordOffsetValue(int value)
   previewQueue(true);
 }
 
+void button_mode_cycleDensityPreviewStyle() 
+{
+  if (densityPreviewStyle == DENSITY_PREVIEW_STYLE_COUNT) {
+    densityPreviewStyle = 0;
+  }
+  else {
+    densityPreviewStyle++;
+  }
+}
+
 

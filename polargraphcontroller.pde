@@ -340,6 +340,8 @@ static final String MODE_SEND_BUTTON_DEACTIVATE = "button_mode_sendButtonDeactiv
 
 static final String MODE_ADJUST_PREVIEW_CORD_OFFSET = "numberbox_mode_previewCordOffsetValue";
 
+static final String MODE_CYCLE_DENSITY_PREVIEW_STYLE = "button_mode_cycleDensityPreviewStyle";
+
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -373,6 +375,8 @@ boolean displayingQueuePreview = true;
 boolean displayingDensityPreview = false;
 
 boolean displayingGuides = true;
+
+static final int DENSITY_PREVIEW_STYLE_COUNT = 6;
 
 static final int DENSITY_PREVIEW_ROUND = 0;
 static final int DENSITY_PREVIEW_DIAMOND = 1;
@@ -1218,7 +1222,7 @@ int countLines(String filename) throws IOException {
                 }
             }
         }
-        return (count == 0 && !empty) ? 1 : count;
+        return (count == 0 && !empty) ? 1 : count+1;
     } finally {
         is.close();
     }
@@ -1230,10 +1234,14 @@ RShape loadShapeFromGCodeFile(String filename) {
   BufferedReader reader = null;
   long totalPoints = 0;
   long time = millis();
+  long countLines = 0;
 
   try {
-    long countLines = countLines(filename);
+    countLines = countLines(filename);
     println("" + countLines + " lines found.");
+    if (countLines < 1) {
+      throw new IOException("No lines found in GCode file.");
+    }
     reader = createReader(filename);
     parent = new RShape();
     String line;
@@ -1242,35 +1250,36 @@ RShape loadShapeFromGCodeFile(String filename) {
     
     long lineNo = 0;
     float lastPercent = 0.0f;
+    boolean reportStatus = true;
     while ((line = reader.readLine ()) != null) {
       lineNo++;
+      
+      if (reportStatus) {
+        float percent = ((float)lineNo / (float)countLines) * 100.0;
+        println("----" + percent + "% of the way through.");
+        lastPercent = percent;
+      }
+
       if (line.toUpperCase().startsWith("G")) {
-        if ((millis() - time) > 500) {
+        if (reportStatus) {
           println(new StringBuilder().append(lineNo).append(" of ").append(countLines).append(": ").append(line).append(". Points: ").append(totalPoints).toString());
           long free = Runtime.getRuntime().freeMemory();
           long maximum = Runtime.getRuntime().maxMemory();
           println(new StringBuilder().append("Free: ").append(free).append(", max: ").append(maximum).toString());
-          time = millis();
         }
-//        float percent = (lineNo / countLines) * 100;
-//        if (percent != lastPercent) {
-//          println("" + percent + "% of the way through.");
-//          lastPercent = percent;
-//        }
         
         Map<String, Float> ins = null;
         try {
           ins = unpackGCodeInstruction(line);
         }
         catch (Exception e) {
-          println("Exception while unpacking a gcode line " + line);
+          println(e.toString());
           continue;
         }
         Integer code = Math.round(ins.get("G"));
         if (code >= 2) {
           continue;
         }
-        
         
         Float z = ins.get("Z");
         if (z != null) {
@@ -1327,12 +1336,28 @@ RShape loadShapeFromGCodeFile(String filename) {
 //        points = null;
 //        println("" + totalPoints + " points.");
       }
+      else {
+        
+      }
+      
+      if ((millis() - time) > 500) {
+        time = millis();
+        reportStatus = true;
+      }
+      else {
+        reportStatus = false;
+      }
+      
+      if (lineNo == (countLines-1)) {
+        reportStatus = true;
+      }
+      
     }
   }
   catch (IOException e) {
     println("Execption reading lines from the gcode file " + filename);
     e.printStackTrace();
-  } 
+  }
   finally {
     try {
       reader.close();
@@ -1341,7 +1366,6 @@ RShape loadShapeFromGCodeFile(String filename) {
       println("Exception closing the gcode file " + filename);
       e.printStackTrace();
     }
-    loop();
   }
   
   RPoint[][] points = parent.getPointsInPaths();
@@ -1355,7 +1379,10 @@ RShape loadShapeFromGCodeFile(String filename) {
       }
     }
   }
-  println("Total points in shape: " + totalPoints);
+
+  String conclusionMessage = "Imported " + totalPoints + " points from " + countLines + " lines of code in the file.";
+  println(conclusionMessage);
+  javax.swing.JOptionPane.showMessageDialog(null, conclusionMessage);
 
   loop();
   return parent;
@@ -1365,7 +1392,7 @@ Boolean isGCodeZAxisForDrawing(float z) {
   return gcodeZAxisDrawingHeight.compareTo(z) == 0;
 }
 
-Map<String, Float> unpackGCodeInstruction(String line) throws NumberFormatException {
+Map<String, Float> unpackGCodeInstruction(String line) throws Exception {
   Map<String, Float> instruction = new HashMap<String, Float>(4);
   try {
     String[] splitted = line.trim().split(" ");
@@ -1377,11 +1404,14 @@ Map<String, Float> unpackGCodeInstruction(String line) throws NumberFormatExcept
       }
     }
 //    println("instruction: " + instruction);
+    if (instruction.isEmpty()) {
+      throw new Exception();
+    }
   }
-  catch (NumberFormatException e) {
-    println("Exception while reading the lines from a gcode file: " + line);
-    throw e;
+  catch (Exception e) {
+    throw new Exception("Exception while reading the lines from a gcode file: " + line + ", " + e.getMessage());
   }
+  
   return instruction;
 }
 

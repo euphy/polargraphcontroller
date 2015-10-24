@@ -493,6 +493,10 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setValue(0);
         n.setMultiplier(0.5);
       }
+      else if (MODE_CYCLE_DENSITY_PREVIEW_STYLE.equals(key))
+      {
+        n.setValue(densityPreviewStyle);
+      }
     }
   }
   return map;
@@ -665,7 +669,8 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_CHANGE_SAMPLE_AREA);
   controlNames.add(MODE_CHOOSE_CHROMA_KEY_COLOUR);
   controlNames.add(MODE_CHANGE_PIXEL_SCALING);
-  
+  controlNames.add(MODE_CYCLE_DENSITY_PREVIEW_STYLE);  
+
   controlNames.add(MODE_RENDER_PIXEL_DIALOG);
 //  controlNames.add(MODE_DRAW_GRID);
   controlNames.add(MODE_DRAW_OUTLINE_BOX);
@@ -953,6 +958,8 @@ Map<String, String> buildControlLabels()
   result.put(MODE_SEND_BUTTON_DEACTIVATE, "Deactivate button");
   
   result.put(MODE_ADJUST_PREVIEW_CORD_OFFSET, "Cord offset");
+  result.put(MODE_CYCLE_DENSITY_PREVIEW_STYLE, "Preview style");
+
   
 
   return result;
@@ -1098,6 +1105,7 @@ Set<String> buildControlNames()
   result.add(MODE_SEND_BUTTON_DEACTIVATE);
 
   result.add(MODE_ADJUST_PREVIEW_CORD_OFFSET);
+  result.add(MODE_CYCLE_DENSITY_PREVIEW_STYLE);
   
   return result;
 }

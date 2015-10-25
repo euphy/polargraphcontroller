@@ -727,6 +727,9 @@ void numberbox_mode_previewCordOffsetValue(int value)
 
 void button_mode_cycleDensityPreviewStyle() 
 {
+  Controller c = cp5.getController(MODE_CYCLE_DENSITY_PREVIEW_STYLE);
+  c.setLabel(this.controlLabels.get(MODE_CYCLE_DENSITY_PREVIEW_STYLE) + ": " + densityPreviewStyle);
+  
   if (densityPreviewStyle == DENSITY_PREVIEW_STYLE_COUNT) {
     densityPreviewStyle = 0;
   }

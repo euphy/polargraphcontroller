@@ -83,25 +83,35 @@ List<String> buildTabNames()
 
 void initTabs()
 {
-  cp5.getTab(TAB_NAME_INPUT).setLabel(TAB_LABEL_INPUT);
-  cp5.getTab(TAB_NAME_INPUT).activateEvent(true);
-  cp5.getTab(TAB_NAME_INPUT).setId(1);
+  int tabWidth = (int)DEFAULT_CONTROL_SIZE.x;
+  int tabHeight = (int)DEFAULT_CONTROL_SIZE.y;
+  
+  Tab.padding = 13; // that's a weird thing to do
+  
+  Tab input = cp5.getTab(TAB_NAME_INPUT); 
+  input.setLabel(TAB_LABEL_INPUT);
+  input.activateEvent(true);
+  input.setId(1);
 
-  cp5.getTab(TAB_NAME_DETAILS).setLabel(TAB_LABEL_DETAILS);
-  cp5.getTab(TAB_NAME_DETAILS).activateEvent(true);
-  cp5.getTab(TAB_NAME_DETAILS).setId(2);
+  Tab details = cp5.getTab(TAB_NAME_DETAILS); 
+  details.setLabel(TAB_LABEL_DETAILS);
+  details.activateEvent(true);
+  details.setId(2);
+  
+  Tab roving = cp5.getTab(TAB_NAME_ROVING);
+  roving.setLabel(TAB_LABEL_ROVING);
+  roving.activateEvent(true);
+  roving.setId(3);
 
-  cp5.getTab(TAB_NAME_ROVING).setLabel(TAB_LABEL_ROVING);
-  cp5.getTab(TAB_NAME_ROVING).activateEvent(true);
-  cp5.getTab(TAB_NAME_ROVING).setId(3);
+  Tab trace = cp5.getTab(TAB_NAME_TRACE);
+  trace.setLabel(TAB_LABEL_TRACE);
+  trace.activateEvent(true);
+  trace.setId(4);
 
-  cp5.getTab(TAB_NAME_TRACE).setLabel(TAB_LABEL_TRACE);
-  cp5.getTab(TAB_NAME_TRACE).activateEvent(true);
-  cp5.getTab(TAB_NAME_TRACE).setId(4);
-
-  cp5.getTab(TAB_NAME_QUEUE).setLabel(TAB_LABEL_QUEUE);
-  cp5.getTab(TAB_NAME_QUEUE).activateEvent(true);
-  cp5.getTab(TAB_NAME_QUEUE).setId(5);
+  Tab queue = cp5.getTab(TAB_NAME_QUEUE);
+  queue.setLabel(TAB_LABEL_QUEUE);
+  queue.activateEvent(true);
+  queue.setId(5);
 }
 
 public Set<String> buildPanelNames()

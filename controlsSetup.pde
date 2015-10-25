@@ -167,6 +167,8 @@ Map<String, Panel> buildPanels() {
   generalPanel.setControlPositions(buildControlPositionsForPanel(generalPanel));
   generalPanel.setControlSizes(buildControlSizesForPanel(generalPanel));
   panels.put(PANEL_NAME_GENERAL, generalPanel);
+  
+  
 
   return panels;
 }
@@ -967,7 +969,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_SEND_BUTTON_DEACTIVATE, "Deactivate button");
   
   result.put(MODE_ADJUST_PREVIEW_CORD_OFFSET, "Cord offset");
-  result.put(MODE_CYCLE_DENSITY_PREVIEW_STYLE, "Preview style");
+  result.put(MODE_CYCLE_DENSITY_PREVIEW_STYLE, "Cycle preview style");
 
   
 

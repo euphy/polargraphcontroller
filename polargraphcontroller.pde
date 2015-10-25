@@ -412,6 +412,7 @@ public color densityPreviewColour = color(0);
 
 public Integer previewCordOffset = 0;
 
+public boolean debugPanels = false;
 
 public boolean showingSummaryOverlay = true;
 public boolean showingDialogBox = false;
@@ -526,9 +527,10 @@ String filePath = null;
 
 static PApplet parentPapplet = null;
 
+boolean rescaleDisplayMachine = true;
+
 void setup()
 {
-  size(windowWidth, windowHeight);
   println("Running polargraph controller");
   frame.setResizable(true);
   initLogging();
@@ -547,9 +549,10 @@ void setup()
   }
   loadFromPropertiesFile();
 
+  size(windowWidth, windowHeight);
   this.cp5 = new ControlP5(this);
   initTabs();
-
+  
   String[] serialPorts = Serial.list();
   println("Serial ports available on your machine:");
   println(serialPorts);
@@ -598,6 +601,29 @@ void setup()
 
   frameRate(8);
 }
+
+void fitDisplayMachineToWindow() {
+  
+  Rectangle gr = panels.get(PANEL_NAME_GENERAL).getOutline();
+  println(gr);
+  
+  Rectangle ir = panels.get(PANEL_NAME_INPUT).getOutline();
+  println(ir);
+  
+  float targetHeight = ir.getBottom() - gr.getTop() - CONTROL_SPACING.y;
+  println("Target height is " + targetHeight + " pixels");
+  
+  float machineHeight = getDisplayMachine().getOutline().getHeight();
+  println(machineHeight);
+  
+  machineScaling = (targetHeight / machineHeight);
+  println(machineScaling);
+  
+  getDisplayMachine().getOffset().x = ((gr.getRight() > ir.getRight()) ? gr.getRight() : ir.getRight()) + CONTROL_SPACING.x;
+  getDisplayMachine().getOffset().y = gr.getTop();
+  
+}
+
 void addEventListeners()
 {
   frame.addComponentListener(new ComponentAdapter() 
@@ -632,17 +658,20 @@ void preLoadCommandQueue()
 
 void windowResized()
 {
-  println("Window resized.");
+  noLoop();
   windowWidth = frame.getWidth();
   windowHeight = frame.getHeight();
+  println("New window size: " + windowWidth + " x " + windowHeight);
   
   for (String key : getPanels().keySet())
   {
-    println("Panel: " + key);
     Panel p = getPanels().get(key);
-    p.setSizeByHeight(frame.getHeight() - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
+    p.setSizeByHeight(windowHeight - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
   }
+  
+  // Required to tell CP5 to be able to use the new sized window
   cp5.setGraphics(this,0,0);
+  loop();
 }
 void draw()
 {
@@ -751,6 +780,10 @@ void drawImagePage()
   strokeWeight(3);
   stroke(150);
   noFill();
+  if (rescaleDisplayMachine) {
+    fitDisplayMachineToWindow();
+    rescaleDisplayMachine = false;
+  }
   getDisplayMachine().draw();
   drawMoveImageOutline();
   stroke(255, 0, 0);
@@ -1559,10 +1592,10 @@ boolean mouseOverPanel()
   for (Panel panel : getPanelsForTab(currentTab))
   {
     if (panel.getOutline().surrounds(getMouseVector())) {
-      println("Outline: " + panel.getOutline().toString());
-      println("OVER PANEL!" + panel.getName());
+//      println("Outline: " + panel.getOutline().toString());
+//      println("OVER PANEL!" + panel.getName());
       result = true;
-	  break;
+      break;
     }
   }
   return result;
@@ -3027,8 +3060,8 @@ void savePropertiesFile()
   props.setProperty("controller.density.preview.style", new Integer(getDensityPreviewStyle()).toString());
 
   // initial screen size
-  props.setProperty("controller.window.width", new Integer((windowWidth < 50) ? 50 : windowWidth-16).toString());
-  props.setProperty("controller.window.height", new Integer((windowWidth < 50) ? 50 : windowHeight-38).toString());
+  props.setProperty("controller.window.width", new Integer((windowWidth < 100) ? 100 : windowWidth-16).toString());
+  props.setProperty("controller.window.height", new Integer((windowWidth < 100) ? 100 : windowHeight-38).toString());
 
   props.setProperty("controller.testPenWidth.startSize", df.format(testPenWidthStartSize));
   props.setProperty("controller.testPenWidth.endSize", df.format(testPenWidthEndSize));

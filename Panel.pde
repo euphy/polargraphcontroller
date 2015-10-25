@@ -120,9 +120,11 @@ class Panel
   
   public void draw()
   {
-//    stroke(outlineColour);
-//    strokeWeight(2);
-//    rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
+    if (debugPanels) {
+      stroke(outlineColour);
+      strokeWeight(2);
+      rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
+    }
 
     drawControls();
   }

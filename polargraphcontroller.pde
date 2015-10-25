@@ -528,6 +528,7 @@ static PApplet parentPapplet = null;
 
 void setup()
 {
+  size(windowWidth, windowHeight);
   println("Running polargraph controller");
   frame.setResizable(true);
   initLogging();
@@ -545,11 +546,7 @@ void setup()
     e.printStackTrace();   
   }
   loadFromPropertiesFile();
-  
-//  size(400, 400, JAVA2D );
-//  surface.setResizable(true);
-//  surface.setSize(windowWidth, windowHeight);
-  size(windowWidth, windowHeight, JAVA2D);
+
   this.cp5 = new ControlP5(this);
   initTabs();
 
@@ -635,57 +632,50 @@ void preLoadCommandQueue()
 
 void windowResized()
 {
+  println("Window resized.");
   windowWidth = frame.getWidth();
   windowHeight = frame.getHeight();
+  
   for (String key : getPanels().keySet())
   {
+    println("Panel: " + key);
     Panel p = getPanels().get(key);
-    p.setHeight(frame.getHeight() - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
+    p.setSizeByHeight(frame.getHeight() - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
   }
-  
+  cp5.setGraphics(this,0,0);
 }
 void draw()
 {
-  if (getCurrentTab() == TAB_NAME_INPUT)
-  {
+  if (getCurrentTab() == TAB_NAME_INPUT) {
     drawImagePage();
   }
-  else if (getCurrentTab() == TAB_NAME_QUEUE)
-  {
+  else if (getCurrentTab() == TAB_NAME_QUEUE) {
     drawCommandQueuePage();
   }
-  else if (getCurrentTab() == TAB_NAME_DETAILS)
-  {
+  else if (getCurrentTab() == TAB_NAME_DETAILS) {
     drawDetailsPage();
   }
-  else if (getCurrentTab() == TAB_NAME_ROVING)
-  {
+  else if (getCurrentTab() == TAB_NAME_ROVING) {
     drawRovingPage();
   }
-  else if (getCurrentTab() == TAB_NAME_TRACE)
-  {
+  else if (getCurrentTab() == TAB_NAME_TRACE) {
     drawTracePage();
   }
-  else
-  {
+  else {
     drawDetailsPage();
   }
 
-
-  if (isShowingSummaryOverlay())
-  {
+  if (isShowingSummaryOverlay()) {
     drawSummaryOverlay();
   }
-  if (isShowingDialogBox())
-  {
+  
+  if (isShowingDialogBox()) {
     drawDialogBox();
   }
 
-  if (drawbotReady)
-  {
+  if (drawbotReady) {
     dispatchCommandQueue();
   }
-  
 }
 
 String getCurrentTab()
@@ -1640,10 +1630,6 @@ void keyPressed()
     getDisplayMachine().getOffset().x = getDisplayMachine().getOffset().x - 10;
   else if (checkKey(KeyEvent.VK_ESCAPE))
     key = 0;
-
-//  if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G)) 
-//    println("CTRL+G");
-
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_G))
   {
     Toggle t = (Toggle) getAllControls().get(MODE_SHOW_GUIDES);
@@ -1677,60 +1663,6 @@ void keyPressed()
   {
     displayingInfoTextOnInputPage = (displayingInfoTextOnInputPage) ? false : true;
   }
-//  else if (key == '+')
-//  {
-//    currentMachineMaxSpeed = currentMachineMaxSpeed+MACHINE_MAXSPEED_INCREMENT;
-//    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
-//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-//    DecimalFormat df = (DecimalFormat)nf;  
-//    df.applyPattern("###.##");
-//    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
-//  }
-//  else if (key == '-')
-//  {
-//    currentMachineMaxSpeed = currentMachineMaxSpeed+(0.0 - MACHINE_MAXSPEED_INCREMENT);
-//    currentMachineMaxSpeed =  Math.round(currentMachineMaxSpeed*100.0)/100.0;
-//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-//    DecimalFormat df = (DecimalFormat)nf;  
-//    df.applyPattern("###.##");
-//    addToRealtimeCommandQueue(CMD_SETMOTORSPEED+df.format(currentMachineMaxSpeed)+",END");
-//  }
-//  else if (key == '*')
-//  {
-//    currentMachineAccel = currentMachineAccel+MACHINE_ACCEL_INCREMENT;
-//    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
-//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-//    DecimalFormat df = (DecimalFormat)nf;  
-//    df.applyPattern("###.##");
-//    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
-//  }
-//  else if (key == '/')
-//  {
-//    currentMachineAccel = currentMachineAccel+(0.0 - MACHINE_ACCEL_INCREMENT);
-//    currentMachineAccel =  Math.round(currentMachineAccel*100.0)/100.0;
-//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-//    DecimalFormat df = (DecimalFormat)nf;  
-//    df.applyPattern("###.##");
-//    addToRealtimeCommandQueue(CMD_SETMOTORACCEL+df.format(currentMachineAccel)+",END");
-//  }
-//  else if (key == ']')
-//  {
-//    currentPenWidth = currentPenWidth+penIncrement;
-//    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
-//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-//    DecimalFormat df = (DecimalFormat)nf;  
-//    df.applyPattern("###.##");
-//    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
-//  }
-//  else if (key == '[')
-//  {
-//    currentPenWidth = currentPenWidth-penIncrement;
-//    currentPenWidth =  Math.round(currentPenWidth*100.0)/100.0;
-//    NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
-//    DecimalFormat df = (DecimalFormat)nf;  
-//    df.applyPattern("###.##");
-//    addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
-//  }
   else if (key == '#' )
   {
     addToRealtimeCommandQueue(CMD_PENUP+"END");
@@ -1748,15 +1680,6 @@ void keyPressed()
   {
     this.maxSegmentLength++;
   }
-//  else if (key == ',')
-//  {
-//    if (this.minimumVectorLineLength > 0)
-//      this.minimumVectorLineLength--;
-//  }
-//  else if (key == '.')
-//  {
-//    this.minimumVectorLineLength++;
-//  }
 }
 void mouseDragged()
 {
@@ -1782,7 +1705,7 @@ void mouseClicked()
 {
   if (mouseOverPanel())
   { // changing mode
-//    panelClicked();
+    
   }
   else
   {

@@ -95,9 +95,9 @@ Map<String, Panel> buildPanels() {
   Map<String, Panel> panels = new HashMap<String, Panel>();
 
   float panelHeight = frame.getHeight() - getMainPanelPosition().y - (DEFAULT_CONTROL_SIZE.y*3);
-  Rectangle panelOutline = new Rectangle(getMainPanelPosition(), 
+  Rectangle panelOutlineInput = new Rectangle(getMainPanelPosition(), 
   new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
-  Panel inputPanel = new Panel(PANEL_NAME_INPUT, panelOutline);
+  Panel inputPanel = new Panel(PANEL_NAME_INPUT, panelOutlineInput);
   inputPanel.setResizable(true);
   inputPanel.setOutlineColour(color(200, 200, 200));
   // get controls
@@ -107,7 +107,9 @@ Map<String, Panel> buildPanels() {
   inputPanel.setControlSizes(buildControlSizesForPanel(inputPanel));
   panels.put(PANEL_NAME_INPUT, inputPanel);
 
-  Panel rovingPanel = new Panel(PANEL_NAME_ROVING, panelOutline);
+  Rectangle panelOutlineRoving = new Rectangle(getMainPanelPosition(), 
+  new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
+  Panel rovingPanel = new Panel(PANEL_NAME_ROVING, panelOutlineRoving);
   rovingPanel.setOutlineColour(color(100,200,200));
   // get controls
   rovingPanel.setResizable(true);
@@ -117,7 +119,9 @@ Map<String, Panel> buildPanels() {
   rovingPanel.setControlSizes(buildControlSizesForPanel(rovingPanel));
   panels.put(PANEL_NAME_ROVING, rovingPanel);
 
-  Panel tracePanel = new Panel(PANEL_NAME_TRACE, panelOutline);
+  Rectangle panelOutlineTrace = new Rectangle(getMainPanelPosition(), 
+  new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
+  Panel tracePanel = new Panel(PANEL_NAME_TRACE, panelOutlineTrace);
   tracePanel.setOutlineColour(color(200,255,200));
   // get controls
   tracePanel.setResizable(true);
@@ -127,7 +131,9 @@ Map<String, Panel> buildPanels() {
   tracePanel.setControlSizes(buildControlSizesForPanel(tracePanel));
   panels.put(PANEL_NAME_TRACE, tracePanel);
 
-  Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutline);
+  Rectangle panelOutlineDetails = new Rectangle(getMainPanelPosition(), 
+  new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
+  Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutlineDetails);
   detailsPanel.setOutlineColour(color(200, 200, 255));
   // get controls
   detailsPanel.setResizable(true);
@@ -137,7 +143,9 @@ Map<String, Panel> buildPanels() {
   detailsPanel.setControlSizes(buildControlSizesForPanel(detailsPanel));
   panels.put(PANEL_NAME_DETAILS, detailsPanel);
 
-  Panel queuePanel = new Panel(PANEL_NAME_QUEUE, panelOutline);
+  Rectangle panelOutlineQueue = new Rectangle(getMainPanelPosition(), 
+  new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
+  Panel queuePanel = new Panel(PANEL_NAME_QUEUE, panelOutlineQueue);
   queuePanel.setOutlineColour(color(200, 200, 50));
   // get controls
   queuePanel.setResizable(true);
@@ -147,10 +155,10 @@ Map<String, Panel> buildPanels() {
   queuePanel.setControlSizes(buildControlSizesForPanel(queuePanel));
   panels.put(PANEL_NAME_QUEUE, queuePanel);
 
-  panelOutline = new Rectangle(
+  Rectangle panelOutlineGeneral = new Rectangle(
     new PVector(getMainPanelPosition().x, getMainPanelPosition().y-((DEFAULT_CONTROL_SIZE.y+CONTROL_SPACING.y)*2)), 
     new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, (DEFAULT_CONTROL_SIZE.y+CONTROL_SPACING.y)*2));
-  Panel generalPanel = new Panel(PANEL_NAME_GENERAL, panelOutline);
+  Panel generalPanel = new Panel(PANEL_NAME_GENERAL, panelOutlineGeneral);
   generalPanel.setResizable(false);
   generalPanel.setOutlineColour(color(200, 50, 200));
   // get controls
@@ -568,6 +576,7 @@ Map<String, PVector> buildControlPositionsForPanel(Panel panel)
   int row = 0;
   for (Controller controller : panel.getControls())
   {
+    
     if (controller.getName().startsWith("minitoggle_"))
     {
       PVector p = new PVector(col*(DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x), row*(DEFAULT_CONTROL_SIZE.y+CONTROL_SPACING.y));

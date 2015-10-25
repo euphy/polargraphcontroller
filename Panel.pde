@@ -24,7 +24,7 @@
 
   sandy.noble@gmail.com
   http://www.polargraph.co.uk/
-  http://code.google.com/p/polargraph/
+  https://github.com/euphy/polargraphcontroller
 */
 class Panel
 {
@@ -120,9 +120,9 @@ class Panel
   
   public void draw()
   {
-    //stroke(outlineColour);
-    //strokeWeight(2);
-    //rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
+//    stroke(outlineColour);
+//    strokeWeight(2);
+//    rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
 
     drawControls();
   }
@@ -200,8 +200,9 @@ class Panel
     }
   }  
   
-  void setHeight(float h)
+  void setSizeByHeight(float h)
   {
+//    println("Setting size for " + this.getName());
     if (this.isResizable())
     {
       if (h <= getMinimumHeight())
@@ -211,23 +212,15 @@ class Panel
       setControlPositions(buildControlPositionsForPanel(this));
       
       float left = 0.0;
-      String controlName = "";
       for (String key : getControlPositions().keySet())
       {
         PVector pos = getControlPositions().get(key);
-        if (pos.x >= left)
+        if (pos.x > left)
         {
           left = pos.x;
-          controlName = key;
         }
       }
-      
-      Map<String, PVector> map = getControlSizes();
-      
-//      PVector size = getControlSizes().get(controlName);
-//      println("size: " + size);
       float right = left + DEFAULT_CONTROL_SIZE.x;
-      
       this.getOutline().setWidth(right);
     }
   }

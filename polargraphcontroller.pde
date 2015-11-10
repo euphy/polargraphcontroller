@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 1;
-int buildNo = 0;
+int buildNo = 1;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -190,7 +190,7 @@ float testPenWidthStartSize = 0.5;
 float testPenWidthEndSize = 2.0;
 float testPenWidthIncrementSize = 0.5;
 
-int machineStepMultiplier = 1;
+int machineStepMultiplier = 8;
 
 int maxSegmentLength = 2;
 
@@ -618,6 +618,10 @@ void fitDisplayMachineToWindow() {
   
   machineScaling = (targetHeight / machineHeight);
   println(machineScaling);
+  
+  if (machineScaling < 0) {
+    machineScaling = 1.0;
+  }
   
   getDisplayMachine().getOffset().x = ((gr.getRight() > ir.getRight()) ? gr.getRight() : ir.getRight()) + CONTROL_SPACING.x;
   getDisplayMachine().getOffset().y = gr.getTop();
@@ -2953,9 +2957,9 @@ void loadFromPropertiesFile()
   this.currentPenWidth = getFloatProperty("machine.pen.size", 0.8);
 
   // motor settings
-  this.currentMachineMaxSpeed = getFloatProperty("machine.motors.maxSpeed", 600.0);
-  this.currentMachineAccel = getFloatProperty("machine.motors.accel", 400.0);
-  this.machineStepMultiplier = getIntProperty("machine.step.multiplier", 1);
+  this.currentMachineMaxSpeed = getFloatProperty("machine.motors.maxSpeed", 2000.0);
+  this.currentMachineAccel = getFloatProperty("machine.motors.accel", 2000.0);
+  this.machineStepMultiplier = getIntProperty("machine.step.multiplier", 8);
   
   // serial port
   this.serialPortNumber = getIntProperty("controller.machine.serialport", 0);

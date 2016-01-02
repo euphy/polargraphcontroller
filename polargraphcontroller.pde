@@ -422,6 +422,9 @@ public Integer windowHeight = 400;
 
 public static Integer serialPortNumber = -1;
 
+public Textarea consoleArea = null;
+public Println console = null;
+public PrintStream savedOut = null;
 
 Properties props = null;
 public static String propertiesFilename = "default.properties.txt";
@@ -485,9 +488,6 @@ public static final int VECTOR_FILTER_LOW_PASS = 0;
 
 String storeFilename = "comm.txt";
 boolean overwriteExistingStoreFile = true;
-//private static Logger logger;
-public static Console console;
-public boolean useWindowedConsole = false;
 
 static boolean drawingTraceShape = true;
 static boolean retraceShape = true;
@@ -1684,12 +1684,7 @@ void keyPressed()
   }
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_C))
   {
-    if (isUseWindowedConsole())
-      setUseWindowedConsole(false);
-    else
-      setUseWindowedConsole(true);
-      
-    initLogging();
+    toggleShowConsole();
   }
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_S))
   {
@@ -1897,7 +1892,7 @@ void mouseWheel(int delta)
 
 void setChromaKey(PVector p)
 {
-  color col = getDisplayMachine().getPixelAtScreenCoords(p);
+  color col = getDisplayMachine().getPixelAtScreenCoords(p); 
   chromaKeyColour = col;
   if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
   {
@@ -1917,6 +1912,26 @@ boolean isPreviewable(String command)
   {
     return false;
   }
+}
+
+boolean toggleShowConsole() {
+  if (console == null) {
+    savedOut = System.out;
+    console = cp5.addConsole(consoleArea);
+    consoleArea.setVisible(true);
+    console.play();
+  }
+  else {
+    console.pause();
+    consoleArea.setVisible(false);
+    cp5.remove(console);
+    console = null;
+    System.setOut(savedOut);
+  }
+  
+  println("Ow");
+  
+  return console == null;
 }
 
 /**
@@ -3250,16 +3265,6 @@ int getDensityPreviewStyle()
 Integer getBaudRate()
 {
   return baudRate;
-}
-
-boolean isUseWindowedConsole()
-{
-  return this.useWindowedConsole;
-}
-
-void setUseWindowedConsole(boolean use)
-{
-  this.useWindowedConsole = use;
 }
 
 void initLogging()

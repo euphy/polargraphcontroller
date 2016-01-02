@@ -183,6 +183,18 @@ void updateNumberboxValues()
   initialiseNumberboxValues(getAllControls());
 }
 
+void initConsoleWindow() {
+  consoleArea = cp5.addTextarea("txt")
+                   .setPosition(300, 100)
+                   .setSize(400, 600)
+                   .setFont(createFont("", 12))
+                   .setLineHeight(14)
+                   .setColor(color(255))
+                   .setColorBackground(color(0, 200))
+                   .setColorForeground(color(255, 100))
+                   .setVisible(false);
+}
+
 Set<String> buildControlsToLockIfBoxNotSpecified()
 {
   Set<String> result = new HashSet<String>();
@@ -220,6 +232,8 @@ Set<String> buildControlsToLockIfImageNotLoaded()
 
 Map<String, Controller> buildAllControls()
 {
+  
+  initConsoleWindow();
 
   Map<String, Controller> map = new HashMap<String, Controller>();
 

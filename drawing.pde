@@ -199,13 +199,13 @@ void sendTestPenWidth()
   StringBuilder sb = new StringBuilder();
   sb.append(testPenWidthCommand)
     .append(int(gridSize))
-      .append(",")
-        .append(df.format(testPenWidthStartSize))
-          .append(",")
-            .append(df.format(testPenWidthEndSize))
-              .append(",")
-                .append(df.format(testPenWidthIncrementSize))
-                  .append(",END");
+    .append(",")
+    .append(df.format(testPenWidthStartSize))
+    .append(",")
+    .append(df.format(testPenWidthEndSize))
+    .append(",")
+    .append(df.format(testPenWidthIncrementSize))
+    .append(",END");
   addToCommandQueue(sb.toString());
 }
 

@@ -521,6 +521,14 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       {
         n.setValue(densityPreviewStyle);
       }
+      else if (MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE.equals(key))
+      {
+        n.setValue(densityPreviewPosterize);
+        n.setMin(1);
+        n.setMax(255);
+        n.setDecimalPrecision(1);
+        n.setMultiplier(0.1);
+      }
     }
   }
   return map;
@@ -694,6 +702,7 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_CHANGE_SAMPLE_AREA);
   controlNames.add(MODE_CHOOSE_CHROMA_KEY_COLOUR);
   controlNames.add(MODE_CHANGE_PIXEL_SCALING);
+  controlNames.add(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE);
   controlNames.add(MODE_CYCLE_DENSITY_PREVIEW_STYLE);  
 
   controlNames.add(MODE_RENDER_PIXEL_DIALOG);
@@ -984,6 +993,8 @@ Map<String, String> buildControlLabels()
   
   result.put(MODE_ADJUST_PREVIEW_CORD_OFFSET, "Cord offset");
   result.put(MODE_CYCLE_DENSITY_PREVIEW_STYLE, "Cycle preview style");
+  
+  result.put(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE, "Pixel posterize");
 
   
 
@@ -1131,6 +1142,8 @@ Set<String> buildControlNames()
 
   result.add(MODE_ADJUST_PREVIEW_CORD_OFFSET);
   result.add(MODE_CYCLE_DENSITY_PREVIEW_STYLE);
+  
+  result.add(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE);
   
   return result;
 }

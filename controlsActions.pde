@@ -738,4 +738,11 @@ void button_mode_cycleDensityPreviewStyle()
   }
 }
 
+void numberbox_mode_changeDensityPreviewPosterize(int value) {
+  if (value < 1) value = 1;
+  else if (value > 255) value = 255;
+  
+  densityPreviewPosterize = value;
+}
+
 

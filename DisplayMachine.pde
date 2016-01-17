@@ -535,7 +535,7 @@ class DisplayMachine extends Machine
               p = scaleToScreen(p);
               stroke(strokeColour);
               vertex(p.x, p.y);
-              //ellipse(p.x, p.y, 3, 3);
+//              ellipse(p.x, p.y, 3, 3);
             }
             else
             {
@@ -719,7 +719,12 @@ class DisplayMachine extends Machine
           // scale em, danno.
           PVector scaledPos = scaleToScreen(cartesianPos);
           noStroke();
-          fill(cartesianPos.z);
+          
+          // Posterize the density value
+          int reduced = int(map(cartesianPos.z, 1, 255, 1, densityPreviewPosterize)+0.5);
+          int brightness = int(map(reduced, 1, densityPreviewPosterize, 1, 255));
+          
+          fill(brightness);
           switch (getDensityPreviewStyle())
           {
             case DENSITY_PREVIEW_ROUND: 
@@ -727,20 +732,20 @@ class DisplayMachine extends Machine
               break;
             case DENSITY_PREVIEW_ROUND_SIZE:
               fill(0);
-              previewRoundPixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1));
+              previewRoundPixel(scaledPos, map(brightness, 1, densityPreviewPosterize, pixelSize, 1));
               break;
             case DENSITY_PREVIEW_DIAMOND:
-              previewDiamondPixel(scaledPos, pixelSize, pixelSize, cartesianPos.z);
+              previewDiamondPixel(scaledPos, pixelSize, pixelSize, brightness);
               break;
             case DENSITY_PREVIEW_NATIVE:
-              previewNativePixel(scaledPos, pixelSize, cartesianPos.z);
+              previewNativePixel(scaledPos, pixelSize, brightness);
               break; 
             case DENSITY_PREVIEW_NATIVE_SIZE:
-              previewNativePixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1), 50);
+              previewNativePixel(scaledPos, map(brightness, 1, densityPreviewPosterize, pixelSize, 1), 50);
               break; 
             case DENSITY_PREVIEW_NATIVE_ARC:
               previewRoundPixel(scaledPos, pixelSize*0.8);
-              previewNativeArcPixel(scaledPos, pixelSize, cartesianPos.z);
+              previewNativeArcPixel(scaledPos, pixelSize, brightness);
               break; 
             default:
               previewRoundPixel(scaledPos, pixelSize);

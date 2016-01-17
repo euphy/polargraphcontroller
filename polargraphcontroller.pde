@@ -57,7 +57,7 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 1;
+int minorVersionNo = 2;
 int buildNo = 1;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
@@ -342,6 +342,8 @@ static final String MODE_ADJUST_PREVIEW_CORD_OFFSET = "numberbox_mode_previewCor
 
 static final String MODE_CYCLE_DENSITY_PREVIEW_STYLE = "button_mode_cycleDensityPreviewStyle";
 
+static final String MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE = "numberbox_mode_changeDensityPreviewPosterize";
+
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -387,6 +389,7 @@ static final int DENSITY_PREVIEW_NATIVE_SIZE = 5;
 
 static final int DEFAULT_DENSITY_PREVIEW_STYLE = DENSITY_PREVIEW_NATIVE;
 int densityPreviewStyle = DEFAULT_DENSITY_PREVIEW_STYLE;
+int densityPreviewPosterize = 255;
 
 static final byte COORD_MODE_NATIVE_STEPS = 0;
 static final byte COORD_MODE_NATIVE_MM = 1;
@@ -537,7 +540,8 @@ void setup()
   parentPapplet = this;
   
   RG.init(this);
-  RG.setPolygonizer(RG.ADAPTATIVE);
+  RG.setPolygonizer(RG.UNIFORMLENGTH);
+//  RG.setPolygonizer(RG.ADAPTATIVE);
 
   try 
   { 
@@ -600,6 +604,7 @@ void setup()
   addEventListeners();
 
   frameRate(8);
+  noLoop();
 }
 
 void fitDisplayMachineToWindow() {
@@ -679,6 +684,7 @@ void windowResized()
 }
 void draw()
 {
+
   if (getCurrentTab() == TAB_NAME_INPUT) {
     drawImagePage();
   }
@@ -1949,6 +1955,8 @@ void previewQueue(boolean forceRebuild)
   {
     println("regenerating preview queue.");
     previewCommandList.clear();
+    
+    
     for (String command : commandQueue)
     {
       if (command.startsWith(CMD_CHANGELENGTHDIRECT) || command.startsWith(CMD_CHANGELENGTH) || command.startsWith(CMD_DRAWPIXEL))
@@ -1962,8 +1970,8 @@ void previewQueue(boolean forceRebuild)
         String bLenStr = splitted[2];
         
         PVector endPoint = new PVector(Integer.parseInt(aLenStr)+previewCordOffset, Integer.parseInt(bLenStr)+previewCordOffset);
-        endPoint = getDisplayMachine().asCartesianCoords(endPoint);
         endPoint = getDisplayMachine().inMM(endPoint);
+        endPoint = getDisplayMachine().asCartesianCoords(endPoint);
         
         pv.x = endPoint.x;
         pv.y = endPoint.y;

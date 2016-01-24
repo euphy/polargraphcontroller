@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 2;
-int buildNo = 1;
+int buildNo = 2;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -2564,7 +2564,7 @@ public PVector getHomePoint()
 public DisplayMachine getDisplayMachine()
 {
   if (displayMachine == null)
-    displayMachine = new DisplayMachine(new Machine(5000, 5000, 800.0, 95.0), machinePosition, machineScaling);
+    displayMachine = new DisplayMachine(new Machine(5000, 5000, 200.0, 95.0), machinePosition, machineScaling);
     
   displayMachine.setOffset(machinePosition);
   displayMachine.setScale(machineScaling);

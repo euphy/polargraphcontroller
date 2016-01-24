@@ -39,7 +39,7 @@ class Machine
   protected Rectangle imageFrame = new Rectangle(1500,1500,1000,1000);
   protected Rectangle pictureFrame = new Rectangle(1600,1600,800,800);
 
-  protected Float stepsPerRev = 800.0;
+  protected Float stepsPerRev = 200.0;
   protected Float mmPerRev = 95.0;
   
   protected Float mmPerStep = null;

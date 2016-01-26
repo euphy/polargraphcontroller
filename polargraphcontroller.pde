@@ -57,14 +57,12 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 2;
-int buildNo = 2;
+int minorVersionNo = 3;
+int buildNo = 1;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
 Map<String, ControlP5> cp5s = new HashMap<String, ControlP5>();
-
-
 
 boolean drawbotReady = false;
 boolean drawbotConnected = false;
@@ -343,6 +341,7 @@ static final String MODE_ADJUST_PREVIEW_CORD_OFFSET = "numberbox_mode_previewCor
 static final String MODE_CYCLE_DENSITY_PREVIEW_STYLE = "button_mode_cycleDensityPreviewStyle";
 
 static final String MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE = "numberbox_mode_changeDensityPreviewPosterize";
+static final String MODE_PREVIEW_PIXEL_DENSITY_RANGE = "minitoggle_mode_previewPixelDensityRange";
 
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
@@ -390,6 +389,7 @@ static final int DENSITY_PREVIEW_NATIVE_SIZE = 5;
 static final int DEFAULT_DENSITY_PREVIEW_STYLE = DENSITY_PREVIEW_NATIVE;
 int densityPreviewStyle = DEFAULT_DENSITY_PREVIEW_STYLE;
 int densityPreviewPosterize = 255;
+boolean previewPixelDensityRange = true;
 
 static final byte COORD_MODE_NATIVE_STEPS = 0;
 static final byte COORD_MODE_NATIVE_MM = 1;
@@ -485,7 +485,7 @@ RShape vectorShape = null;
 String vectorFilename = null;
 float vectorScaling = 100;
 PVector vectorPosition = new PVector(0.0,0.0);
-int minimumVectorLineLength = 0;
+int minimumVectorLineLength = 2;
 public static final int VECTOR_FILTER_LOW_PASS = 0;
 
 

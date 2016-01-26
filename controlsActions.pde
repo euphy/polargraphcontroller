@@ -745,4 +745,9 @@ void numberbox_mode_changeDensityPreviewPosterize(int value) {
   densityPreviewPosterize = value;
 }
 
+void minitoggle_mode_previewPixelDensityRange(boolean flag) {
+  previewPixelDensityRange = flag;
+  println("previewPixelDensityRange: " + previewPixelDensityRange);
+}
+
 

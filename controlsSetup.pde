@@ -579,7 +579,11 @@ Map<String, Controller> initialiseToggleValues(Map<String, Controller> map)
       Toggle t = (Toggle) map.get(key);
       t.setValue((rotateWebcamImage) ? 1 : 0);
     }
-    
+    else if (MODE_PREVIEW_PIXEL_DENSITY_RANGE.equals(key))
+    {
+      Toggle t = (Toggle) map.get(key);
+      t.setValue((previewPixelDensityRange) ? 1 : 0);
+    }
   }
   return map;
 }
@@ -725,6 +729,7 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_SHOW_QUEUE_PREVIEW);
   controlNames.add(MODE_SHOW_DENSITY_PREVIEW);
   controlNames.add(MODE_SHOW_GUIDES);
+  controlNames.add(MODE_PREVIEW_PIXEL_DENSITY_RANGE);
 
   
   return controlNames;
@@ -995,7 +1000,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_CYCLE_DENSITY_PREVIEW_STYLE, "Cycle preview style");
   
   result.put(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE, "Pixel posterize");
-
+  result.put(MODE_PREVIEW_PIXEL_DENSITY_RANGE, "Show density range");
   
 
   return result;
@@ -1144,6 +1149,7 @@ Set<String> buildControlNames()
   result.add(MODE_CYCLE_DENSITY_PREVIEW_STYLE);
   
   result.add(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE);
+  result.add(MODE_PREVIEW_PIXEL_DENSITY_RANGE);
   
   return result;
 }

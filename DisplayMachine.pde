@@ -702,6 +702,24 @@ class DisplayMachine extends Machine
     }
   }
 
+  
+  int pixel_maxDensity(float penSize, float rowSizeInMM) 
+  {
+    float numberOfSegments = rowSizeInMM / penSize;
+
+    int maxDens = 1;
+    
+    if (numberOfSegments >= 2.0) {
+      maxDens = int(numberOfSegments);
+    }
+  
+    if (maxDens <= 1) {
+      maxDens = 1;
+    }  
+    
+    return maxDens;
+  }
+
   void drawExtractedPixelDensities()
   {
 
@@ -709,20 +727,36 @@ class DisplayMachine extends Machine
     pixelSize = (pixelSize < 1.0) ? 1.0 : pixelSize;
 
     pixelSize = pixelSize * getPixelScalingOverGridSize();
+    
+    float rowSizeInMM = inMM(getGridSize()) * getPixelScalingOverGridSize();
+    
+    int posterizeLevels = 255;
+    
+    if (previewPixelDensityRange) {
+      posterizeLevels = pixel_maxDensity(currentPenWidth, rowSizeInMM);
+    }
+    else {
+      posterizeLevels = densityPreviewPosterize;
+    }
 
     if (getExtractedPixels() != null)
     {
       for (PVector cartesianPos : getExtractedPixels())
       {
-        if ((cartesianPos.z <= pixelExtractBrightThreshold) && (cartesianPos.z >= pixelExtractDarkThreshold))
+        if ((cartesianPos.z <= pixelExtractBrightThreshold) && 
+            (cartesianPos.z >= pixelExtractDarkThreshold))
         {
           // scale em, danno.
           PVector scaledPos = scaleToScreen(cartesianPos);
           noStroke();
+          if ((scaledPos.x <= 0) || (scaledPos.x > displayWidth) ||
+              (scaledPos.y <= 0) || (scaledPos.y > displayHeight)) {
+              continue;
+            }  
           
           // Posterize the density value
-          int reduced = int(map(cartesianPos.z, 1, 255, 1, densityPreviewPosterize)+0.5);
-          int brightness = int(map(reduced, 1, densityPreviewPosterize, 1, 255));
+          int reduced = int(map(cartesianPos.z, 1, 255, 1, posterizeLevels)+0.5);
+          int brightness = int(map(reduced, 1, posterizeLevels, 1, 255));
           
           fill(brightness);
           switch (getDensityPreviewStyle())
@@ -732,7 +766,7 @@ class DisplayMachine extends Machine
               break;
             case DENSITY_PREVIEW_ROUND_SIZE:
               fill(0);
-              previewRoundPixel(scaledPos, map(brightness, 1, densityPreviewPosterize, pixelSize, 1));
+              previewRoundPixel(scaledPos, map(brightness, 1, posterizeLevels, pixelSize, 1));
               break;
             case DENSITY_PREVIEW_DIAMOND:
               previewDiamondPixel(scaledPos, pixelSize, pixelSize, brightness);
@@ -741,7 +775,7 @@ class DisplayMachine extends Machine
               previewNativePixel(scaledPos, pixelSize, brightness);
               break; 
             case DENSITY_PREVIEW_NATIVE_SIZE:
-              previewNativePixel(scaledPos, map(brightness, 1, densityPreviewPosterize, pixelSize, 1), 50);
+              previewNativePixel(scaledPos, map(brightness, 1, posterizeLevels, pixelSize, 1), 50);
               break; 
             case DENSITY_PREVIEW_NATIVE_ARC:
               previewRoundPixel(scaledPos, pixelSize*0.8);

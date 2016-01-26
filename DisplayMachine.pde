@@ -739,7 +739,8 @@ class DisplayMachine extends Machine
               previewNativePixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1), 50);
               break; 
             case DENSITY_PREVIEW_NATIVE_ARC:
-              previewRoundPixel(scaledPos, pixelSize*0.8);
+              previewNativePixel(scaledPos, map(cartesianPos.z, 1, 255, pixelSize, 1), 50);
+//              previewRoundPixel(scaledPos, pixelSize*0.8);
               previewNativeArcPixel(scaledPos, pixelSize, cartesianPos.z);
               break; 
             default:
@@ -805,25 +806,30 @@ class DisplayMachine extends Machine
     // plot out the vertexes    
     noFill();
     stroke(0,0,0, 255-brightness);
+    try {
     
-    float i1Angle1 = atan2(int1.get(0).y-getOutline().getTop(), int1.get(0).x-getOutline().getLeft());
-    float i1Angle2 = atan2(int1.get(1).y-getOutline().getTop(), int1.get(1).x-getOutline().getLeft());
-    arc(getOutline().getLeft(), getOutline().getTop(), (distFromPointA-half)*2, (distFromPointA-half)*2, i1Angle1, i1Angle2);
-
-    i1Angle1 = atan2(int2.get(0).y-getOutline().getTop(), int2.get(0).x-getOutline().getLeft());
-    i1Angle2 = atan2(int2.get(1).y-getOutline().getTop(), int2.get(1).x-getOutline().getLeft());
-    arc(getOutline().getLeft(), getOutline().getTop(), (distFromPointA+half)*2, (distFromPointA+half)*2, i1Angle1, i1Angle2);
-
-    i1Angle1 = atan2( int1.get(0).y-getOutline().getTop(), int1.get(0).x-getOutline().getRight());
-    i1Angle2 = atan2( int2.get(0).y-getOutline().getTop(), int2.get(0).x-getOutline().getRight());
-    arc(getOutline().getRight(), getOutline().getTop(), (distFromPointB-half)*2, (distFromPointB-half)*2, i1Angle2, i1Angle1);
-
-    i1Angle1 = atan2( int1.get(1).y-getOutline().getTop(), int1.get(1).x-getOutline().getRight());
-    i1Angle2 = atan2( int2.get(1).y-getOutline().getTop(), int2.get(1).x-getOutline().getRight());
-    arc(getOutline().getRight(), getOutline().getTop(), (distFromPointB+half)*2, (distFromPointB+half)*2, i1Angle2, i1Angle1);
-
-    
-    endShape();
+      float i1Angle1 = atan2(int1.get(0).y-getOutline().getTop(), int1.get(0).x-getOutline().getLeft());
+      float i1Angle2 = atan2(int1.get(1).y-getOutline().getTop(), int1.get(1).x-getOutline().getLeft());
+      arc(getOutline().getLeft(), getOutline().getTop(), (distFromPointA-half)*2, (distFromPointA-half)*2, i1Angle1, i1Angle2);
+  
+      i1Angle1 = atan2(int2.get(0).y-getOutline().getTop(), int2.get(0).x-getOutline().getLeft());
+      i1Angle2 = atan2(int2.get(1).y-getOutline().getTop(), int2.get(1).x-getOutline().getLeft());
+      arc(getOutline().getLeft(), getOutline().getTop(), (distFromPointA+half)*2, (distFromPointA+half)*2, i1Angle1, i1Angle2);
+  
+      i1Angle1 = atan2( int1.get(0).y-getOutline().getTop(), int1.get(0).x-getOutline().getRight());
+      i1Angle2 = atan2( int2.get(0).y-getOutline().getTop(), int2.get(0).x-getOutline().getRight());
+      arc(getOutline().getRight(), getOutline().getTop(), (distFromPointB-half)*2, (distFromPointB-half)*2, i1Angle2, i1Angle1);
+  
+      i1Angle1 = atan2( int1.get(1).y-getOutline().getTop(), int1.get(1).x-getOutline().getRight());
+      i1Angle2 = atan2( int2.get(1).y-getOutline().getTop(), int2.get(1).x-getOutline().getRight());
+      arc(getOutline().getRight(), getOutline().getTop(), (distFromPointB+half)*2, (distFromPointB+half)*2, i1Angle2, i1Angle1);
+    }
+    catch (IndexOutOfBoundsException ioobe) {
+      println(ioobe);
+    }
+    finally {
+      endShape();
+    }
   }
   
   

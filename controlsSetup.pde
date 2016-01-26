@@ -440,7 +440,7 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setDecimalPrecision(2);
         n.setValue(pixelScalingOverGridSize);
         n.setMin(0.1);
-        n.setMax(4.0);
+//        n.setMax(4.0);
         n.setMultiplier(0.01);
       }
       else if (MODE_CHANGE_MIN_VECTOR_LINE_LENGTH.equals(key))

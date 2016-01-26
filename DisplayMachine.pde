@@ -749,8 +749,8 @@ class DisplayMachine extends Machine
           // scale em, danno.
           PVector scaledPos = scaleToScreen(cartesianPos);
           noStroke();
-          if ((scaledPos.x <= 0) || (scaledPos.x > displayWidth) ||
-              (scaledPos.y <= 0) || (scaledPos.y > displayHeight)) {
+          if ((scaledPos.x <= 0) || (scaledPos.x > windowWidth) ||
+              (scaledPos.y <= 0) || (scaledPos.y > windowHeight)) {
               continue;
             }  
           

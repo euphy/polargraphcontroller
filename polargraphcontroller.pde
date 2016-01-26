@@ -1970,8 +1970,8 @@ void previewQueue(boolean forceRebuild)
         String bLenStr = splitted[2];
         
         PVector endPoint = new PVector(Integer.parseInt(aLenStr)+previewCordOffset, Integer.parseInt(bLenStr)+previewCordOffset);
-        endPoint = getDisplayMachine().inMM(endPoint);
         endPoint = getDisplayMachine().asCartesianCoords(endPoint);
+        endPoint = getDisplayMachine().inMM(endPoint);
         
         pv.x = endPoint.x;
         pv.y = endPoint.y;

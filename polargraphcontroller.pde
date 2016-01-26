@@ -57,8 +57,8 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 1;
-int buildNo = 0;
+int minorVersionNo = 2;
+int buildNo = 2;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -190,7 +190,7 @@ float testPenWidthStartSize = 0.5;
 float testPenWidthEndSize = 2.0;
 float testPenWidthIncrementSize = 0.5;
 
-int machineStepMultiplier = 1;
+int machineStepMultiplier = 8;
 
 int maxSegmentLength = 2;
 
@@ -342,6 +342,8 @@ static final String MODE_ADJUST_PREVIEW_CORD_OFFSET = "numberbox_mode_previewCor
 
 static final String MODE_CYCLE_DENSITY_PREVIEW_STYLE = "button_mode_cycleDensityPreviewStyle";
 
+static final String MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE = "numberbox_mode_changeDensityPreviewPosterize";
+
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -387,6 +389,7 @@ static final int DENSITY_PREVIEW_NATIVE_SIZE = 5;
 
 static final int DEFAULT_DENSITY_PREVIEW_STYLE = DENSITY_PREVIEW_NATIVE;
 int densityPreviewStyle = DEFAULT_DENSITY_PREVIEW_STYLE;
+int densityPreviewPosterize = 255;
 
 static final byte COORD_MODE_NATIVE_STEPS = 0;
 static final byte COORD_MODE_NATIVE_MM = 1;
@@ -422,6 +425,9 @@ public Integer windowHeight = 400;
 
 public static Integer serialPortNumber = -1;
 
+public Textarea consoleArea = null;
+public Println console = null;
+public PrintStream savedOut = null;
 
 Properties props = null;
 public static String propertiesFilename = "default.properties.txt";
@@ -485,9 +491,6 @@ public static final int VECTOR_FILTER_LOW_PASS = 0;
 
 String storeFilename = "comm.txt";
 boolean overwriteExistingStoreFile = true;
-//private static Logger logger;
-public static Console console;
-public boolean useWindowedConsole = false;
 
 static boolean drawingTraceShape = true;
 static boolean retraceShape = true;
@@ -537,7 +540,8 @@ void setup()
   parentPapplet = this;
   
   RG.init(this);
-  RG.setPolygonizer(RG.ADAPTATIVE);
+  RG.setPolygonizer(RG.UNIFORMLENGTH);
+//  RG.setPolygonizer(RG.ADAPTATIVE);
 
   try 
   { 
@@ -600,6 +604,7 @@ void setup()
   addEventListeners();
 
   frameRate(8);
+  noLoop();
 }
 
 void fitDisplayMachineToWindow() {
@@ -618,6 +623,10 @@ void fitDisplayMachineToWindow() {
   
   machineScaling = (targetHeight / machineHeight);
   println(machineScaling);
+  
+  if (machineScaling < 0) {
+    machineScaling = 1.0;
+  }
   
   getDisplayMachine().getOffset().x = ((gr.getRight() > ir.getRight()) ? gr.getRight() : ir.getRight()) + CONTROL_SPACING.x;
   getDisplayMachine().getOffset().y = gr.getTop();
@@ -675,6 +684,7 @@ void windowResized()
 }
 void draw()
 {
+
   if (getCurrentTab() == TAB_NAME_INPUT) {
     drawImagePage();
   }
@@ -1680,12 +1690,7 @@ void keyPressed()
   }
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_C))
   {
-    if (isUseWindowedConsole())
-      setUseWindowedConsole(false);
-    else
-      setUseWindowedConsole(true);
-      
-    initLogging();
+    toggleShowConsole();
   }
   else if (checkKey(CONTROL) && checkKey(KeyEvent.VK_S))
   {
@@ -1893,7 +1898,7 @@ void mouseWheel(int delta)
 
 void setChromaKey(PVector p)
 {
-  color col = getDisplayMachine().getPixelAtScreenCoords(p);
+  color col = getDisplayMachine().getPixelAtScreenCoords(p); 
   chromaKeyColour = col;
   if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
   {
@@ -1915,6 +1920,26 @@ boolean isPreviewable(String command)
   }
 }
 
+boolean toggleShowConsole() {
+  if (console == null) {
+    savedOut = System.out;
+    console = cp5.addConsole(consoleArea);
+    consoleArea.setVisible(true);
+    console.play();
+  }
+  else {
+    console.pause();
+    consoleArea.setVisible(false);
+    cp5.remove(console);
+    console = null;
+    System.setOut(savedOut);
+  }
+  
+  println("Ow");
+  
+  return console == null;
+}
+
 /**
   This will comb the command queue and attempt to draw a picture of what it contains.
   Coordinates here are in pixels.
@@ -1930,6 +1955,8 @@ void previewQueue(boolean forceRebuild)
   {
     println("regenerating preview queue.");
     previewCommandList.clear();
+    
+    
     for (String command : commandQueue)
     {
       if (command.startsWith(CMD_CHANGELENGTHDIRECT) || command.startsWith(CMD_CHANGELENGTH) || command.startsWith(CMD_DRAWPIXEL))
@@ -1943,8 +1970,8 @@ void previewQueue(boolean forceRebuild)
         String bLenStr = splitted[2];
         
         PVector endPoint = new PVector(Integer.parseInt(aLenStr)+previewCordOffset, Integer.parseInt(bLenStr)+previewCordOffset);
-        endPoint = getDisplayMachine().asCartesianCoords(endPoint);
         endPoint = getDisplayMachine().inMM(endPoint);
+        endPoint = getDisplayMachine().asCartesianCoords(endPoint);
         
         pv.x = endPoint.x;
         pv.y = endPoint.y;
@@ -2537,7 +2564,7 @@ public PVector getHomePoint()
 public DisplayMachine getDisplayMachine()
 {
   if (displayMachine == null)
-    displayMachine = new DisplayMachine(new Machine(5000, 5000, 800.0, 95.0), machinePosition, machineScaling);
+    displayMachine = new DisplayMachine(new Machine(5000, 5000, 200.0, 95.0), machinePosition, machineScaling);
     
   displayMachine.setOffset(machinePosition);
   displayMachine.setScale(machineScaling);
@@ -2953,9 +2980,9 @@ void loadFromPropertiesFile()
   this.currentPenWidth = getFloatProperty("machine.pen.size", 0.8);
 
   // motor settings
-  this.currentMachineMaxSpeed = getFloatProperty("machine.motors.maxSpeed", 600.0);
-  this.currentMachineAccel = getFloatProperty("machine.motors.accel", 400.0);
-  this.machineStepMultiplier = getIntProperty("machine.step.multiplier", 1);
+  this.currentMachineMaxSpeed = getFloatProperty("machine.motors.maxSpeed", 2000.0);
+  this.currentMachineAccel = getFloatProperty("machine.motors.accel", 2000.0);
+  this.machineStepMultiplier = getIntProperty("machine.step.multiplier", 8);
   
   // serial port
   this.serialPortNumber = getIntProperty("controller.machine.serialport", 0);
@@ -3246,16 +3273,6 @@ int getDensityPreviewStyle()
 Integer getBaudRate()
 {
   return baudRate;
-}
-
-boolean isUseWindowedConsole()
-{
-  return this.useWindowedConsole;
-}
-
-void setUseWindowedConsole(boolean use)
-{
-  this.useWindowedConsole = use;
 }
 
 void initLogging()

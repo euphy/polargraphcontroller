@@ -21,7 +21,7 @@ ControlFrameSimple addDrawPixelsControlFrame(String theName, int theWidth, int t
       p.dispose();
       f.dispose();
     }
-  } 
+  }
   );
   f.setResizable( true );
   f.setVisible( true );

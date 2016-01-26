@@ -39,7 +39,7 @@ class Machine
   protected Rectangle imageFrame = new Rectangle(1500,1500,1000,1000);
   protected Rectangle pictureFrame = new Rectangle(1600,1600,800,800);
 
-  protected Float stepsPerRev = 800.0;
+  protected Float stepsPerRev = 200.0;
   protected Float mmPerRev = 95.0;
   
   protected Float mmPerStep = null;
@@ -364,7 +364,7 @@ class Machine
   public void loadDefinitionFromProperties(Properties props)
   {
     // get these first because they are important to convert the rest of them
-    setStepsPerRev(getFloatProperty("machine.motors.stepsPerRev", 800.0));
+    setStepsPerRev(getFloatProperty("machine.motors.stepsPerRev", 200.0));
     setMMPerRev(getFloatProperty("machine.motors.mmPerRev", 95.0));
     
     // now stepsPerMM and mmPerStep should have been calculated. It's safe to get the rest.
@@ -383,12 +383,12 @@ class Machine
     String pos = getStringProperty("controller.page.position.x", "CENTRE");
     float px = 0.0;
     println("machine size: " + getSize().x + ", " + inSteps(pageSize.x));
-    if (pos.equalsIgnoreCase("CENTRE"))
-    {
+    if (pos.equalsIgnoreCase("CENTRE")) {
       px = inMM((getSize().x - pageSize.x) / 2.0);
     }
-    else
+    else {
       px = getFloatProperty("controller.page.position.x", (int) getDisplayMachine().getPageCentrePosition(pageSize.x));
+    }
       
     float py = getFloatProperty("controller.page.position.y", 120);
       

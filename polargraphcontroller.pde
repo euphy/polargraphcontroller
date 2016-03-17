@@ -149,6 +149,8 @@ List<String> machineMessageLog = new ArrayList<String>();
 List<PreviewVector> previewCommandList = new ArrayList<PreviewVector>();
 long lastCommandQueueHash = 0L;
 
+File LastImageDir = null;
+File LastPrefDir = null;
 
 String lastCommand = "";
 String lastDrawingCommand = "";
@@ -1061,11 +1063,14 @@ void loadImageWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
+      if (LastImageDir != null) fc.setCurrentDirectory(LastImageDir);
       fc.setFileFilter(new ImageFileFilter());
-      
       fc.setDialogTitle("Choose an image file...");
 
       int returned = fc.showOpenDialog(frame);
+      
+      LastImageDir = fc.getCurrentDirectory();
+      
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
         File file = fc.getSelectedFile();
@@ -1106,17 +1111,24 @@ void loadVectorWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
+      
+      if (LastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      
       fc.setFileFilter(new VectorFileFilter());
 
       fc.setDialogTitle("Choose a vector file...");
 
       int returned = fc.showOpenDialog(frame);
+      
+      LastImageDir = fc.getCurrentDirectory();
+      
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
         File file = fc.getSelectedFile();
         if (file.exists())
         {
           RShape shape = loadShapeFromFile(file.getPath());
+          println(shape);
           if (shape != null) 
           {
             setVectorFilename(file.getPath());
@@ -1138,7 +1150,7 @@ class VectorFileFilter extends javax.swing.filechooser.FileFilter
   public boolean accept(File file) {
     String filename = file.getName();
     filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gco") || filename.endsWith(".g") || filename.endsWith(".txt"))
+    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gcode") || filename.endsWith(".g") || filename.endsWith(".ngc") || filename.endsWith(".txt"))
       return true;
     else
       return false;
@@ -1155,11 +1167,15 @@ void loadNewPropertiesFilenameWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
+      if (LastPrefDir != null) fc.setCurrentDirectory(LastPrefDir);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Choose a config file...");
 
       int returned = fc.showOpenDialog(frame);
+      
+      LastPrefDir = fc.getCurrentDirectory();
+      
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
         File file = fc.getSelectedFile();
@@ -1203,6 +1219,7 @@ void saveNewPropertiesFileWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
+      if (LastPrefDir != null) fc.setCurrentDirectory(LastPrefDir);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Enter a config file name...");
@@ -1234,7 +1251,7 @@ RShape loadShapeFromFile(String filename) {
   if (filename.toLowerCase().endsWith(".svg")) {
     sh = RG.loadShape(filename);
   }
-  else if (filename.toLowerCase().endsWith(".gco") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".txt")) {
+  else if (filename.toLowerCase().endsWith(".gcode") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".ngc") || filename.toLowerCase().endsWith(".txt")) {
     sh = loadShapeFromGCodeFile(filename);
   }
   return sh;
@@ -1333,6 +1350,9 @@ RShape loadShapeFromGCodeFile(String filename) {
         
         Float x = ins.get("X");
         Float y = ins.get("Y");
+        
+        println("X: " + x + " Y: "+ y);
+        
         if (x != null && y == null) {
           // move x axis only, use y of last
           RPoint[][] points = parent.getPointsInPaths();
@@ -1430,18 +1450,20 @@ Map<String, Float> unpackGCodeInstruction(String line) throws Exception {
   try {
     String[] splitted = line.trim().split(" ");
     for (int i = 0; i < splitted.length; i++) {
+      // remove ; character
+      splitted[i] = splitted[i].replace(";", "");
       String axis = splitted[i].substring(0, 1);
       Float value = Float.parseFloat(splitted[i].substring(1));
+
       if ("X".equalsIgnoreCase(axis) || "Y".equalsIgnoreCase(axis) || "Z".equalsIgnoreCase(axis) || "G".equalsIgnoreCase(axis)) {
         instruction.put(axis, value);
       }
     }
-//    println("instruction: " + instruction);
+    println("instruction: " + instruction);
     if (instruction.isEmpty()) {
       throw new Exception();
     }
-  }
-  catch (Exception e) {
+  } catch (Exception e) {
     throw new Exception("Exception while reading the lines from a gcode file: " + line + ", " + e.getMessage());
   }
   

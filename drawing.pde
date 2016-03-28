@@ -684,7 +684,6 @@ void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSorti
     if (pointPaths[i] != null) 
     {
       boolean firstPointFound = false;
-
       if (pointPaths[i].length > pathLengthHighPassCutoff)
       {
         List<PVector> filteredPoints = filterPoints(pointPaths[i], VECTOR_FILTER_LOW_PASS, minimumVectorLineLength, scaling, position);
@@ -701,7 +700,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSorti
           if (liftToGetToNewPoint)
             addToCommandQueue(CMD_PENUP+"END");
           // move to this point and put the pen down
-          command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
+          command = CMD_CHANGELENGTHDIRECT+Math.round(p.x)+","+Math.round(p.y)+","+getMaxSegmentLength()+",END";
           addToCommandQueue(command);
           if (liftToGetToNewPoint)
             addToCommandQueue(CMD_PENDOWN+"END");
@@ -712,7 +711,7 @@ void sendVectorShapes(RShape vec, float scaling, PVector position, int pathSorti
           for (int j=1; j<filteredPoints.size(); j++)
           {
             p = filteredPoints.get(j);
-            command = CMD_CHANGELENGTHDIRECT+(int)p.x+","+(int)p.y+","+getMaxSegmentLength()+",END";
+            command = CMD_CHANGELENGTHDIRECT+Math.round(p.x)+","+Math.round(p.y)+","+getMaxSegmentLength()+",END";
             addToCommandQueue(command);
           }
           lastPoint = new PVector(p.x, p.y);
@@ -890,6 +889,7 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scali
 
   // scale and convert all the points first
   List<PVector> scaled = new ArrayList<PVector>(points.length);
+  println("a filterPointsLowPass: Scaled length: " + points.length);
   for (int j = 0; j<points.length; j++)
   {
     RPoint firstPoint = points[j];
@@ -904,7 +904,8 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scali
     }
   }
 
-  if (scaled.size() > 1)
+  println("b filterPointsLowPass: Scaled length: " + scaled.size());
+  if (scaled.size() > 1.0)
   {
     PVector p = scaled.get(0);
     result.add(p);
@@ -918,12 +919,13 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scali
 
       if (abs(diffx) > filterParam || abs(diffy) > filterParam)
       {
-        //println("Adding point " + p + ", last: " + result.get(result.size()-1));
+        println(j + ". Adding point " + p + ", last: " + result.get(result.size()-1));
         result.add(p);
       }
     }
   }
 
+  println("c filterPointsLowPass: Scaled length: " + result.size());
   if (result.size() < 2)
     result.clear();
 

@@ -163,12 +163,17 @@ void button_mode_liveConfirmDraw()
     float scaling = getDisplayMachine().inMM(getDisplayMachine().getImageFrame().getWidth()) / captureShape.getWidth();
     PVector position = new PVector(getDisplayMachine().inMM(getDisplayMachine().getImageFrame().getPosition().x), 
     getDisplayMachine().inMM(getDisplayMachine().getImageFrame().getPosition().y));
-  
+
+    int oldPolygonizer = polygonizer;
+    polygonizer = RG.ADAPTATIVE;
+    setupPolygonizer();  
     sendVectorShapes(captureShape, scaling, position, PATH_SORT_CENTRE_FIRST);
     button_mode_penUp();
 
     //  save shape as SVG
     trace_saveShape(captureShape);
+    polygonizer = oldPolygonizer;
+    setupPolygonizer();
   }
 } 
 void toggle_mode_showWebcamRawVideo(boolean flag)
@@ -748,6 +753,27 @@ void numberbox_mode_changeDensityPreviewPosterize(int value) {
 void minitoggle_mode_previewPixelDensityRange(boolean flag) {
   previewPixelDensityRange = flag;
   println("previewPixelDensityRange: " + previewPixelDensityRange);
+}
+
+void numberbox_mode_changePolygonizerLength(float value) {
+  polygonizerLength = value;
+  setupPolygonizer();
+}
+
+
+void button_mode_cyclePolygonizer() 
+{
+  
+  // this is a bit silly for only two choices
+  if (polygonizer == 1) {
+    polygonizer = 0;
+  }
+  else {
+    polygonizer++;
+  }
+  setupPolygonizer();
+  Controller c = cp5.getController(MODE_CHANGE_POLYGONIZER);
+  c.setLabel(this.controlLabels.get(MODE_CHANGE_POLYGONIZER) + ": " + polygonizer);
 }
 
 

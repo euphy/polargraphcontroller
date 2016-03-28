@@ -285,11 +285,34 @@ Map<String, Controller> buildAllControls()
     }
   }
 
+  initialiseButtonValues(map);
   initialiseToggleValues(map);
   initialiseNumberboxValues(map);
   return map;
 }
 
+Map<String, Controller> initialiseButtonValues(Map<String, Controller> map)
+{
+  for (String key : map.keySet())
+  {
+    if (key.startsWith("button_"))
+    {
+      Button n = (Button) map.get(key);
+
+      if (MODE_CYCLE_DENSITY_PREVIEW_STYLE.equals(key)) {
+        n.setValue(densityPreviewStyle);
+        n.setLabel(this.controlLabels.get(MODE_CYCLE_DENSITY_PREVIEW_STYLE) + ": " + densityPreviewStyle);              
+      }
+      else if (MODE_CHANGE_POLYGONIZER.equals(key)) {
+        n.setValue(polygonizer);
+        n.setLabel(this.controlLabels.get(MODE_CHANGE_POLYGONIZER) + ": " + polygonizer);              
+      }        
+    }
+  }
+  
+  return map;
+}
+        
 Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
 {
   for (String key : map.keySet())
@@ -517,10 +540,6 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setValue(0);
         n.setMultiplier(0.5);
       }
-      else if (MODE_CYCLE_DENSITY_PREVIEW_STYLE.equals(key))
-      {
-        n.setValue(densityPreviewStyle);
-      }
       else if (MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE.equals(key))
       {
         n.setValue(densityPreviewPosterize);
@@ -528,6 +547,13 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setMax(255);
         n.setDecimalPrecision(1);
         n.setMultiplier(0.1);
+      }
+      else if (MODE_CHANGE_POLYGONIZER_LENGTH.equals(key)) {
+        n.setValue(polygonizerLength);
+        n.setMin(1.0);
+        n.setDecimalPrecision(1);
+        n.setMultiplier(0.1);
+
       }
     }
   }
@@ -723,6 +749,8 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_RENDER_VECTORS);
   
   controlNames.add(MODE_ADJUST_PREVIEW_CORD_OFFSET);
+  controlNames.add(MODE_CHANGE_POLYGONIZER);
+  controlNames.add(MODE_CHANGE_POLYGONIZER_LENGTH);
 
   controlNames.add(MODE_SHOW_IMAGE);
   controlNames.add(MODE_SHOW_VECTOR);
@@ -1002,6 +1030,9 @@ Map<String, String> buildControlLabels()
   result.put(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE, "Pixel posterize");
   result.put(MODE_PREVIEW_PIXEL_DENSITY_RANGE, "Show density range");
   
+  result.put(MODE_CHANGE_POLYGONIZER, "Cycle polygonizer");
+  result.put(MODE_CHANGE_POLYGONIZER_LENGTH, "Polygonizer length");
+  
 
   return result;
 }
@@ -1150,6 +1181,9 @@ Set<String> buildControlNames()
   
   result.add(MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE);
   result.add(MODE_PREVIEW_PIXEL_DENSITY_RANGE);
+  
+  result.add(MODE_CHANGE_POLYGONIZER_LENGTH);
+  result.add(MODE_CHANGE_POLYGONIZER);
   
   return result;
 }

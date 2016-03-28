@@ -316,6 +316,10 @@ class DisplayMachine extends Machine
     {
       drawExtractedPixelCentres();
     }
+    if (displayingGridSpots)
+    {
+      drawGridIntersections();
+    }
     if (displayingDensityPreview)
     {
       drawExtractedPixelDensities();
@@ -532,10 +536,13 @@ class DisplayMachine extends Machine
                 beginShape();
                 inShape = true;
               }
+//              PVector nativeCoords = asNativeCoords(inSteps(p));
+//              println(j + "!  Adding point " + nativeCoords);
+              
               p = scaleToScreen(p);
               stroke(strokeColour);
               vertex(p.x, p.y);
-//              ellipse(p.x, p.y, 3, 3);
+//              ellipse(p.x, p.y, 2, 2);
             }
             else
             {
@@ -660,10 +667,18 @@ class DisplayMachine extends Machine
    */
   public void drawRows()
   {
-    PVector mVect = getMouseVector();
-
+    float rowThickness = inMM(getGridSize()) * getScaling();
+    rowThickness = (rowThickness < 1.0) ? 1.0 : rowThickness;
+    strokeWeight(rowThickness);
+    stroke(150, 200, 255, 50);
+    strokeCap(SQUARE);
+    drawRow(getMouseVector(), true, true);
+    noStroke();
+  }
+  
+  public void drawRow(PVector mouse, boolean left, boolean right) {
     // scale it to  find out the coordinates on the machine that the mouse is pointing at.
-    mVect = scaleToDisplayMachine(mVect);
+    PVector mVect = scaleToDisplayMachine(mouse);
     // convert it to the native coordinates system
     mVect = convertToNative(mVect);
     // snap it to the grid
@@ -674,17 +689,15 @@ class DisplayMachine extends Machine
     // and finally, because scaleToScreen also allows for the machine position (offset), subtract it.
     mVect.sub(getOffset());
 
-    float rowThickness = inMM(getGridSize()) * getScaling();
-    rowThickness = (rowThickness < 1.0) ? 1.0 : rowThickness;
-    strokeWeight(rowThickness);
-    stroke(150, 200, 255, 50);
-    strokeCap(SQUARE);
-
     float dia = mVect.x*2;
-    arc(getOutline().getLeft(), getOutline().getTop(), dia, dia, 0, 1.57079633);
+    if (left) {
+      arc(getOutline().getLeft(), getOutline().getTop(), dia, dia, 0, 1.57079633);
+    }
 
     dia = mVect.y*2;
-    arc(getOutline().getRight(), getOutline().getTop(), dia, dia, 1.57079633, 3.14159266);
+    if (right) {
+      arc(getOutline().getRight(), getOutline().getTop(), dia, dia, 1.57079633, 3.14159266);
+    }
     
   }
 
@@ -701,7 +714,11 @@ class DisplayMachine extends Machine
       line(scaledPos.x-1, scaledPos.y+1, scaledPos.x+1, scaledPos.y-1);
     }
   }
-
+  
+  void drawGridIntersections()
+  {
+//    println("oh");
+  }
   
   int pixel_maxDensity(float penSize, float rowSizeInMM) 
   {

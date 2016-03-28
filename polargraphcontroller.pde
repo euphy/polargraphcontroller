@@ -57,7 +57,7 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 3;
+int minorVersionNo = 4;
 int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
@@ -343,6 +343,12 @@ static final String MODE_CYCLE_DENSITY_PREVIEW_STYLE = "button_mode_cycleDensity
 static final String MODE_CHANGE_DENSITY_PREVIEW_POSTERIZE = "numberbox_mode_changeDensityPreviewPosterize";
 static final String MODE_PREVIEW_PIXEL_DENSITY_RANGE = "minitoggle_mode_previewPixelDensityRange";
 
+static final String MODE_CHANGE_POLYGONIZER = "button_mode_cyclePolygonizer";
+static final String MODE_CHANGE_POLYGONIZER_LENGTH = "numberbox_mode_changePolygonizerLength";
+
+
+
+
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
 
@@ -369,6 +375,7 @@ boolean pixelTimerRunning = false;
 boolean displayingSelectedCentres = false;
 boolean displayingRowGridlines = false;
 boolean displayingInfoTextOnInputPage = false;
+boolean displayingGridSpots = true;
 
 boolean displayingImage = true;
 boolean displayingVector = true;
@@ -532,6 +539,10 @@ static PApplet parentPapplet = null;
 
 boolean rescaleDisplayMachine = true;
 
+// Polygonization. It's a geomerative thing.
+int polygonizer = 0;
+float polygonizerLength = 0.0;
+
 void setup()
 {
   println("Running polargraph controller");
@@ -539,9 +550,6 @@ void setup()
   initLogging();
   parentPapplet = this;
   
-  RG.init(this);
-  RG.setPolygonizer(RG.UNIFORMLENGTH);
-//  RG.setPolygonizer(RG.ADAPTATIVE);
 
   try 
   { 
@@ -551,6 +559,8 @@ void setup()
   { 
     e.printStackTrace();   
   }
+
+  RG.init(this);
   loadFromPropertiesFile();
 
   size(windowWidth, windowHeight);
@@ -639,10 +649,11 @@ void addEventListeners()
     {
       public void componentResized(ComponentEvent event) 
       {
-        if (event.getSource()==frame) 
-        {
-  	  windowResized();
-        }
+      windowResized();
+//        if (event.getSource()==frame) 
+//        {
+//  	  windowResized();
+//        }
       }
     }
   );
@@ -1625,7 +1636,7 @@ boolean mouseOverQueue()
 void changeMachineScaling(int delta)
 {
   boolean scalingChanged = true;
-  machineScaling += (delta * 0.1);
+  machineScaling += (delta * (machineScaling * 0.1));
   if (machineScaling <  MIN_SCALING)
   {
     machineScaling = MIN_SCALING;
@@ -1791,6 +1802,7 @@ void machineDragged()
     lastMachineDragPosition = new PVector(currentPos.x, currentPos.y);
     PVector currentPosition = getDisplayMachine().getOutline().getPosition();
     getDisplayMachine().getOffset().add(change);
+    cursor(MOVE);
   }
 }
 
@@ -1893,7 +1905,25 @@ void leftButtonMachineClick()
 
 void mouseWheel(int delta) 
 {
+  noLoop();
+  // get the mouse position on the machine, before changing the machine scaling
+  PVector pos = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
   changeMachineScaling(delta);
+  
+  // now work out what the machine position needs to be to line the pos up with mousevector again
+  PVector scaledPos = getDisplayMachine().scaleToDisplayMachine(getMouseVector());
+//  println("original pos: " + pos);
+//  println("scaled pos: " + scaledPos);
+  
+  PVector change = PVector.sub(scaledPos, pos);
+//  println("change: " + change);
+
+  // and adjust for the new scaling factor
+  change.mult(machineScaling);
+  
+  // finally update the machine offset (position)
+  getDisplayMachine().getOffset().add(change);
+  loop();
 } 
 
 void setChromaKey(PVector p)
@@ -1935,7 +1965,7 @@ boolean toggleShowConsole() {
     System.setOut(savedOut);
   }
   
-  println("Ow");
+//  println("Ow");
   
   return console == null;
 }
@@ -2017,6 +2047,7 @@ void previewQueue(boolean forceRebuild)
       ellipse(p.x, p.y, 5,5);
       noFill();
     }
+//    ellipse(p.x, p.y, 5,5); // Circle at each node
 
   }
 
@@ -3021,6 +3052,11 @@ void loadFromPropertiesFile()
   }
   this.homePointCartesian = new PVector(getDisplayMachine().inSteps(homePointX), getDisplayMachine().inSteps(homePointY));
 //  println("home point loaded: " + homePointCartesian + ", " + getHomePoint());
+
+  // Geomerative stuff  
+  polygonizer = getIntProperty("controller.geomerative.polygonizer", RG.ADAPTATIVE);
+  polygonizerLength = getFloatProperty("controller.geomerative.polygonizerLength", 1.0);
+  setupPolygonizer();
   
   setVectorFilename(getStringProperty("controller.vector.filename", null));
   if (getVectorFilename() != null)
@@ -3048,8 +3084,7 @@ void loadFromPropertiesFile()
   getVectorPosition().x = getFloatProperty("controller.vector.position.x", 0.0);
   getVectorPosition().y = getFloatProperty("controller.vector.position.y", 0.0);
   this.minimumVectorLineLength = getIntProperty("controller.vector.minLineLength", 0);
-
-
+  
   
   println("Finished loading configuration from properties file.");
 }
@@ -3122,6 +3157,9 @@ void savePropertiesFile()
   props.setProperty("controller.vector.position.x", df.format(getVectorPosition().x));
   props.setProperty("controller.vector.position.y", df.format(getVectorPosition().y));
   props.setProperty("controller.vector.minLineLength", new Integer(this.minimumVectorLineLength).toString());
+  
+  props.setProperty("controller.geomerative.polygonizer", new Integer(polygonizer).toString());
+  props.setProperty("controller.geomerative.polygonizerLength", df.format(polygonizerLength));
 
  
   FileOutputStream propertiesOutput = null;
@@ -3275,6 +3313,15 @@ Integer getBaudRate()
   return baudRate;
 }
 
+void setupPolygonizer() {
+  RG.setPolygonizer(polygonizer); // http://www.polargraph.co.uk/forum/polargraphs-group2/troubleshooting-forum5/svg-differences-between-polargraphcontroller-2-1-1-2-3-0-thread523.0
+  switch(polygonizer) {
+   case 1: RG.setPolygonizerLength(polygonizerLength); break;
+  }
+  println("Polygonizer: " + polygonizer);
+  println("PolygonizerLength: " + polygonizerLength);
+  
+}
 void initLogging()
 {
   try

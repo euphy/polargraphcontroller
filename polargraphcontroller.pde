@@ -149,8 +149,8 @@ List<String> machineMessageLog = new ArrayList<String>();
 List<PreviewVector> previewCommandList = new ArrayList<PreviewVector>();
 long lastCommandQueueHash = 0L;
 
-File LastImageDir = null;
-File LastPrefDir = null;
+File lastImageDir = null;
+File lastPrefDir = null;
 
 String lastCommand = "";
 String lastDrawingCommand = "";
@@ -1063,13 +1063,13 @@ void loadImageWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
-      if (LastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      if (lastImageDir != null) fc.setCurrentDirectory(LastImageDir);
       fc.setFileFilter(new ImageFileFilter());
       fc.setDialogTitle("Choose an image file...");
 
       int returned = fc.showOpenDialog(frame);
       
-      LastImageDir = fc.getCurrentDirectory();
+      lastImageDir = fc.getCurrentDirectory();
       
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
@@ -1112,7 +1112,7 @@ void loadVectorWithFileChooser()
     public void run() {
       JFileChooser fc = new JFileChooser();
       
-      if (LastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      if (lastImageDir != null) fc.setCurrentDirectory(LastImageDir);
       
       fc.setFileFilter(new VectorFileFilter());
 
@@ -1120,7 +1120,7 @@ void loadVectorWithFileChooser()
 
       int returned = fc.showOpenDialog(frame);
       
-      LastImageDir = fc.getCurrentDirectory();
+      lastImageDir = fc.getCurrentDirectory();
       
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
@@ -1128,7 +1128,6 @@ void loadVectorWithFileChooser()
         if (file.exists())
         {
           RShape shape = loadShapeFromFile(file.getPath());
-          println(shape);
           if (shape != null) 
           {
             setVectorFilename(file.getPath());
@@ -1167,14 +1166,14 @@ void loadNewPropertiesFilenameWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
-      if (LastPrefDir != null) fc.setCurrentDirectory(LastPrefDir);
+      if (lastPrefDir != null) fc.setCurrentDirectory(lastPrefDir);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Choose a config file...");
 
       int returned = fc.showOpenDialog(frame);
       
-      LastPrefDir = fc.getCurrentDirectory();
+      lastPrefDir = fc.getCurrentDirectory();
       
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
@@ -1219,7 +1218,7 @@ void saveNewPropertiesFileWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
-      if (LastPrefDir != null) fc.setCurrentDirectory(LastPrefDir);
+      if (lastPrefDir != null) fc.setCurrentDirectory(lastPrefDir);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Enter a config file name...");

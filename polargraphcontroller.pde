@@ -1063,7 +1063,7 @@ void loadImageWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
-      if (lastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      if (lastImageDir != null) fc.setCurrentDirectory(lastImageDir);
       fc.setFileFilter(new ImageFileFilter());
       fc.setDialogTitle("Choose an image file...");
 
@@ -1112,7 +1112,7 @@ void loadVectorWithFileChooser()
     public void run() {
       JFileChooser fc = new JFileChooser();
       
-      if (lastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      if (lastImageDir != null) fc.setCurrentDirectory(lastImageDir);
       
       fc.setFileFilter(new VectorFileFilter());
 

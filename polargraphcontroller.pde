@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 4;
-int buildNo = 0;
+int buildNo = 1;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -149,8 +149,8 @@ List<String> machineMessageLog = new ArrayList<String>();
 List<PreviewVector> previewCommandList = new ArrayList<PreviewVector>();
 long lastCommandQueueHash = 0L;
 
-File LastImageDir = null;
-File LastPrefDir = null;
+File lastImageDirectory = null;
+File lastPropertiesDirectory = null;
 
 String lastCommand = "";
 String lastDrawingCommand = "";
@@ -1074,13 +1074,13 @@ void loadImageWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
-      if (LastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      if (lastImageDirectory != null) fc.setCurrentDirectory(lastImageDirectory);
       fc.setFileFilter(new ImageFileFilter());
       fc.setDialogTitle("Choose an image file...");
 
       int returned = fc.showOpenDialog(frame);
       
-      LastImageDir = fc.getCurrentDirectory();
+      lastImageDirectory = fc.getCurrentDirectory();
       
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
@@ -1122,16 +1122,15 @@ void loadVectorWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
-      
-      if (LastImageDir != null) fc.setCurrentDirectory(LastImageDir);
+      if (lastImageDirectory != null) 
+      { 
+        fc.setCurrentDirectory(lastImageDirectory);
+      }
       
       fc.setFileFilter(new VectorFileFilter());
-
       fc.setDialogTitle("Choose a vector file...");
-
       int returned = fc.showOpenDialog(frame);
-      
-      LastImageDir = fc.getCurrentDirectory();
+      lastImageDirectory = fc.getCurrentDirectory();
       
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
@@ -1160,7 +1159,7 @@ class VectorFileFilter extends javax.swing.filechooser.FileFilter
   public boolean accept(File file) {
     String filename = file.getName();
     filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gcode") || filename.endsWith(".g") || filename.endsWith(".ngc") || filename.endsWith(".txt"))
+    if (file.isDirectory() || filename.endsWith(".svg") || isGCodeExtension(filename))
       return true;
     else
       return false;
@@ -1177,14 +1176,14 @@ void loadNewPropertiesFilenameWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
-      if (LastPrefDir != null) fc.setCurrentDirectory(LastPrefDir);
+      if (lastPropertiesDirectory != null) fc.setCurrentDirectory(lastPropertiesDirectory);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Choose a config file...");
 
       int returned = fc.showOpenDialog(frame);
       
-      LastPrefDir = fc.getCurrentDirectory();
+      lastPropertiesDirectory = fc.getCurrentDirectory();
       
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
@@ -1229,7 +1228,7 @@ void saveNewPropertiesFileWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
-      if (LastPrefDir != null) fc.setCurrentDirectory(LastPrefDir);
+      if (lastPropertiesDirectory != null) fc.setCurrentDirectory(lastPropertiesDirectory);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Enter a config file name...");
@@ -1261,11 +1260,17 @@ RShape loadShapeFromFile(String filename) {
   if (filename.toLowerCase().endsWith(".svg")) {
     sh = RG.loadShape(filename);
   }
-  else if (filename.toLowerCase().endsWith(".gcode") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".ngc") || filename.toLowerCase().endsWith(".txt")) {
+  else if (isGCodeExtension(filename)) {
     sh = loadShapeFromGCodeFile(filename);
   }
   return sh;
 }
+
+
+boolean isGCodeExtension(String filename) {
+  return (filename.toLowerCase().endsWith(".gcode") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".ngc") || filename.toLowerCase().endsWith(".txt"));
+}
+
 
 int countLines(String filename) throws IOException {
     InputStream is = new BufferedInputStream(new FileInputStream(filename));

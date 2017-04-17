@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 4;
-int buildNo = 1;
+int buildNo = 2;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -573,7 +573,6 @@ void setup()
   println("Serial ports available on your machine:");
   println(serialPorts);
 
-//  println("getSerialPortNumber()"+getSerialPortNumber());
   if (getSerialPortNumber() >= 0)
   {
     println("About to connect to serial port in slot " + getSerialPortNumber());
@@ -684,17 +683,28 @@ void windowResized()
   windowWidth = frame.getWidth();
   windowHeight = frame.getHeight();
   println("New window size: " + windowWidth + " x " + windowHeight);
+  if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH) {
+    println("Max");
+    frame.setExtendedState(0);
+    frame.setSize(windowWidth, windowHeight);
+  }
   
   for (String key : getPanels().keySet())
   {
     Panel p = getPanels().get(key);
     p.setSizeByHeight(windowHeight - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
+    if (debugPanels) {
+      println("Resize " + key + " to be " + p.getOutline().getWidth() + "px across, " + p.getOutline().getHeight() + "px tall");
+    }
   }
-  
+
   // Required to tell CP5 to be able to use the new sized window
+  // How does this work?
   cp5.setGraphics(this,0,0);
+  
   loop();
 }
+
 void draw()
 {
 
@@ -997,7 +1007,9 @@ void drawMoveImageOutline()
     PVector offsetMouseVector = PVector.sub(getDisplayMachine().scaleToDisplayMachine(getMouseVector()), centroid);
     if (pointPaths != null)
     {
-      for (int i = 0; i<pointPaths.length; i++)
+      int increment = round((pointPaths.length/10.0)+0.5);
+      println(increment);
+      for (int i = 0; i<pointPaths.length; i+=increment)
       {
         if (pointPaths[i] != null) 
         {
@@ -3086,21 +3098,19 @@ void loadFromPropertiesFile()
   if (getVectorFilename() != null)
   {
     RShape shape = null;
-    try
-    {
+    // test if file exists
+    File f =  new File(getVectorFilename());
+    if (f.isFile()) {
       shape = RG.loadShape(getVectorFilename());
     }
-    catch (Exception e)
-    {
-      shape = null;
+    else {
+      println("Tried to load vector file (" + getVectorFilename() + ") but I couldn't find it.");
     }
     
-    if (shape != null) 
-    {
+    if (shape != null) {
       setVectorShape(shape);
     }
-    else 
-    {
+    else {
       println("File not found (" + getVectorFilename() + ")");
     }
   }

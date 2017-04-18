@@ -31,15 +31,14 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 
   ScrollableList sl = p.cp5().addScrollableList("dropdown_serialPort")
     .setPosition(10, 10)
-    .setSize(150, 100)
+    .setSize(150, 150)
     .setBarHeight(20)
-    .setItemHeight(20)
+    .setItemHeight(16)
     .plugTo(this, "dropdown_serialPort");  
 
   sl.addItem("No serial connection", -1);
 
-  String[] ports = {"a", "b", "c", "d", "e", "f", "g", "h"}; 
-  //Serial.list();
+  String[] ports = Serial.list();
   
   for (int i = 0; i < ports.length; i++) {
     println("Adding " + ports[i]);
@@ -62,7 +61,10 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 void dropdown_serialPort(int newSerialPort) 
 {
   println("In dropdown_serialPort");
-  
+
+  // Shift port index by one 
+  // No serial in list is slot 0 in code because of list index
+  newSerialPort -= 1;
   
   
   if (newSerialPort == -2)

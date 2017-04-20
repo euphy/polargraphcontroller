@@ -38,8 +38,7 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 
   sl.addItem("No serial connection", -1);
 
-  String[] ports = {"a", "b", "c", "d", "e", "f", "g", "h"}; 
-  //Serial.list();
+  String[] ports = Serial.list();
   
   for (int i = 0; i < ports.length; i++) {
     println("Adding " + ports[i]);
@@ -61,8 +60,8 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 
 void dropdown_serialPort(int newSerialPort) 
 {
-  println("In dropdown_serialPort");
-  
+  println("In dropdown_serialPort, newSerialPort: " + newSerialPort);
+  newSerialPort -= 1;
   
   
   if (newSerialPort == -2)

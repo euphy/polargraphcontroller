@@ -60,12 +60,11 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 
 void dropdown_serialPort(int newSerialPort) 
 {
-  println("In dropdown_serialPort");
+  println("In dropdown_serialPort, newSerialPort: " + newSerialPort);
 
-  // Shift port index by one 
   // No serial in list is slot 0 in code because of list index
+  // So shift port index by one 
   newSerialPort -= 1;
-  
   
   if (newSerialPort == -2)
   {

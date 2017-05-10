@@ -153,6 +153,59 @@ void numberbox_mode_vectorPathLengthHighPassCutoff(int value)
   pathLengthHighPassCutoff =  value;
 }
 
+void numberbox_mode_liveBigRadiusValue(int value)
+{
+  if (value != Radius)
+  {
+    Radius =  value;
+    retraceShape = true;
+  }
+}
+void numberbox_mode_liveSmallRadiusValue(int value)
+{
+  if (value != radius)
+  {
+    radius =  value;
+    retraceShape = true;
+  }
+}
+void numberbox_mode_liveRhoRadiusValue(int value)
+{
+  if (value != rho)
+  {
+    rho =  value;
+    retraceShape = true;
+  }
+}
+void numberbox_mode_liveIntervalValue(int value)
+{
+  if (value != Interval)
+  {
+    Interval =  value;
+    retraceShape = true;
+  }
+}
+void numberbox_mode_liveMultiplierValue(int value)
+{
+  if (value != multiplier)
+  {
+    multiplier =  value;
+    retraceShape = true;
+  }
+}
+void numberbox_mode_liveModeValue(int value)
+{
+  if (value != mode)
+  {
+    mode =  value;
+    retraceShape = true;
+  }
+}
+void button_mode_exportSpirograph()
+{
+  Export();
+}
+
 void button_mode_liveConfirmDraw()
 {
   if (captureShape != null)

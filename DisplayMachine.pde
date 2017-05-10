@@ -374,6 +374,84 @@ class DisplayMachine extends Machine
     }
   }
   
+  public void drawForSpiro()
+  {
+    // work out the scaling factor.
+    noStroke();
+    // draw machine outline
+    
+    // drop shadow
+    fill(80);
+    rect(getOutline().getLeft()+DROP_SHADOW_DISTANCE, getOutline().getTop()+DROP_SHADOW_DISTANCE, getOutline().getWidth(), getOutline().getHeight());
+
+    fill(getMachineColour());
+    rect(getOutline().getLeft(), getOutline().getTop(), getOutline().getWidth(), getOutline().getHeight());
+    //text("machine " + getDimensionsAsText(getSize()) + " " + getZoomText(), getOutline().getLeft(), getOutline().getTop());
+
+    if (displayingGuides)
+    {
+      // draw some guides
+      stroke(getGuideColour());
+      strokeWeight(1);
+      // centre line
+      line(getOutline().getLeft()+(getOutline().getWidth()/2), getOutline().getTop(), 
+      getOutline().getLeft()+(getOutline().getWidth()/2), getOutline().getBottom());
+
+      // page top line
+      line(getOutline().getLeft(), getOutline().getTop()+sc(getHomePoint().y), 
+      getOutline().getRight(), getOutline().getTop()+sc(getHomePoint().y));
+    }
+
+    // draw page
+    fill(getPageColour());
+    rect(getOutline().getLeft()+sc(getPage().getLeft()), 
+    getOutline().getTop()+sc(getPage().getTop()), 
+    sc(getPage().getWidth()), 
+    sc(getPage().getHeight()));
+    //text("page " + getDimensionsAsText(getPage()), getOutline().getLeft()+sc(getPage().getLeft()), 
+    //getOutline().getTop()+sc(getPage().getTop()));
+    fill(0);
+    //text("offset " + getDimensionsAsText(getPage().getPosition()), 
+    //getOutline().getLeft()+sc(getPage().getLeft()), 
+    //getOutline().getTop()+sc(getPage().getTop())+10);
+    noFill();
+
+    // draw home point
+    noFill();
+    strokeWeight(5);
+    stroke(0, 128);
+    PVector onScreen = scaleToScreen(inMM(getHomePoint()));
+    ellipse(onScreen.x, onScreen.y, 15, 15);
+    strokeWeight(2);
+    stroke(255);
+    ellipse(onScreen.x, onScreen.y, 15, 15);
+    
+    text("Home point", onScreen.x+ 15, onScreen.y-5);
+    //text(int(inMM(getHomePoint().x)+0.5) + ", " + int(inMM(getHomePoint().y)+0.5), onScreen.x+ 15, onScreen.y+15);
+
+
+    if (displayingGuides 
+      && getOutline().surrounds(getMouseVector())
+      && currentMode != MODE_MOVE_IMAGE
+      && mouseOverControls().isEmpty()
+      )
+    {  
+      drawHangingStrings();
+      //drawLineLengthTexts();
+      cursor(CROSS);
+    }
+    else
+    {
+      cursor(ARROW);
+    }
+
+    if (displayingVector && getVectorShape() != null)
+    {
+      displayVectorImage();
+    }
+  }
+
+
 //  public void displayLiveVideo()
 //  {
 //    // draw actual image, maximum size

@@ -131,6 +131,18 @@ Map<String, Panel> buildPanels() {
   tracePanel.setControlSizes(buildControlSizesForPanel(tracePanel));
   panels.put(PANEL_NAME_TRACE, tracePanel);
 
+  Rectangle panelOutlineSpirograph = new Rectangle(getMainPanelPosition(), 
+  new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
+  Panel spirographPanel = new Panel(PANEL_NAME_SPIROGRAPH, panelOutlineSpirograph);
+  spirographPanel.setOutlineColour(color(200,255,200));
+  // get controls
+  spirographPanel.setResizable(true);
+  spirographPanel.setControls(getControlsForPanels().get(PANEL_NAME_SPIROGRAPH));
+  // get control positions
+  spirographPanel.setControlPositions(buildControlPositionsForPanel(spirographPanel));
+  spirographPanel.setControlSizes(buildControlSizesForPanel(spirographPanel));
+  panels.put(PANEL_NAME_SPIROGRAPH, spirographPanel);
+  
   Rectangle panelOutlineDetails = new Rectangle(getMainPanelPosition(), 
   new PVector((DEFAULT_CONTROL_SIZE.x+CONTROL_SPACING.x)*2, panelHeight));
   Panel detailsPanel = new Panel(PANEL_NAME_DETAILS, panelOutlineDetails);
@@ -510,6 +522,54 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
         n.setMax(10);
         n.setMultiplier(0.1);
       }
+      else if (MODE_LIVE_BIG_RADIUS_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(Radius);
+        n.setMin(1);
+        n.setMax(255);
+        n.setMultiplier(1);
+      }
+      else if (MODE_LIVE_SMALL_RADIUS_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(radius);
+        n.setMin(1);
+        n.setMax(255);
+        n.setMultiplier(1);
+      }
+      else if (MODE_LIVE_RHO_RADIUS_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(rho);
+        n.setMin(1);
+        n.setMax(255);
+        n.setMultiplier(1);
+      }
+      else if (MODE_LIVE_INTERVAL_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(Interval);
+        n.setMin(100);
+        n.setMax(5000);
+        n.setMultiplier(1);
+      }
+      else if (MODE_LIVE_MULTIPLIER_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(multiplier);
+        n.setMin(0);
+        n.setMax(60);
+        n.setMultiplier(1);
+      }
+      else if (MODE_LIVE_MODE_VALUE.equals(key))
+      {
+        n.setDecimalPrecision(1);
+        n.setValue(mode);
+        n.setMin(0);
+        n.setMax(3);
+        n.setMultiplier(1);
+      }
       else if (MODE_LIVE_SIMPLIFICATION_VALUE.equals(key))
       {
         n.setDecimalPrecision(1);
@@ -550,7 +610,7 @@ Map<String, Controller> initialiseNumberboxValues(Map<String, Controller> map)
       }
       else if (MODE_CHANGE_POLYGONIZER_LENGTH.equals(key)) {
         n.setValue(polygonizerLength);
-        n.setMin(1.0);
+        n.setMin(1.0); 
         n.setDecimalPrecision(1);
         n.setMultiplier(0.1);
 
@@ -693,6 +753,7 @@ Map<String, List<Controller>> buildControlsForPanels()
   map.put(PANEL_NAME_QUEUE, getControllersForControllerNames(getControlNamesForQueuePanel()));
   map.put(PANEL_NAME_GENERAL, getControllersForControllerNames(getControlNamesForGeneralPanel()));
   map.put(PANEL_NAME_TRACE, getControllersForControllerNames(getControlNamesForTracePanel()));
+  map.put(PANEL_NAME_SPIROGRAPH, getControllersForControllerNames(getControlNamesForSpirographPanel()));
   return map;
 }
 
@@ -788,7 +849,7 @@ List<String> getControlNamesForRovingPanel()
   return controlNames;
 }
 
-List<String> getControlNamesForTracePanel()
+List<String> getControlNamesForTracePanel() 
 {
   List<String> controlNames = new ArrayList<String>();
   controlNames.add(MODE_LIVE_BLUR_VALUE);
@@ -803,6 +864,31 @@ List<String> getControlNamesForTracePanel()
 //  controlNames.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
 //  controlNames.add(MODE_FLIP_WEBCAM_INPUT);
 //  controlNames.add(MODE_ROTATE_WEBCAM_INPUT);
+  return controlNames;
+}
+
+List<String> getControlNamesForSpirographPanel() // now spirograph panel
+{
+  List<String> controlNames = new ArrayList<String>();
+  controlNames.add(MODE_LIVE_BIG_RADIUS_VALUE);
+  controlNames.add(MODE_LIVE_SMALL_RADIUS_VALUE);
+  controlNames.add(MODE_LIVE_INTERVAL_VALUE);
+  controlNames.add(MODE_LIVE_RHO_RADIUS_VALUE);
+  controlNames.add(MODE_LIVE_MULTIPLIER_VALUE);
+  controlNames.add(MODE_LIVE_MODE_VALUE);
+  controlNames.add(MODE_EXPORT_SPIROGRAPH);
+
+//copied from INPUT tab:
+  //controlNames.add(MODE_LOAD_VECTOR_FILE);
+  controlNames.add(MODE_RESIZE_VECTOR); 
+  controlNames.add(MODE_MOVE_VECTOR); 
+  controlNames.add(MODE_PEN_LIFT_UP); 
+  controlNames.add(MODE_PEN_LIFT_DOWN); 
+  controlNames.add(MODE_SET_POSITION_HOME);
+  controlNames.add(MODE_RETURN_TO_HOME);
+  controlNames.add(MODE_CLEAR_QUEUE);
+  controlNames.add(MODE_RENDER_VECTORS);
+  
   return controlNames;
 }
 
@@ -1015,6 +1101,14 @@ Map<String, String> buildControlLabels()
   result.put(MODE_LIVE_CONFIRM_DRAW, "Draw capture");
   result.put(MODE_LIVE_CANCEL_CAPTURE, "Cancel capture");
   result.put(MODE_LIVE_ADD_CAPTION, "Add caption");
+
+  result.put(MODE_LIVE_BIG_RADIUS_VALUE, "Major Radius");
+  result.put(MODE_LIVE_SMALL_RADIUS_VALUE, "Minor radius");
+  result.put(MODE_LIVE_RHO_RADIUS_VALUE, "Rho");
+  result.put(MODE_LIVE_INTERVAL_VALUE, "Interval");
+  result.put(MODE_LIVE_MULTIPLIER_VALUE, "Multiplier");
+  result.put(MODE_LIVE_MODE_VALUE, "Mode");
+  result.put(MODE_EXPORT_SPIROGRAPH, "Export Spirograph");
   
   result.put(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF, "Path length cutoff");
   result.put(MODE_SHOW_WEBCAM_RAW_VIDEO, "Show video");
@@ -1168,6 +1262,14 @@ Set<String> buildControlNames()
   result.add(MODE_LIVE_CANCEL_CAPTURE);
   result.add(MODE_LIVE_ADD_CAPTION);
   result.add(MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF);
+
+  result.add(MODE_LIVE_BIG_RADIUS_VALUE);
+  result.add(MODE_LIVE_SMALL_RADIUS_VALUE);
+  result.add(MODE_LIVE_RHO_RADIUS_VALUE);
+  result.add(MODE_LIVE_INTERVAL_VALUE);
+  result.add(MODE_LIVE_MULTIPLIER_VALUE);
+  result.add(MODE_LIVE_MODE_VALUE);
+  result.add(MODE_EXPORT_SPIROGRAPH);
   
   result.add(MODE_SHOW_WEBCAM_RAW_VIDEO);
   result.add(MODE_FLIP_WEBCAM_INPUT);

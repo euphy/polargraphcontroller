@@ -61,11 +61,16 @@ Map<String, Set<Panel>> buildPanelsForTabs()
   queuePanels.add(getPanel(PANEL_NAME_QUEUE));
   queuePanels.add(getPanel(PANEL_NAME_GENERAL));
   
+  Set<Panel> spirographPanels = new HashSet<Panel>(2);
+  spirographPanels.add(getPanel(PANEL_NAME_SPIROGRAPH));
+  spirographPanels.add(getPanel(PANEL_NAME_GENERAL));
+  
   map.put(TAB_NAME_INPUT, inputPanels);
   map.put(TAB_NAME_ROVING, rovingPanels);
   map.put(TAB_NAME_TRACE, tracePanels);
   map.put(TAB_NAME_DETAILS, detailsPanels);
   map.put(TAB_NAME_QUEUE, queuePanels);
+  map.put(TAB_NAME_SPIROGRAPH, spirographPanels);
   
   return map;
 }
@@ -78,6 +83,7 @@ List<String> buildTabNames()
   list.add(TAB_NAME_TRACE);
   list.add(TAB_NAME_DETAILS);
   list.add(TAB_NAME_QUEUE);
+  list.add(TAB_NAME_SPIROGRAPH);
   return list;
 }
 
@@ -112,6 +118,11 @@ void initTabs()
   queue.setLabel(TAB_LABEL_QUEUE);
   queue.activateEvent(true);
   queue.setId(5);
+
+  Tab spirograph = cp5.getTab(TAB_NAME_SPIROGRAPH);
+  spirograph.setLabel(TAB_LABEL_SPIROGRAPH);
+  spirograph.activateEvent(true);
+  spirograph.setId(6);
 }
 
 public Set<String> buildPanelNames()
@@ -123,6 +134,7 @@ public Set<String> buildPanelNames()
   set.add(PANEL_NAME_DETAILS);
   set.add(PANEL_NAME_QUEUE);
   set.add(PANEL_NAME_GENERAL);
+  set.add(PANEL_NAME_SPIROGRAPH);
   return set;
 }
 

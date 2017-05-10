@@ -15,3 +15,11 @@ copies of all the libraries that I use, as well as all the source, and compiled 
 
 sandy.noble@gmail.com
 http://www.polargraph.co.uk/
+
+
+Spirograph functions Copyright Mark Craig 2017
+
+GPIO access on Raspberry Pi requires PiJ4 library available from http://pi4j.com/index.html.
+
+@markcra
+http://www.markcra.com/

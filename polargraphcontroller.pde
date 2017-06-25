@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 4;
-int buildNo = 2;
+int buildNo = 3;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -1330,7 +1330,7 @@ RShape loadShapeFromGCodeFile(String filename) {
     boolean reportStatus = true;
     while ((line = reader.readLine ()) != null) {
       lineNo++;
-      println("Line: " + line);
+//      println("Line: " + line);
       
       if (reportStatus) {
         float percent = ((float)lineNo / (float)countLines) * 100.0;
@@ -1354,7 +1354,7 @@ RShape loadShapeFromGCodeFile(String filename) {
           println(e.toString());
           continue;
         }
-        println("Ins: " + ins);
+//        println("Ins: " + ins);
         Integer code = Math.round(ins.get("G"));
         
         Float z = ins.get("Z");

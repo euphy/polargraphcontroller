@@ -120,9 +120,7 @@ void sendRequestMachineSize()
 void sendMachineSpec()
 {
   // ask for input to get the new machine size
-  String command = CMD_CHANGEMACHINENAME+newMachineName+",END";
-  addToCommandQueue(command);
-  command = CMD_CHANGEMACHINESIZE+getDisplayMachine().inMM(getDisplayMachine().getWidth())+","+getDisplayMachine().inMM(getDisplayMachine().getHeight())+",END";
+  String command = CMD_CHANGEMACHINESIZE+getDisplayMachine().inMM(getDisplayMachine().getWidth())+","+getDisplayMachine().inMM(getDisplayMachine().getHeight())+",END";
   addToCommandQueue(command);
   command = CMD_CHANGEMACHINEMMPERREV+int(getDisplayMachine().getMMPerRev())+",END";
   addToCommandQueue(command);
@@ -970,5 +968,3 @@ void sendDrawRandomSprite(String spriteFilename)
 {
   addToCommandQueue(CMD_DRAW_RANDOM_SPRITE+","+spriteFilename+",100,500,END");
 }
-
-

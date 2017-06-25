@@ -38,7 +38,7 @@ String DRAW_PIXELS_WINDOW_NAME = "drawPixelsWindow";
 String DRAW_WRITING_WINDOW_NAME = "drawWritingWindow";
 
 void button_mode_serialPortDialog() {
-  ControlFrameSimple cf = addSerialPortControlFrame("Serial Port", 200, 200, 20, 240, color( 100 ) );
+  ControlFrameSimple cf = addSerialPortControlFrame("Serial Port", 200, 500, 20, 240, color( 100 ) );
 }
 
 void button_mode_machineStoreDialog() {

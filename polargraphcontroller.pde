@@ -57,8 +57,8 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 4;
-int buildNo = 2;
+int minorVersionNo = 5;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -565,6 +565,7 @@ void setup()
   RG.init(this);
   loadFromPropertiesFile();
 
+  size(200, 200);
   size(windowWidth, windowHeight);
   this.cp5 = new ControlP5(this);
   initTabs();
@@ -651,10 +652,10 @@ void addEventListeners()
       public void componentResized(ComponentEvent event) 
       {
       windowResized();
-//        if (event.getSource()==frame) 
-//        {
-//  	  windowResized();
-//        }
+        if (event.getSource()==frame) 
+        {
+  	  windowResized();
+        }
       }
     }
   );

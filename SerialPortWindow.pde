@@ -31,7 +31,7 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 
   ScrollableList sl = p.cp5().addScrollableList("dropdown_serialPort")
     .setPosition(10, 10)
-    .setSize(150, 100)
+    .setSize(150, 450)
     .setBarHeight(20)
     .setItemHeight(20)
     .plugTo(this, "dropdown_serialPort");  
@@ -53,7 +53,7 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
   // set the value of the actual control
   sl.setValue(portNo);
 
-  sl.setOpen(false);
+  sl.setOpen(true);
   return p;
 }
 

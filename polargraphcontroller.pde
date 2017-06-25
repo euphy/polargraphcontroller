@@ -1297,6 +1297,7 @@ RShape loadShapeFromGCodeFile(String filename) {
     boolean reportStatus = true;
     while ((line = reader.readLine ()) != null) {
       lineNo++;
+      println("Line: " + line);
       
       if (reportStatus) {
         float percent = ((float)lineNo / (float)countLines) * 100.0;
@@ -1320,10 +1321,8 @@ RShape loadShapeFromGCodeFile(String filename) {
           println(e.toString());
           continue;
         }
+        println("Ins: " + ins);
         Integer code = Math.round(ins.get("G"));
-        if (code >= 2) {
-          continue;
-        }
         
         Float z = ins.get("Z");
         if (z != null) {
@@ -1366,19 +1365,6 @@ RShape loadShapeFromGCodeFile(String filename) {
             parent.addMoveTo(x, y);
           }
         }
-//        RPoint[][] points = parent.getPointsInPaths();
-//        totalPoints = 0;
-//        if (points != null) {
-//          for (int i = 0; i<points.length; i++) {
-//            if (points[i] != null) {
-//              for (int j = 0; j<points[i].length; j++) {
-//                totalPoints++;
-//              }
-//            }
-//          }
-//        }
-//        points = null;
-//        println("" + totalPoints + " points.");
       }
       else {
         
@@ -1399,7 +1385,7 @@ RShape loadShapeFromGCodeFile(String filename) {
     }
   }
   catch (IOException e) {
-    println("Execption reading lines from the gcode file " + filename);
+    println("IOExecption reading lines from the gcode file " + filename);
     e.printStackTrace();
   }
   finally {
@@ -1407,7 +1393,7 @@ RShape loadShapeFromGCodeFile(String filename) {
       reader.close();
     } 
     catch (IOException e) {
-      println("Exception closing the gcode file " + filename);
+      println("IOException closing the gcode file " + filename);
       e.printStackTrace();
     }
   }
@@ -1442,19 +1428,29 @@ Map<String, Float> unpackGCodeInstruction(String line) throws Exception {
     String[] splitted = line.trim().split(" ");
     for (int i = 0; i < splitted.length; i++) {
       String axis = splitted[i].substring(0, 1);
-      Float value = Float.parseFloat(splitted[i].substring(1));
+      String sanitisedValue = splitted[i].substring(1);
+      println("BEfore:" + sanitisedValue);
+      sanitisedValue = sanitisedValue.replace(",", ".");
+      println("After: " + sanitisedValue);
+      
+      Float value = Float.parseFloat(sanitisedValue);
       if ("X".equalsIgnoreCase(axis) || "Y".equalsIgnoreCase(axis) || "Z".equalsIgnoreCase(axis) || "G".equalsIgnoreCase(axis)) {
-        instruction.put(axis, value);
+        instruction.put(axis.toUpperCase(), value);
       }
     }
 //    println("instruction: " + instruction);
     if (instruction.isEmpty()) {
-      throw new Exception();
+      throw new Exception("Empty instruction");
     }
   }
+  catch (NumberFormatException nfe) {
+    println("Number format exception: " + nfe.getMessage()); 
+  }
   catch (Exception e) {
+    println("e: " + e);
     throw new Exception("Exception while reading the lines from a gcode file: " + line + ", " + e.getMessage());
   }
+  println("Instruction: " + instruction);
   
   return instruction;
 }

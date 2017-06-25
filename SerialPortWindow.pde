@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------
  Class and controllers on the "serial port" subwindow
  ------------------------------------------------------------------------*/
-
+  
 ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int theHeight, int theX, int theY, int theColor ) {
   final Frame f = new Frame( theName );
   final ControlFrameSimple p = new ControlFrameSimple( this, theWidth, theHeight, theColor );
@@ -28,36 +28,44 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
   } 
   catch(Exception e) {
   }
-  
-  // set up controls
-  RadioButton r = p.cp5().addRadioButton("radio_serialPort")
-    .setPosition(10, 10)
-    .setSize(15, 15)
-    .setSpacingRow(5)
-    .plugTo(this, "radio_serialPort");
 
-  r.addItem("No serial connection", -1);
+  ScrollableList sl = p.cp5().addScrollableList("dropdown_serialPort")
+    .setPosition(10, 10)
+    .setSize(150, 150)
+    .setBarHeight(20)
+    .setItemHeight(16)
+    .plugTo(this, "dropdown_serialPort");  
+
+  sl.addItem("No serial connection", -1);
 
   String[] ports = Serial.list();
-
+  
   for (int i = 0; i < ports.length; i++) {
     println("Adding " + ports[i]);
-    r.addItem(ports[i], i);
+    sl.addItem(ports[i], i);
   }
-
+  
   int portNo = getSerialPortNumber();
-  if (portNo >= 0 && portNo < ports.length)
-    r.activate(ports[portNo]);
-  else
-    r.activate("No serial connection");
+  println("portNo: " + portNo);
+  if (portNo < 0 || portNo >= ports.length)
+    portNo = -1;
 
+  // set the value of the actual control
+  sl.setValue(portNo);
+
+  sl.setOpen(false);
   return p;
 }
 
 
-void radio_serialPort(int newSerialPort) 
+void dropdown_serialPort(int newSerialPort) 
 {
-  println("In radio_serialPort");
+  println("In dropdown_serialPort, newSerialPort: " + newSerialPort);
+
+  // No serial in list is slot 0 in code because of list index
+  // So shift port index by one 
+  newSerialPort -= 1;
+  
   if (newSerialPort == -2)
   {
   } 

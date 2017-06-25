@@ -58,7 +58,7 @@ import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
 int minorVersionNo = 4;
-int buildNo = 0;
+int buildNo = 2;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -149,6 +149,8 @@ List<String> machineMessageLog = new ArrayList<String>();
 List<PreviewVector> previewCommandList = new ArrayList<PreviewVector>();
 long lastCommandQueueHash = 0L;
 
+File lastImageDirectory = null;
+File lastPropertiesDirectory = null;
 
 String lastCommand = "";
 String lastDrawingCommand = "";
@@ -571,7 +573,6 @@ void setup()
   println("Serial ports available on your machine:");
   println(serialPorts);
 
-//  println("getSerialPortNumber()"+getSerialPortNumber());
   if (getSerialPortNumber() >= 0)
   {
     println("About to connect to serial port in slot " + getSerialPortNumber());
@@ -682,17 +683,28 @@ void windowResized()
   windowWidth = frame.getWidth();
   windowHeight = frame.getHeight();
   println("New window size: " + windowWidth + " x " + windowHeight);
+  if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH) {
+    println("Max");
+    frame.setExtendedState(0);
+    frame.setSize(windowWidth, windowHeight);
+  }
   
   for (String key : getPanels().keySet())
   {
     Panel p = getPanels().get(key);
     p.setSizeByHeight(windowHeight - p.getOutline().getTop() - (DEFAULT_CONTROL_SIZE.y*2));
+    if (debugPanels) {
+      println("Resize " + key + " to be " + p.getOutline().getWidth() + "px across, " + p.getOutline().getHeight() + "px tall");
+    }
   }
-  
+
   // Required to tell CP5 to be able to use the new sized window
+  // How does this work?
   cp5.setGraphics(this,0,0);
+  
   loop();
 }
+
 void draw()
 {
 
@@ -995,7 +1007,9 @@ void drawMoveImageOutline()
     PVector offsetMouseVector = PVector.sub(getDisplayMachine().scaleToDisplayMachine(getMouseVector()), centroid);
     if (pointPaths != null)
     {
-      for (int i = 0; i<pointPaths.length; i++)
+      int increment = round((pointPaths.length/10.0)+0.5);
+      println(increment);
+      for (int i = 0; i<pointPaths.length; i+=increment)
       {
         if (pointPaths[i] != null) 
         {
@@ -1072,11 +1086,14 @@ void loadImageWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
+      if (lastImageDirectory != null) fc.setCurrentDirectory(lastImageDirectory);
       fc.setFileFilter(new ImageFileFilter());
-      
       fc.setDialogTitle("Choose an image file...");
 
       int returned = fc.showOpenDialog(frame);
+      
+      lastImageDirectory = fc.getCurrentDirectory();
+      
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
         File file = fc.getSelectedFile();
@@ -1117,11 +1134,16 @@ void loadVectorWithFileChooser()
   {
     public void run() {
       JFileChooser fc = new JFileChooser();
+      if (lastImageDirectory != null) 
+      { 
+        fc.setCurrentDirectory(lastImageDirectory);
+      }
+      
       fc.setFileFilter(new VectorFileFilter());
-
       fc.setDialogTitle("Choose a vector file...");
-
       int returned = fc.showOpenDialog(frame);
+      lastImageDirectory = fc.getCurrentDirectory();
+      
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
         File file = fc.getSelectedFile();
@@ -1149,7 +1171,7 @@ class VectorFileFilter extends javax.swing.filechooser.FileFilter
   public boolean accept(File file) {
     String filename = file.getName();
     filename.toLowerCase();
-    if (file.isDirectory() || filename.endsWith(".svg") || filename.endsWith(".gco") || filename.endsWith(".g") || filename.endsWith(".txt"))
+    if (file.isDirectory() || filename.endsWith(".svg") || isGCodeExtension(filename))
       return true;
     else
       return false;
@@ -1166,11 +1188,15 @@ void loadNewPropertiesFilenameWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
+      if (lastPropertiesDirectory != null) fc.setCurrentDirectory(lastPropertiesDirectory);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Choose a config file...");
 
       int returned = fc.showOpenDialog(frame);
+      
+      lastPropertiesDirectory = fc.getCurrentDirectory();
+      
       if (returned == JFileChooser.APPROVE_OPTION) 
       {
         File file = fc.getSelectedFile();
@@ -1214,6 +1240,7 @@ void saveNewPropertiesFileWithFileChooser()
     public void run() 
     {
       JFileChooser fc = new JFileChooser();
+      if (lastPropertiesDirectory != null) fc.setCurrentDirectory(lastPropertiesDirectory);
       fc.setFileFilter(new PropertiesFileFilter());
       
       fc.setDialogTitle("Enter a config file name...");
@@ -1245,11 +1272,17 @@ RShape loadShapeFromFile(String filename) {
   if (filename.toLowerCase().endsWith(".svg")) {
     sh = RG.loadShape(filename);
   }
-  else if (filename.toLowerCase().endsWith(".gco") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".txt")) {
+  else if (isGCodeExtension(filename)) {
     sh = loadShapeFromGCodeFile(filename);
   }
   return sh;
 }
+
+
+boolean isGCodeExtension(String filename) {
+  return (filename.toLowerCase().endsWith(".gcode") || filename.toLowerCase().endsWith(".g") || filename.toLowerCase().endsWith(".ngc") || filename.toLowerCase().endsWith(".txt"));
+}
+
 
 int countLines(String filename) throws IOException {
     InputStream is = new BufferedInputStream(new FileInputStream(filename));
@@ -1427,18 +1460,17 @@ Map<String, Float> unpackGCodeInstruction(String line) throws Exception {
   try {
     String[] splitted = line.trim().split(" ");
     for (int i = 0; i < splitted.length; i++) {
+      // remove ; character
+      splitted[i] = splitted[i].replace(";", "");
       String axis = splitted[i].substring(0, 1);
       String sanitisedValue = splitted[i].substring(1);
-      println("BEfore:" + sanitisedValue);
       sanitisedValue = sanitisedValue.replace(",", ".");
-      println("After: " + sanitisedValue);
-      
       Float value = Float.parseFloat(sanitisedValue);
       if ("X".equalsIgnoreCase(axis) || "Y".equalsIgnoreCase(axis) || "Z".equalsIgnoreCase(axis) || "G".equalsIgnoreCase(axis)) {
         instruction.put(axis.toUpperCase(), value);
       }
     }
-//    println("instruction: " + instruction);
+//  println("instruction: " + instruction);
     if (instruction.isEmpty()) {
       throw new Exception("Empty instruction");
     }
@@ -1450,7 +1482,6 @@ Map<String, Float> unpackGCodeInstruction(String line) throws Exception {
     println("e: " + e);
     throw new Exception("Exception while reading the lines from a gcode file: " + line + ", " + e.getMessage());
   }
-  println("Instruction: " + instruction);
   
   return instruction;
 }
@@ -3058,21 +3089,19 @@ void loadFromPropertiesFile()
   if (getVectorFilename() != null)
   {
     RShape shape = null;
-    try
-    {
+    // test if file exists
+    File f =  new File(getVectorFilename());
+    if (f.isFile()) {
       shape = RG.loadShape(getVectorFilename());
     }
-    catch (Exception e)
-    {
-      shape = null;
+    else {
+      println("Tried to load vector file (" + getVectorFilename() + ") but I couldn't find it.");
     }
     
-    if (shape != null) 
-    {
+    if (shape != null) {
       setVectorShape(shape);
     }
-    else 
-    {
+    else {
       println("File not found (" + getVectorFilename() + ")");
     }
   }

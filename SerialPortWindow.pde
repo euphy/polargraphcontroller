@@ -33,7 +33,7 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
     .setPosition(10, 10)
     .setSize(150, 450)
     .setBarHeight(20)
-    .setItemHeight(20)
+    .setItemHeight(16)
     .plugTo(this, "dropdown_serialPort");  
 
   sl.addItem("No serial connection", -1);
@@ -61,8 +61,10 @@ ControlFrameSimple addSerialPortControlFrame(String theName, int theWidth, int t
 void dropdown_serialPort(int newSerialPort) 
 {
   println("In dropdown_serialPort, newSerialPort: " + newSerialPort);
+
+  // No serial in list is slot 0 in code because of list index
+  // So shift port index by one 
   newSerialPort -= 1;
-  
   
   if (newSerialPort == -2)
   {

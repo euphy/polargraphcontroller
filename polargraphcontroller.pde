@@ -26,7 +26,15 @@
  sandy.noble@gmail.com
  http://www.polargraph.co.uk
  https://github.com/euphy/polargraphcontroller
- 
+
+ ===================
+ Modified by Mark Craig to include Spirograph (replaced Trace tab and butchered some of it's code)
+
+Spirograph functions Copyright Mark Craig 2017
+GPIO access on Raspberry Pi requires PiJ4 library available from http://pi4j.com/index.html.
+
+@markcra
+http://www.markcra.com/
  */
 
 //import processing.video.*;
@@ -55,6 +63,24 @@ import java.awt.Frame;
 import java.awt.BorderLayout;
 
 import java.lang.reflect.Method;
+
+/* // Comment block the following out for use on non-Raspberry Pi hardware.
+// for GPIO rotary encoders & buttons
+import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
+import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
+import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.RaspiPin;
+
+GpioController gpio;
+GpioPinDigitalInput button1, input1A, input1B, button2, input2A, input2B, button3, input3A, input3B, button4, input4A, input4B;
+GpioPinDigitalInput button5, input5A, input5B, button6, input6A, input6B, button7, input7A, input7B;
+// end of comment block for RaspPi
+*/
 
 int majorVersionNo = 2;
 int minorVersionNo = 5;
@@ -330,6 +356,14 @@ static final String MODE_LIVE_CANCEL_CAPTURE = "button_mode_liveClearCapture";
 static final String MODE_LIVE_ADD_CAPTION = "button_mode_liveAddCaption";
 static final String MODE_LIVE_CONFIRM_DRAW = "button_mode_liveConfirmDraw";
 
+static final String MODE_LIVE_BIG_RADIUS_VALUE = "numberbox_mode_liveBigRadiusValue";
+static final String MODE_LIVE_SMALL_RADIUS_VALUE = "numberbox_mode_liveSmallRadiusValue";
+static final String MODE_LIVE_RHO_RADIUS_VALUE = "numberbox_mode_liveRhoRadiusValue";
+static final String MODE_LIVE_INTERVAL_VALUE = "numberbox_mode_liveIntervalValue";
+static final String MODE_LIVE_MULTIPLIER_VALUE = "numberbox_mode_liveMultiplierValue";
+static final String MODE_LIVE_MODE_VALUE = "numberbox_mode_liveModeValue";
+static final String MODE_EXPORT_SPIROGRAPH = "button_mode_exportSpirograph";
+
 static final String MODE_VECTOR_PATH_LENGTH_HIGHPASS_CUTOFF = "numberbox_mode_vectorPathLengthHighPassCutoff";
 static final String MODE_SHOW_WEBCAM_RAW_VIDEO = "toggle_mode_showWebcamRawVideo";
 static final String MODE_FLIP_WEBCAM_INPUT = "toggle_mode_flipWebcam";
@@ -452,6 +486,8 @@ public static final String TAB_NAME_QUEUE = "tab_queue";
 public static final String TAB_LABEL_QUEUE = "Queue";
 public static final String TAB_NAME_TRACE = "tab_trace";
 public static final String TAB_LABEL_TRACE = "Trace";
+public static final String TAB_NAME_SPIROGRAPH = "tab_spirograph";
+public static final String TAB_LABEL_SPIROGRAPH = "Spirograph";
 
 // Page states
 public String currentTab = TAB_NAME_INPUT;
@@ -462,6 +498,7 @@ public static final String PANEL_NAME_ROVING = "panel_roving";
 public static final String PANEL_NAME_DETAILS = "panel_details";
 public static final String PANEL_NAME_QUEUE = "panel_queue";
 public static final String PANEL_NAME_TRACE = "panel_trace";
+public static final String PANEL_NAME_SPIROGRAPH = "panel_spirograph";
 
 public static final String PANEL_NAME_GENERAL = "panel_general";
 
@@ -545,6 +582,17 @@ boolean rescaleDisplayMachine = true;
 int polygonizer = 0;
 float polygonizerLength = 0.0;
 
+// Global variables for Spirograph.
+int mode = 0; // different spirograph drawing methods
+int pos_x = 320;  // position of spirograph preview on screen
+int pos_y = 320;
+int radius = 1; // minor radius
+int Radius = 171; // major radius
+int rho = 53; // pen position on minor radius
+int Interval = 516; // how many lines/segments are used
+int multiplier = 0; // used in mode 2
+
+
 void setup()
 {
   println("Running polargraph controller");
@@ -609,6 +657,8 @@ void setup()
     useSerialPortConnection = false;
   }
 
+  setupGPIO();
+
   currentMode = MODE_BEGIN;
   preLoadCommandQueue();
   changeTab(TAB_NAME_INPUT, TAB_NAME_INPUT);
@@ -670,6 +720,230 @@ void addEventListeners()
   ); 
 }  
 
+void setupGPIO() {
+  /* // Comment block the following out for use on non-Raspberry Pi hardware.
+  gpio = GpioFactory.getInstance();
+  button1 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00, "Pin1", PinPullResistance.PULL_UP);
+  input1A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_03, "Pin1A", PinPullResistance.PULL_UP);
+  input1B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, "Pin1B", PinPullResistance.PULL_UP);
+  button2 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_08, "Pin2", PinPullResistance.PULL_UP);
+  input2A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_09, "Pin2A", PinPullResistance.PULL_UP);
+  input2B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_07, "Pin2B", PinPullResistance.PULL_UP);
+  button3 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_13, "Pin3", PinPullResistance.PULL_UP);
+  input3A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_12, "Pin3A", PinPullResistance.PULL_UP);
+  input3B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_14, "Pin3B", PinPullResistance.PULL_UP);
+  button4 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_23, "Pin4", PinPullResistance.PULL_UP);
+  input4A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_22, "Pin4A", PinPullResistance.PULL_UP);
+  input4B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_21, "Pin4B", PinPullResistance.PULL_UP);
+  button5 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_15, "Pin5", PinPullResistance.PULL_UP);
+  input5A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_16, "Pin5A", PinPullResistance.PULL_UP);
+  input5B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, "Pin5B", PinPullResistance.PULL_UP);
+  button6 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04, "Pin6", PinPullResistance.PULL_UP);
+  input6A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, "Pin6A", PinPullResistance.PULL_UP);
+  input6B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, "Pin6B", PinPullResistance.PULL_UP);
+  button7 = gpio.provisionDigitalInputPin(RaspiPin.GPIO_29, "Pin7", PinPullResistance.PULL_UP);
+  input7A = gpio.provisionDigitalInputPin(RaspiPin.GPIO_28, "Pin7A", PinPullResistance.PULL_UP);
+  input7B = gpio.provisionDigitalInputPin(RaspiPin.GPIO_27, "Pin7B", PinPullResistance.PULL_UP);
+
+  button1.addListener(new GpioPinListenerDigital() { // Cancel button: clears the queue, lifts the pen and returns to home position.
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button1.getState().getValue();
+      print("button1.getState().getValue() returned ");
+      println(a);
+      if (a == 0) { // rising edge
+        resetQueue();
+        //addToCommandQueue(CMD_PENUP + penLiftUpPosition +",END");
+        button_mode_returnToHome(); 
+      }
+    }
+  });
+  button2.addListener(new GpioPinListenerDigital() { // Export button: Use these spirgraph settings (move it across to polargraph).
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button2.getState().getValue();
+      if (a == 0) { // rising edge
+        button_mode_exportSpirograph(); 
+      }
+    }
+  });
+  button3.addListener(new GpioPinListenerDigital() { // start button
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button3.getState().getValue();
+      if (a == 0) { // rising edge
+        sendVectorShapes(); 
+      }
+    }
+  });
+  button4.addListener(new GpioPinListenerDigital() { // pause/resume queue button
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button4.getState().getValue();
+      if (a == 0) { // rising edge
+        commandQueueRunning = !commandQueueRunning;
+      }
+    }
+  });
+  button5.addListener(new GpioPinListenerDigital() { // set Home
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button5.getState().getValue();
+      if (a == 0) { // rising edge 
+        sendSetHomePosition();
+      }
+    }
+  });
+  button6.addListener(new GpioPinListenerDigital() { // reset position to defualt
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button6.getState().getValue();
+      if (a == 0) { // rising edge
+        PVector newVecPosition = new PVector(0, 0);
+        vectorPosition = newVecPosition;
+      }
+    }
+  });
+  button7.addListener(new GpioPinListenerDigital() { // reset scale to default
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = button7.getState().getValue();
+      if (a == 0) { // rising edge
+         cp5.getController(MODE_RESIZE_VECTOR).setValue( 38.6 );
+      }
+    }
+  });
+
+  input1A.addListener(new GpioPinListenerDigital() {
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input1A.getState().getValue();
+      int b = input1B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        if (Radius + n > 0 && Radius + n < 1000) {
+          cp5.getController(MODE_LIVE_BIG_RADIUS_VALUE).setValue( Radius + n );
+        }
+        lastA = a;  
+      }
+    }
+  });
+
+  input2A.addListener(new GpioPinListenerDigital() {
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input2A.getState().getValue();
+      int b = input2B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        if (radius + n > 0 && radius + n < 1000) {
+          cp5.getController(MODE_LIVE_SMALL_RADIUS_VALUE).setValue( radius + n );
+        }
+        lastA = a;  
+      }
+    }
+  });
+  input3A.addListener(new GpioPinListenerDigital() {
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input3A.getState().getValue();
+      int b = input3B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        if (rho + n > 0 && rho + n < 1000) {
+          cp5.getController(MODE_LIVE_RHO_RADIUS_VALUE).setValue( rho + n );
+        }
+        lastA = a;  
+      }
+    }
+  });
+
+  input4A.addListener(new GpioPinListenerDigital() {
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input4A.getState().getValue();
+      int b = input4B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        if (Interval + n > 0 && Interval + n < 1000) {
+          cp5.getController(MODE_LIVE_INTERVAL_VALUE).setValue( Interval + n );
+        }
+        lastA = a;  
+      }
+    }
+  });
+  
+  input5A.addListener(new GpioPinListenerDigital() { // X-position of Vectors
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input5A.getState().getValue();
+      int b = input5B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        PVector push = new PVector(n, 0);
+        vectorPosition = PVector.add(vectorPosition, push);
+        lastA = a;  
+      }
+    }
+  });
+  
+  input6A.addListener(new GpioPinListenerDigital() { // Y-position of Vectors
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input6A.getState().getValue();
+      int b = input6B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        PVector push = new PVector(0, n);
+        vectorPosition = PVector.add(vectorPosition, push);
+        lastA = a;  
+      }
+    }
+  });
+  
+  input7A.addListener(new GpioPinListenerDigital() { // Scale of vectors
+    int lastA;
+  
+    @Override
+    public synchronized void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent arg0) {
+      int a = input7A.getState().getValue();
+      int b = input7B.getState().getValue();
+      if (lastA != a) {
+        int n = (b == a ? -1 : 1);
+        float scale = vectorScaling;
+        if (scale + n > 0 && scale + n < 100) {
+          cp5.getController(MODE_RESIZE_VECTOR).setValue( scale + n );
+        }
+        lastA = a;  
+      }
+    }
+  });
+  */ // end of comment block for RaspPi
+}
 
 void preLoadCommandQueue()
 {
@@ -723,6 +997,9 @@ void draw()
   }
   else if (getCurrentTab() == TAB_NAME_TRACE) {
     drawTracePage();
+  }
+  else if (getCurrentTab() == TAB_NAME_SPIROGRAPH) {
+    drawSpiroPage();
   }
   else {
     drawDetailsPage();
@@ -937,6 +1214,281 @@ void drawTracePage()
 //    displayGamepadOverlay();
 }
 
+void drawSpiroPage() {
+  strokeWeight(1);
+  background(100);
+  noFill();
+  stroke(255, 150, 255, 100);
+  strokeWeight(3);
+  stroke(150);
+  noFill();
+  
+  getDisplayMachine().drawForSpiro();//Trace();
+  if (true || retraceShape) // displayingImage && getDisplayMachine().imageIsReady() &&
+  {
+    spirograph();
+    //processedLiveImage = trace_processImageForTrace(getDisplayMachine().getImage());
+    //colourSeparations = trace_buildSeps(processedLiveImage, sepKeyColour);
+    //traceShape = trace_traceImage(colourSeparations);
+    //drawingTraceShape = true;
+    retraceShape = false;
+  }
+  
+  
+
+  stroke(255, 0, 0);
+ 
+  for (Panel panel : getPanelsForTab(TAB_NAME_SPIROGRAPH))
+  {
+    panel.draw();
+  }
+  text(propertiesFilename, getPanel(PANEL_NAME_GENERAL).getOutline().getLeft(), getPanel(PANEL_NAME_GENERAL).getOutline().getTop()-7);
+
+
+  if (displayingInfoTextOnInputPage)
+    showText(250,45);
+  drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
+  showCommandQueue((int) width-200, 20);
+
+
+//  processGamepadInput();
+//
+//  if (displayGamepadOverlay)
+//    displayGamepadOverlay();
+}
+
+void spirograph() {
+  float theta;
+  int last_x = (Radius-radius)*1+rho*1;
+  if (mode != 0)
+    last_x = (Radius+radius)*1-rho*1;
+  int last_y = 0;
+  int x;
+  int y;
+  if (radius <= 0) radius = 1;
+  if (Radius <= 0) Radius = 1;
+  if (rho <= 0) rho = 1;
+  if (mode == 0) { // hypotrochoid
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = int((Radius-radius)*cos(theta)+rho*cos((Radius-radius)/radius*theta));
+      y = int((Radius-radius)*sin(theta)+rho*sin((Radius-radius)/radius*theta));
+      line(pos_x+last_x, pos_y+last_y, pos_x+x, pos_y+y);
+      last_x = x;
+      last_y = y;
+    }
+    line(pos_x+last_x, pos_y+last_y, pos_x+(Radius-radius)*1+rho*1, pos_y);
+  }
+  else if (mode == 1) { // epitrochoid
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = int((Radius+radius)*cos(theta)-rho*cos((Radius+radius)/radius*theta));
+      y = int((Radius+radius)*sin(theta)-rho*sin((Radius+radius)/radius*theta));
+      line(pos_x+last_x, pos_y+last_y, pos_x+x, pos_y+y);
+      last_x = x;
+      last_y = y;
+    }
+    line(pos_x+last_x, pos_y+last_y, pos_x+(Radius+radius)*1-rho*1, pos_y);
+  }
+  else if (mode == 2) {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = int((Radius)*cos(theta)*cos(multiplier*theta)-rho*cos((Radius+radius)/radius*theta));
+      y = int((Radius)*sin(theta)*sin(multiplier*theta)-rho*sin((Radius+radius)/radius*theta));
+      line(pos_x+last_x, pos_y+last_y, pos_x+x, pos_y+y);
+      last_x = x;
+      last_y = y;
+    }
+    line(pos_x+last_x, pos_y+last_y, pos_x+(Radius+(0 + radius/2 * 1))*1-rho*1, pos_y);
+  }
+  else if (mode == 3){
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = int((Radius)*cos(theta)*cos(multiplier*theta));
+      y = int((Radius)*sin(theta)*sin(multiplier*theta));
+      line(pos_x+last_x, pos_y+last_y, pos_x+x, pos_y+y);
+      last_x = x;
+      last_y = y;
+    }
+    line(pos_x+last_x, pos_y+last_y, pos_x+(Radius+(0 + radius/2 * 1))*1-rho*1, pos_y);
+  }
+  else {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = int((Radius)*(sin(53*theta)*sin(multiplier*theta+PI/4)+sin(53*theta+PI/4)));
+      y = int((Radius)*(sin(53*theta+PI/4)*(sin(53*theta)+sin(53*theta+PI/4))));
+      line(pos_x+last_x, pos_y+last_y, pos_x+x, pos_y+y);
+      last_x = x;
+      last_y = y;
+    }
+    line(pos_x+last_x, pos_y+last_y, pos_x+(Radius+(0 + radius/2 * 1))*1-rho*1, pos_y);
+  }
+}
+
+void Export() {
+  // handle the EXPORT button click
+  
+  // Open a dialog to choose the location and name for the file
+  File file = new File("output.svg");
+  exportToSVG(file);
+  //exportToSVG("output.svg"); // doesn't work as it's a string, not a File.
+  loadVectorFromSpirograph();
+  //selectOutput("Save the file as a .svg", "exportToSVG");
+
+  // turn off polygonizer if it's on
+  if (polygonizer == 1) {
+    button_mode_cyclePolygonizer();
+  }
+}
+
+void exportToSVG(File filepath) {
+  // write an SVG file
+  String data[] = new String[7];
+  int lineNo = 0;
+  
+//  int Radius = int(RadiusNumbox.getValue());
+//  int radius = int(radiusNumbox.getValue());
+//  int rho = int(rhoNumbox.getValue());
+//  int Interval = int(IntervalNumbox.getValue());
+  float theta;
+  int last_x = (Radius-radius)*1+rho*1;
+  int last_y = 0;
+  float x;
+  float y;
+  if (radius <= 0) radius = 1;
+  if (Radius <= 0) Radius = 1;
+  if (rho <= 0) rho = 1;
+
+  int SVGwidth = 2*(Radius-radius+rho);
+  int SVGheight = 2*(Radius-radius+rho);
+  int SVGx = -SVGwidth / 2;
+  int SVGy = -SVGwidth / 2;
+  
+  if (mode == 3) {
+    SVGwidth = 2*Radius;
+    SVGheight = SVGwidth;
+    SVGx = -SVGwidth / 2;
+    SVGy = -SVGwidth / 2;
+  }
+
+  
+  // Header
+  data[lineNo] = "<?xml version=\"1.0\" standalone=\"no\"?>";
+  lineNo++;
+  data[lineNo] = "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
+  lineNo++;
+  data[lineNo] = "<!-- Created by Mark Craig (http://www.markcra.com/) -->";
+  lineNo++;
+  // Start of XML
+  data[lineNo] = "<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" ";
+  data[lineNo] += "width=\"" + str(SVGwidth);
+  data[lineNo] += "\" height=\"" + str(SVGheight); 
+  data[lineNo] += "\" viewBox=\"" + str(SVGx) + " " + str(SVGy) + " " + str(SVGwidth) + " " + str(SVGheight);
+  data[lineNo] += "\" id=\"Layer_1\" xml:space=\"preserve\"><defs id=\"defs8928\" />";
+  lineNo++;
+  
+  // hide the settings in plain sight so anyone can recreate the same spirograph from the SVG
+  data[lineNo] = "<!-- Settings Radius: " + str(Radius) + " radius: " + str(radius) + " rho: " + str(rho) + " Interval: " + str(Interval) + " mode: " + str(mode) + "-->";
+  lineNo++;
+
+  // Drawing lines
+  if (mode == 0) {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = (Radius-radius)*cos(theta)+rho*cos((Radius-radius)/radius*theta);
+      y = (Radius-radius)*sin(theta)+rho*sin((Radius-radius)/radius*theta);
+      
+      if (i>0) {
+        data[lineNo] += "L "+str(x) + " " + str(y) + " ";
+      }
+      else if (i==0) { // first time through we start the path
+        data[lineNo] = "<path d=\"M "+str(x) + " " + str(y) + " ";
+        //lineNo++;
+      }
+    }
+    // End Line
+    data[lineNo] += "L " + str((Radius-radius)*1+rho*1) + " " + str(0);
+  }
+  else if (mode == 1) {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = (Radius+radius)*cos(theta)-rho*cos((Radius+radius)/radius*theta);
+      y = (Radius+radius)*sin(theta)-rho*sin((Radius+radius)/radius*theta);
+      
+      if (i>0) {
+        data[lineNo] += "L "+str(x) + " " + str(y) + " ";
+      }
+      else if (i==0) { // first time through we start the path
+        data[lineNo] = "<path d=\"M "+str(x) + " " + str(y) + " ";
+        //lineNo++;
+      }
+    }
+    // End Line
+    data[lineNo] += "L " + str((Radius+radius)*1-rho*1) + " " + str(0);
+  }
+  else if (mode == 2) {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = (Radius)*cos(theta)*cos(multiplier*theta)-rho*cos((Radius+radius)/radius*theta);
+      y = (Radius)*sin(theta)*sin(multiplier*theta)-rho*sin((Radius+radius)/radius*theta);
+      
+      if (i>0) {
+        data[lineNo] += "L "+str(x) + " " + str(y) + " ";
+      }
+      else if (i==0) { // first time through we start the path
+        data[lineNo] = "<path d=\"M "+str(x) + " " + str(y) + " ";
+        //lineNo++;
+      }
+    }
+    // End Line
+    data[lineNo] += "L " + str((Radius+radius)*1-rho*1) + " " + str(0);
+  }
+  else if (mode == 3) {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = (Radius)*cos(theta)*cos(multiplier*theta);
+      y = (Radius)*sin(theta)*sin(multiplier*theta);
+      
+      if (i>0) {
+        data[lineNo] += "L "+str(x) + " " + str(y) + " ";
+      }
+      else if (i==0) { // first time through we start the path
+        data[lineNo] = "<path d=\"M "+str(x) + " " + str(y) + " ";
+        //lineNo++;
+      }
+    }
+    // End Line
+    data[lineNo] += "L " + str((Radius+radius)*1) + " " + str(0);
+  }
+  else {
+    for(int i=0; i<Interval; i++) {
+      theta = float(i) / (Interval/2) * PI;
+      x = int((Radius)*(sin(53*theta)*sin(multiplier*theta+PI/4)+sin(53*theta+PI/4)));
+      y = int((Radius)*(sin(53*theta+PI/4)*(sin(53*theta)+sin(53*theta+PI/4))));    
+
+      if (i>0) {
+        data[lineNo] += "L "+str(x) + " " + str(y) + " ";
+      }
+      else if (i==0) { // first time through we start the path
+        data[lineNo] = "<path d=\"M "+str(x) + " " + str(y) + " ";
+        //lineNo++;
+      }
+    }
+    // End Line
+    data[lineNo] += "L " + str((Radius+radius)*1) + " " + str(0);
+  }
+
+  data[lineNo] += "\" id=\"path1\" fill=\"none\" stroke=\"black\" stroke-width=\"0.1\"/>";
+  lineNo++;
+  
+  // Wrap up the file
+  data[lineNo] = "</svg>";
+  
+  // Save to File
+  // The same file is overwritten by adding the data folder path to saveStrings().
+  saveStrings(filepath, data); 
+  println("Export complete.");
+}
 
 void drawCommandQueuePage()
 {
@@ -1165,6 +1717,21 @@ void loadVectorWithFileChooser()
     }
   }
   );
+}
+
+void loadVectorFromSpirograph() {
+  // need a hard coded filename and location to load the spirograph.
+  File file = new File("output.svg"); // doesn't look right to me but can't find any better function.
+  RShape shape = loadShapeFromFile(file.getPath());
+  if (shape != null) 
+  {
+    setVectorFilename(file.getPath());
+    setVectorShape(shape);
+  }
+  else 
+  {
+    println("File not found (" + file.getPath() + ")");
+  }
 }
 
 class VectorFileFilter extends javax.swing.filechooser.FileFilter 

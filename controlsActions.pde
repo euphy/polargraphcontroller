@@ -323,6 +323,7 @@ void button_mode_loadImage()
     getDisplayMachine().setImageFilename(null);
   }
 }
+
 void button_mode_loadVectorFile()
 {
   if (getVectorShape() == null)
@@ -336,6 +337,7 @@ void button_mode_loadVectorFile()
     vectorFilename = null;
   }
 }
+
 void numberbox_mode_pixelBrightThreshold(float value)
 {
   pixelExtractBrightThreshold = (int) value;
@@ -730,17 +732,11 @@ void numberbox_mode_previewCordOffsetValue(int value)
   previewQueue(true);
 }
 
-void button_mode_cycleDensityPreviewStyle() 
+void dropdown_mode_cycleDensityPreviewStyle(int index) 
 {
-  Controller c = cp5.getController(MODE_CYCLE_DENSITY_PREVIEW_STYLE);
-  c.setLabel(this.controlLabels.get(MODE_CYCLE_DENSITY_PREVIEW_STYLE) + ": " + densityPreviewStyle);
-  
-  if (densityPreviewStyle == DENSITY_PREVIEW_STYLE_COUNT) {
-    densityPreviewStyle = 0;
-  }
-  else {
-    densityPreviewStyle++;
-  }
+  println("In dropdown_mode_cycleDensityPreviewStyle");
+  densityPreviewStyle = index;
+  println("Style: " + densityPreviewStyle);
 }
 
 void numberbox_mode_changeDensityPreviewPosterize(int value) {
@@ -760,20 +756,17 @@ void numberbox_mode_changePolygonizerLength(float value) {
   setupPolygonizer();
 }
 
-
-void button_mode_cyclePolygonizer() 
-{
-  
-  // this is a bit silly for only two choices
-  if (polygonizer == 1) {
-    polygonizer = 0;
-  }
-  else {
-    polygonizer++;
-  }
+void numberbox_mode_changePolygonizerAdaptativeAngle(float value) {
+  println("numberbox_mode_changePolygonizerAdaptativeAngle");
+  polygonizerAdaptativeAngle = value;
   setupPolygonizer();
-  Controller c = cp5.getController(MODE_CHANGE_POLYGONIZER);
-  c.setLabel(this.controlLabels.get(MODE_CHANGE_POLYGONIZER) + ": " + polygonizer);
+}
+
+
+void dropdown_mode_changePolygonizer(int value) 
+{
+  polygonizer = value;
+  setupPolygonizer();
 }
 
 

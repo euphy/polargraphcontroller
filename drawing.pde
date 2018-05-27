@@ -912,12 +912,12 @@ List<PVector> filterPointsLowPass(RPoint[] points, long filterParam, float scali
     {
       p = scaled.get(j);
       // and even then, only bother drawing if it's a move of over "x" steps
-      int diffx = int(p.x) - int(result.get(result.size()-1).x);
-      int diffy = int(p.y) - int(result.get(result.size()-1).y);
+      int diffx = abs(int(p.x) - int(result.get(result.size()-1).x));
+      int diffy = abs(int(p.y) - int(result.get(result.size()-1).y));
 
-      if (abs(diffx) > filterParam || abs(diffy) > filterParam)
+      if (diffx > filterParam || diffy > filterParam)
       {
-        println(j + ". Adding point " + p + ", last: " + result.get(result.size()-1));
+        println(j + ". Adding point " + p + " because diffx (" + diffx + ") or diffy (" + diffy + ") is > " + filterParam + ", last: " + result.get(result.size()-1));
         result.add(p);
       }
     }

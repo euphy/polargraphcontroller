@@ -186,9 +186,15 @@ class Machine
     return mmInt;
   }
   
+  public float inMMFloat(float steps) 
+  {
+    double mm = steps / getStepsPerMM();
+    return (float) mm;
+  }
+  
   public PVector inMM (PVector steps)
   {
-    PVector mm = new PVector(inMM(steps.x), inMM(steps.y));
+    PVector mm = new PVector(inMMFloat(steps.x), inMMFloat(steps.y));
     return mm;
   }
   
@@ -322,8 +328,8 @@ class Machine
   
   public PVector asCartesianCoords(PVector pgCoords)
   {
-    float calcX = int((pow(getWidth(), 2) - pow(pgCoords.y, 2) + pow(pgCoords.x, 2)) / (getWidth()*2));
-    float calcY = int(sqrt(pow(pgCoords.x,2)-pow(calcX,2)));
+    float calcX = (pow(getWidth(), 2.0) - pow(pgCoords.y, 2.0) + pow(pgCoords.x, 2.0)) / (getWidth()*2.0);
+    float calcY = sqrt(pow(pgCoords.x,2.0)-pow(calcX,2.0));
     PVector vect = new PVector(calcX, calcY);
     return vect;
   }

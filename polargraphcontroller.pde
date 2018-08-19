@@ -2383,6 +2383,16 @@ void readMachinePosition(String sync)
     currentMachinePos.y = b;  
     currentMachinePos = getDisplayMachine().inMM(getDisplayMachine().asCartesianCoords(currentMachinePos));
   }
+  else if (splitted.length == 5)
+  {
+    String currentAPos = splitted[2];
+    String currentBPos = splitted[3];
+    Float a = Float.valueOf(currentAPos).floatValue();
+    Float b = Float.valueOf(currentBPos).floatValue();
+    currentMachinePos.x = a;
+    currentMachinePos.y = b;  
+    currentMachinePos = getDisplayMachine().inMM(getDisplayMachine().asCartesianCoords(currentMachinePos));
+  }
 }
 void readCartesianMachinePosition(String sync)
 {

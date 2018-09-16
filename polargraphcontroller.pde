@@ -54,8 +54,8 @@ import java.awt.BorderLayout;
 import java.lang.reflect.Method;
 
 int majorVersionNo = 2;
-int minorVersionNo = 5;
-int buildNo = 2;
+int minorVersionNo = 6;
+int buildNo = 0;
 
 String programTitle = "Polargraph Controller v" + majorVersionNo + "." + minorVersionNo + " build " + buildNo;
 ControlP5 cp5;
@@ -249,6 +249,7 @@ static final String MODE_CHANGE_SAMPLE_AREA = "numberbox_mode_changeSampleArea";
 static final String MODE_CHANGE_GRID_SIZE = "numberbox_mode_changeGridSize";
 
 static final String MODE_SHOW_DENSITY_PREVIEW = "minitoggle_mode_showDensityPreview";
+
 static final String MODE_SHOW_IMAGE = "minitoggle_mode_showImage";
 static final String MODE_SHOW_QUEUE_PREVIEW = "minitoggle_mode_showQueuePreview";
 static final String MODE_SHOW_VECTOR = "minitoggle_mode_showVector";
@@ -346,7 +347,16 @@ static final String MODE_CHANGE_POLYGONIZER = "dropdown_mode_changePolygonizer";
 static final String MODE_CHANGE_POLYGONIZER_LENGTH = "numberbox_mode_changePolygonizerLength";
 static final String MODE_CHANGE_POLYGONIZER_ADAPTATIVE_ANGLE = "numberbox_mode_changePolygonizerAdaptativeAngle";
 
+static final String MODE_CHANGE_INVERT_MASK = "dropdown_mode_changeMaskInvert";
+
+
 List<String> polygonizerStyles = Arrays.asList("ADAPTATIVE", "UNIFORMLENGTH");
+
+List<String> invertMaskModes = Arrays.asList("Mask off", "Mask hides", "Mask shows");
+static final int MASK_MODES_COUNT = 3;
+static final int MASK_IS_UNUSED = 0;
+static final int MASKED_COLOURS_ARE_HIDDEN = 1;
+static final int MASKED_COLOURS_ARE_SHOWN = 2;
 
 
 PVector statusTextPosition = new PVector(300.0, 12.0);
@@ -412,6 +422,7 @@ static final char BITMAP_BACKGROUND_COLOUR = 0x0F;
 PVector homePointCartesian = null;
 
 public color chromaKeyColour = color(0,255,0);
+public int invertMaskMode = MASK_IS_UNUSED;
 
 // used in the preview page
 public color pageColour = color(220);
@@ -1554,6 +1565,11 @@ void setChromaKey(PVector p)
 {
   color col = getDisplayMachine().getPixelAtScreenCoords(p); 
   chromaKeyColour = col;
+  rebuildPixels();
+}
+
+void rebuildPixels()
+{
   if (getDisplayMachine().pixelsCanBeExtracted() && isBoxSpecified())
   {
     getDisplayMachine().extractPixelsFromArea(getBoxVector1(), getBoxVectorSize(), getGridSize(), sampleArea);
@@ -2373,10 +2389,24 @@ void readMachineMessage(String msg)
 void readMachinePosition(String sync)
 {
   String[] splitted = split(sync, ",");
+  int aPosIndex = 0;
+  int bPosIndex = 0;
+  
   if (splitted.length == 4)
   {
-    String currentAPos = splitted[1];
-    String currentBPos = splitted[2];
+    aPosIndex = 1;
+    bPosIndex = 2;
+  } 
+  else if (splitted.length == 5)
+  {
+    aPosIndex = 2;
+    bPosIndex = 3;
+  }
+  
+  if (aPosIndex != 0)
+  {
+    String currentAPos = splitted[aPosIndex];
+    String currentBPos = splitted[bPosIndex];
     Float a = Float.valueOf(currentAPos).floatValue();
     Float b = Float.valueOf(currentBPos).floatValue();
     currentMachinePos.x = a;

@@ -279,9 +279,9 @@ Map<String, Controller> buildAllControls()
     {
       Button b = cp5.addButton(controlName, 0, 100, 100, 100, 100);
       b.setLabel(getControlLabels().get(controlName));
-      controlP5.Label l = b.getCaptionLabel();
-      l.getStyle().marginLeft = 4; //move to the right
       b.hide();
+      controlP5.Label l = b.getCaptionLabel();
+      l.align(ControlP5.LEFT, CENTER);
       map.put(controlName, b);
       //      println("Added button " + controlName);
     }
@@ -291,8 +291,8 @@ Map<String, Controller> buildAllControls()
       t.setLabel(getControlLabels().get(controlName));
       t.hide();
       controlP5.Label l = t.getCaptionLabel();
-      l.getStyle().marginTop = -17; //move upwards (relative to button size)
-      l.getStyle().marginLeft = 4; //move to the right
+      l.align(ControlP5.LEFT, CENTER);
+      l.getStyle().setPaddingLeft(4);
       map.put(controlName, t);
       //      println("Added toggle " + controlName);
     }
@@ -302,8 +302,8 @@ Map<String, Controller> buildAllControls()
       t.setLabel(getControlLabels().get(controlName));
       t.hide();
       controlP5.Label l = t.getCaptionLabel();
-      l.getStyle().marginTop = -17; //move upwards (relative to button size)
-      l.getStyle().marginLeft = 4; //move to the right
+      l.align(ControlP5.LEFT, CENTER);
+      l.getStyle().setPaddingLeft(4);
       map.put(controlName, t);
       //      println("Added minitoggle " + controlName);
     }
@@ -314,8 +314,8 @@ Map<String, Controller> buildAllControls()
       n.hide();
       n.setDecimalPrecision(0);
       controlP5.Label l = n.getCaptionLabel();
-      l.getStyle().marginTop = -17; //move upwards (relative to button size)
-      l.getStyle().marginLeft = 40; //move to the right
+      l.align(ControlP5.LEFT, CENTER);
+      l.getStyle().setPaddingLeft(35);
       // change the control direction to left/right
       n.setDirection(Controller.VERTICAL);
       map.put(controlName, n);
@@ -688,6 +688,12 @@ Map<String, Controller> initialiseDropdownContents(Map<String, Controller> map)
       ScrollableList sl = (ScrollableList) map.get(key);
       sl.setItems(polygonizerStyles);
     }
+    if (MODE_CHANGE_INVERT_MASK.equals(key))
+    {
+      println("Adding " + key);
+      ScrollableList sl = (ScrollableList) map.get(key);
+      sl.setItems(invertMaskModes);
+    }
   }
   return map;
 }
@@ -705,6 +711,13 @@ Map<String, Controller> initialiseDropdownValues(Map<String, Controller> map)
       sl.close();
     }
     else if (MODE_CHANGE_POLYGONIZER.equals(key))
+    {
+      println("Adding " + key);
+      ScrollableList sl = (ScrollableList) map.get(key);
+      sl.setValue(polygonizer);
+      sl.close();
+    }
+    else if (MODE_CHANGE_INVERT_MASK.equals(key))
     {
       println("Adding " + key);
       ScrollableList sl = (ScrollableList) map.get(key);
@@ -850,6 +863,7 @@ List<String> getControlNamesForInputPanel()
   controlNames.add(MODE_CHANGE_GRID_SIZE);
   controlNames.add(MODE_CHANGE_SAMPLE_AREA);
   controlNames.add(MODE_CHOOSE_CHROMA_KEY_COLOUR);
+  controlNames.add(MODE_CHANGE_INVERT_MASK);
   controlNames.add(MODE_CHANGE_PIXEL_SCALING);
 
   controlNames.add(MODE_RENDER_PIXEL_DIALOG);
@@ -1105,6 +1119,7 @@ Map<String, String> buildControlLabels()
   result.put(MODE_MOVE_VECTOR, "Move vector");
   result.put(MODE_RENDER_PIXEL_DIALOG, "Render pixels...");
   result.put(MODE_CHOOSE_CHROMA_KEY_COLOUR, "Choose mask colour");
+  result.put(MODE_CHANGE_INVERT_MASK, "Mask mode");
   result.put(MODE_CHANGE_PIXEL_SCALING, "Pixel scaling");
   
   result.put(MODE_PEN_LIFT_UP, "Pen lift");
@@ -1260,6 +1275,7 @@ Set<String> buildControlNames()
   result.add(MODE_CHANGE_MIN_VECTOR_LINE_LENGTH);
   
   result.add(MODE_CHOOSE_CHROMA_KEY_COLOUR);
+  result.add(MODE_CHANGE_INVERT_MASK);
   result.add(MODE_CHANGE_PIXEL_SCALING);
   result.add(MODE_PEN_LIFT_UP);
   result.add(MODE_PEN_LIFT_DOWN);

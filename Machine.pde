@@ -292,6 +292,16 @@ class Machine
     }
   }
 
+  boolean isMasked(PVector pos, float scalingFactor)
+  {
+    switch (invertMaskMode) {
+      case MASK_IS_UNUSED:  return false;
+      case MASKED_COLOURS_ARE_HIDDEN:  return isChromaKey(pos, scalingFactor);
+      case MASKED_COLOURS_ARE_SHOWN:  return !isChromaKey(pos, scalingFactor);
+      default:  return false;
+    }
+  }
+
   boolean isChromaKey(PVector pos, float scalingFactor)
   {
     if (getImageFrame().surrounds(pos))
@@ -626,7 +636,7 @@ class Machine
         PVector cartesianCoord = asCartesianCoords(nativeCoord);
         if (selectedArea.surrounds(cartesianCoord))
         {
-          if (isChromaKey(cartesianCoord, scalingFactor))
+          if (isMasked(cartesianCoord, scalingFactor))
           {
             nativeCoord.z = MASKED_PIXEL_BRIGHTNESS; // magic number
             nativeCoords.add(nativeCoord);

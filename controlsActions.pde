@@ -762,11 +762,16 @@ void numberbox_mode_changePolygonizerAdaptativeAngle(float value) {
   setupPolygonizer();
 }
 
-
 void dropdown_mode_changePolygonizer(int value) 
 {
   polygonizer = value;
   setupPolygonizer();
+}
+
+void dropdown_mode_changeMaskInvert(int value)
+{
+  invertMaskMode = value;
+  rebuildPixels();
 }
 
 

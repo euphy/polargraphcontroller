@@ -2,7 +2,7 @@ polargraphcontroller
 ====================
 
 Polargraph controller
-Copyright Sandy Noble 2015.
+Copyright Sandy Noble 2018.
 
 - Requires the excellent ControlP5 GUI library available from https://github.com/sojamo/controlp5.
 - Requires the excellent Geomerative library available from http://www.ricardmarxer.com/geomerative/.

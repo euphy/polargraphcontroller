@@ -843,8 +843,17 @@ void drawImagePage()
 
   showGroupBox();
   showCurrentMachinePosition();
-  if (displayingQueuePreview)
-    previewQueue();
+
+  try {
+    if (displayingQueuePreview)
+      previewQueue();
+  }
+  catch (ConcurrentModificationException cme)
+  {
+    // not sure why this prompts an exception. Will revisit this another day.
+    println("Caught CME coming from previewQueue(): " + cme.getMessage());
+  }
+
   if (displayingInfoTextOnInputPage)
     showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);

@@ -13,5 +13,7 @@ This is a desktop application for controlling a polargraph machine, communicatin
 The [latest releases bundle] (https://github.com/euphy/polargraphcontroller/releases/latest) contains 
 copies of all the libraries that I use, as well as all the source, and compiled versions of the code where sensible.
 
+How to [run it from source](https://github.com/euphy/polargraph/wiki/Running-the-controller-from-source-code).
+
 sandy.noble@gmail.com
 http://www.polargraph.co.uk/

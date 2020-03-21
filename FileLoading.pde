@@ -322,6 +322,9 @@ RShape loadShapeFromGCodeFile(String filename) {
             drawLine = false;
           }
         }
+        else { //  if there is no Z axis, assume it's always on
+//          drawLine = true; // this isn't always safe!
+        }        
         
         Float x = ins.get("X");
         Float y = ins.get("Y");

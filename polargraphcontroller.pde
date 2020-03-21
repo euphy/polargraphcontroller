@@ -685,7 +685,7 @@ void addEventListeners()
 
 void preLoadCommandQueue()
 {
-  addToCommandQueue(CMD_CHANGEPENWIDTH+currentPenWidth+",END");
+  addToCommandQueue(CMD_SETPENWIDTH+currentPenWidth+",END");
   addToCommandQueue(CMD_SETMOTORSPEED+currentMachineMaxSpeed+",END");
   addToCommandQueue(CMD_SETMOTORACCEL+currentMachineAccel+",END");
 }
@@ -819,6 +819,7 @@ Panel getPanel(String panelName)
 
 void drawImagePage()
 {
+  noLoop();
   strokeWeight(1);
   background(getBackgroundColour());
   noFill();
@@ -843,13 +844,21 @@ void drawImagePage()
 
   showGroupBox();
   showCurrentMachinePosition();
-  if (displayingQueuePreview)
-    previewQueue();
+  try {
+    if (displayingQueuePreview)
+      previewQueue();
+  }
+  catch (ConcurrentModificationException cme)
+  {
+    // not doing anything with this exception - I don't mind if it's wrong on the screen for a second or two.
+    println("Caught the pesky ConcurrentModificationException: " + cme.getMessage());
+  }
   if (displayingInfoTextOnInputPage)
     showText(250,45);
   drawStatusText((int)statusTextPosition.x, (int)statusTextPosition.y);
 
   showCommandQueue((int) getDisplayMachine().getOutline().getRight()+6, 20);
+ 
 }
 
 void drawMachineOutline()
@@ -1367,6 +1376,7 @@ void keyPressed()
 }
 void mouseDragged()
 {
+  loop();
   if (mouseOverControls().isEmpty())
   {
     if (mouseButton == CENTER)
@@ -1383,6 +1393,10 @@ void mouseDragged()
       }
     }
   }
+}
+void mouseMoved()
+{
+  loop();
 }
   
 void mouseClicked()

@@ -533,12 +533,14 @@ void numberbox_mode_changeMachineWidth(float value)
   clearBoxVectors();
   float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getSize().x = steps;
+  getDisplayMachine().maxLength = null;
 }
 void numberbox_mode_changeMachineHeight(float value)
 {
   clearBoxVectors();
   float steps = getDisplayMachine().inSteps((int) value);
   getDisplayMachine().getSize().y = steps;
+  getDisplayMachine().maxLength = null;
 }
 void numberbox_mode_changeMMPerRev(float value)
 {
@@ -615,7 +617,7 @@ void button_mode_sendPenWidth()
   NumberFormat nf = NumberFormat.getNumberInstance(Locale.UK);
   DecimalFormat df = (DecimalFormat)nf;  
   df.applyPattern("###.##");
-  addToRealtimeCommandQueue(CMD_CHANGEPENWIDTH+df.format(currentPenWidth)+",END");
+  addToRealtimeCommandQueue(CMD_SETPENWIDTH+df.format(currentPenWidth)+",END");
 }  
 
 void numberbox_mode_changePenTestStartWidth(float value)

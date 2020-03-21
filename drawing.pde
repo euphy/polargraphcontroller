@@ -27,9 +27,9 @@
   https://github.com/euphy/polargraphcontroller
 */
 static final String CMD_CHANGELENGTH = "C01,";
-static final String CMD_CHANGEPENWIDTH = "C02,";
-static final String CMD_CHANGEMOTORSPEED = "C03,";
-static final String CMD_CHANGEMOTORACCEL = "C04,";
+static final String CMD_SETPENWIDTH = "C02,";
+//static final String CMD_CHANGEMOTORSPEED = "C03,";
+//static final String CMD_CHANGEMOTORACCEL = "C04,";
 static final String CMD_DRAWPIXEL = "C05,";
 static final String CMD_DRAWSCRIBBLEPIXEL = "C06,";
 static final String CMD_DRAWRECT = "C07,";
